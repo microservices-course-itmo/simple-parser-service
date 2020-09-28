@@ -1,6 +1,6 @@
-package com.wine.to.up.demo.service.repository;
+package com.wine.to.up.simple.parser.service.repository;
 
-import com.wine.to.up.demo.service.domain.entity.Message;
+import com.wine.to.up.simple.parser.service.domain.entity.Message;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -14,6 +14,7 @@ import java.util.UUID;
 public interface MessageRepository extends CrudRepository<Message, UUID> {
     /**
      * Define our custom method using HQL language
+     * 
      * @return list of distinct message stored in DB
      */
     @Query("SELECT DISTINCT m.content FROM Message m")
