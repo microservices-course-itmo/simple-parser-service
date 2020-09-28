@@ -1,5 +1,6 @@
 package com.wine.to.up.simple.parser.service;
 
+import com.wine.to.up.simple.parser.service.SimpleParser.WineShop;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
