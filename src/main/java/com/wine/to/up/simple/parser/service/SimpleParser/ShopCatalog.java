@@ -67,6 +67,7 @@ public class ShopCatalog {
             e.printStackTrace();
         }finally{
             try {
+                assert fr != null;
                 fr.close();
             } catch (IOException e) {
                 e.printStackTrace();
