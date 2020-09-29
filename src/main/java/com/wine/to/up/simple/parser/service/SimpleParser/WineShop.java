@@ -43,8 +43,7 @@ public class WineShop {
     }
 
     //write object info to file
-    public void infoToFile(String filePath) {
-        File file = new File(filePath);
+    public void infoToFile(File file) {
         FileWriter fileWriter = null;
         try {
             fileWriter = new FileWriter(file, true);
@@ -54,6 +53,7 @@ public class WineShop {
             e.printStackTrace();
         } finally {
             try {
+                assert fileWriter != null;
                 fileWriter.close();
             } catch (IOException e) {
                 e.printStackTrace();
