@@ -28,7 +28,7 @@ public class Brands {
     }
 
     @SneakyThrows
-    public void writeInfoToFile(Brands someBrand){
+    public void writeInfoToFile(Brands someBrand) {
         FileWriter writer = new FileWriter("Brands.txt", false);
         writer.write(someBrand.toString() + "\n");
         writer.flush();

@@ -12,7 +12,7 @@ public class ShopCatalog {
     private int shopID;
     private int price;
 
-    //ArrayList<Shops> shops = new ArrayList<Shops>(); - возможно нужно будет добавить сюда лист магазинов
+    ArrayList<WineShop> shops = new ArrayList<>();
 
     public int getWineID() {
         return wineID;
@@ -77,12 +77,10 @@ public class ShopCatalog {
 
     @Override
     public String toString() {
-        return "ShopCatalog{" +
-                "wineID=" + wineID +
-                ", wineShopID=" + wineShopID +
-                ", shopID=" + shopID +
-                ", price=" + price +
-                '}';
+        return "wineID: " + wineID +
+                ", wineShopID: " + wineShopID +
+                ", shopID: " + shopID +
+                ", price: " + price;
     }
 }
 
