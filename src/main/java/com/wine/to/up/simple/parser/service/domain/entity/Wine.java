@@ -4,7 +4,6 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.io.File;
-import java.io.FileWriter;
 import java.util.UUID;
 
 @Entity
@@ -15,18 +14,22 @@ import java.util.UUID;
 @ToString
 public class Wine {
     @Id
-    @Column(name = "wineid")
+    @Column(name = "wineId")
     private UUID wineID = UUID.randomUUID();
+
+    @Column(name = "name")
+    private String name;
+
     @Column(name = "picture")
     private File picture;
 
-    @OneToOne
-    @JoinColumn(name = "brandid", referencedColumnName = "brandid")
+    @ManyToOne
+    @JoinColumn(name = "brandId", referencedColumnName = "brandId")
     @NonNull
     private Brands brandID;
 
-    @OneToOne
-    @JoinColumn(name = "countryid", referencedColumnName = "countryid")
+    @ManyToOne
+    @JoinColumn(name = "countryId", referencedColumnName = "countryId")
     @NonNull
     private Countries countryID;
 
@@ -36,34 +39,22 @@ public class Wine {
     @Column(name = "abv")
     private Float abv; // alcohol by volume
 
-    @Column(name = "colortype")
+    @Column(name = "colorType")
     @NonNull
     private String colorType;
 
-    @Column(name = "sugartype")
+    @Column(name = "sugarType")
     @NonNull
     private String sugarType;
 
-    // @OneToMany
-    // @JoinColumn(name = "winegrapesid", referencedColumnName = "winegrapesid")
-    // private List<WineGrapesInfo> wineGrapesID;
-
-    public Wine(@NonNull Brands brandID, @NonNull Countries countryID, @NonNull Float volume, @NonNull Float abv,
-            @NonNull String colorType, @NonNull String sugarType) {
+    public Wine(@NonNull String name, @NonNull Brands brandID, @NonNull Countries countryID, @NonNull Float volume, @NonNull Float abv,
+                @NonNull String colorType, @NonNull String sugarType) {
+        this.name = name;
         this.brandID = brandID;
         this.countryID = countryID;
         this.volume = volume;
         this.abv = abv;
         this.colorType = colorType;
         this.sugarType = sugarType;
-        // this.wineGrapesID = wineGrapesID;
     }
-
-    @SneakyThrows
-    public void writeInfoToFile(Wine someWine) {
-        FileWriter writer = new FileWriter("Wine.txt", false);
-        writer.write(someWine.toString() + "\n");
-        writer.flush();
-    }
-
 }

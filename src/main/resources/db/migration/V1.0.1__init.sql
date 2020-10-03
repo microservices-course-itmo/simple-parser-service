@@ -1,33 +1,39 @@
+DROP TABLE IF EXISTS wine CASCADE;
+DROP TABLE IF EXISTS winegrapesinfo CASCADE;
+DROP TABLE IF EXISTS wine_grapes CASCADE;
+DROP TABLE IF EXISTS grapes CASCADE;
+DROP TABLE IF EXISTS brands CASCADE;
+DROP TABLE IF EXISTS countries CASCADE;
 
-CREATE TABLE Grapes (
-    grapeid UUID PRIMARY KEY,
-    grapename TEXT NOT NULL UNIQUE
+CREATE TABLE grapes (
+    grape_id UUID PRIMARY KEY,
+    grape_name TEXT NOT NULL UNIQUE
 );
 
-CREATE TABLE Brands (
-    brandID UUID PRIMARY KEY UNIQUE,
-    brandName TEXT NOT NULL UNIQUE
+CREATE TABLE brands (
+    brand_id UUID PRIMARY KEY UNIQUE,
+    brand_name TEXT NOT NULL UNIQUE
 );
 
-CREATE TABLE Countries (
-    countryID UUID PRIMARY KEY UNIQUE,
-    countryName TEXT NOT NULL UNIQUE
+CREATE TABLE countries (
+    country_id UUID PRIMARY KEY UNIQUE,
+    country_name TEXT NOT NULL UNIQUE
 );
 
-CREATE TABLE WineGrapesInfo (
-                                ID uuid PRIMARY KEY,
-                                wineGrapesID UUID,
-                                grapeID UUID REFERENCES Grapes(grapeID)  NOT NULL
-);
-
-CREATE TABLE Wine (
-    wineID UUID PRIMARY KEY,
-    picture BYTEA NOT NULL,
-    branID UUID REFERENCES Brands(brandID)  NOT NULL,
-    countryID UUID REFERENCES Countries(countryID)  NOT NULL,
+CREATE TABLE wine (
+    wine_id UUID PRIMARY KEY,
+    name TEXT NOT NULL,
+    picture BYTEA,
+    brand_id UUID REFERENCES brands(brand_id)  NOT NULL,
+    country_id UUID REFERENCES countries(country_id)  NOT NULL,
     volume FLOAT NOT NULL,
     abv FLOAT NOT NULL,
-    colorType TEXT NOT NULL,
-    sugarType TEXT NOT NULL,
-    wineGrapesID UUID NOT NULL
+    color_type TEXT NOT NULL,
+    sugar_type TEXT NOT NULL
+);
+
+CREATE TABLE wine_grapes (
+     id uuid PRIMARY KEY,
+     wine_id UUID REFERENCES  wine(wine_id) NOT NULL,
+     grape_id UUID REFERENCES grapes(grape_id)  NOT NULL
 );
