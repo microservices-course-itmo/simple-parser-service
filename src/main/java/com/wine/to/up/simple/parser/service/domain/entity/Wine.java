@@ -33,6 +33,9 @@ public class Wine {
     @NonNull
     private Countries countryID;
 
+    @Column(name = "price")
+    private float price;
+
     @Column(name = "volume")
     private Float volume;
 
@@ -47,14 +50,20 @@ public class Wine {
     @NonNull
     private String sugarType;
 
-    public Wine(@NonNull String name, @NonNull Brands brandID, @NonNull Countries countryID, @NonNull Float volume, @NonNull Float abv,
-                @NonNull String colorType, @NonNull String sugarType) {
+    @Column(name = "grapeType")
+    private String grapeType;
+
+
+    public Wine(@NonNull String name, @NonNull Brands brandID, @NonNull Countries countryID, @NonNull Float price, @NonNull Float volume, @NonNull Float abv,
+                @NonNull String colorType, @NonNull String sugarType, @NonNull String grapeType) {
         this.name = name;
         this.brandID = brandID;
         this.countryID = countryID;
+        this.price = price;
         this.volume = volume;
         this.abv = abv;
         this.colorType = colorType;
         this.sugarType = sugarType;
+        this.grapeType = grapeType;
     }
 }
