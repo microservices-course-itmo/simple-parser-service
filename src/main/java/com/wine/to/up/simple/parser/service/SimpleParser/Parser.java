@@ -8,38 +8,37 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class Parser {
     private final String URL = "https://simplewine.ru";
-    private final int PAGES_TO_PARSE = 21; // < 132
+    private final int PAGES_TO_PARSE = 21; // currently max 132, lower const value for testing purposes
     private Document doc;
     private Document wineDocument;
     private ArrayList<String> wineURLs;
-    private ArrayList<Wine> WineCatalog;
-    // private Logger logger;
-    int n_pages;
+    private ArrayList<Wine> wineCatalog;
+    private int numberOfPages;
 
-    public Parser() throws IOException {
+    public Parser() {
         wineURLs = new ArrayList<String>();
-        WineCatalog = new ArrayList<Wine>();
-        // logger = LoggerFactory.getLogger("ParserLogger");
+        wineCatalog = new ArrayList<Wine>();
     }
 
     public ArrayList<Wine> startParser() throws IOException {
-        String name = "";
+        String wineName = "";
         String brandID = "";
         String countryID = "";
-        float volume = 0;
-        String price = "";
-        int year = 0;
-        float abv = 0;
+        float bottleVolume = 0;
+        String bottlePrice = "";
+        int bottleYear = 0;
+        float bottleABV = 0;
         String colorType = "";
         String sugarType = "";
         String grapeType = "";
-        String[] name_year;
 
         doc = Jsoup.connect(URL + "/catalog/vino/").get();
-        int temp = doc.getElementsByAttributeValue("class", "pagination__navigation").size();
-        n_pages = Integer
+        numberOfPages = Integer
                 .parseInt(doc.getElementsByAttributeValue("class", "pagination__navigation").get(0).child(7).text());
 
         for (int i = 1; i < PAGES_TO_PARSE; i++) {
@@ -47,9 +46,10 @@ public class Parser {
             Elements wines = doc.getElementsByAttributeValue("class", "catalog-grid__item");
 
             for (Element wine : wines) {
-                name_year = wine.getElementsByAttributeValue("class", "product-snippet__name").text().split(", ");
-                name = name_year[0].replaceFirst("Вино ", "");
-                price = wine.getElementsByAttributeValue("class", "product-snippet__price").attr("content");
+                String[] NameAndYear = wine.getElementsByAttributeValue("class", "product-snippet__name").text()
+                        .split(", ");
+                wineName = NameAndYear[0].replaceFirst("Вино ", "");
+                bottlePrice = wine.getElementsByAttributeValue("class", "product-snippet__price").attr("content");
 
                 Elements wine_Elements = wine.getElementsByAttributeValue("class", "product-snippet__info-item");
 
@@ -66,7 +66,7 @@ public class Parser {
                             sugarType = wine_Element.child(1).text();
                             break;
                         case "Объем:":
-                            volume = Float.parseFloat(wine_Element.child(1).text().split(" ")[0]);
+                            bottleVolume = Float.parseFloat(wine_Element.child(1).text().split(" ")[0]);
                             break;
                         case "Производитель:":
                             brandID = wine_Element.child(1).text();
@@ -81,10 +81,11 @@ public class Parser {
                     }
                 }
                 wineURLs.add(wine.getElementsByAttributeValue("class", "product-snippet__name").attr("href"));
-                WineCatalog.add(new Wine(name, brandID, countryID, price, volume, abv, colorType, sugarType));
-                // logger.info("New wine was added to the catalog");
+                wineCatalog.add(new Wine(wineName, brandID, countryID, bottlePrice, bottleVolume, bottleABV, colorType,
+                        sugarType));
+                log.info("New wine was added to the catalog");
             }
         }
-        return WineCatalog;
+        return wineCatalog;
     }
 }
