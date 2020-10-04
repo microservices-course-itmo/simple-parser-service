@@ -23,6 +23,8 @@
         <service.commonlib.version>0.2.1-SNAPSHOT</service.commonlib.version>
         <!--        TODO create-service: replace-->
         <demo.service.api.version>0.3.0-SNAPSHOT</demo.service.api.version>
+        
+        <org.jsoup.version>1.13.1</org.jsoup.version>
     </properties>
 
     <dependencies>
@@ -35,7 +37,7 @@
         <dependency>
              <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
-              <version>1.13.1</version>
+              <version>${org.jsoup.version}</version>
         </dependency>
 
         <!-- Required: Spring-->
