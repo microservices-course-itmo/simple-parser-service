@@ -33,11 +33,20 @@ public class Wine {
     @NonNull
     private Countries countryID;
 
+    @Column(name = "price")
+    private float price;
+
+    @Column(name = "discount")
+    private int discount;
+
     @Column(name = "volume")
     private Float volume;
 
     @Column(name = "abv")
     private Float abv; // alcohol by volume
+
+    @Column(name = "year")
+    private int year;
 
     @Column(name = "colorType")
     @NonNull
@@ -47,14 +56,35 @@ public class Wine {
     @NonNull
     private String sugarType;
 
-    public Wine(@NonNull String name, @NonNull Brands brandID, @NonNull Countries countryID, @NonNull Float volume, @NonNull Float abv,
-                @NonNull String colorType, @NonNull String sugarType) {
+    @Column(name = "grapeType")
+    private String grapeType;
+
+
+    public Wine(@NonNull String name, @NonNull Brands brandID, @NonNull Countries countryID, @NonNull Float price, @NonNull Float volume, @NonNull Float abv,
+                @NonNull String colorType, @NonNull String sugarType, @NonNull String grapeType) {
         this.name = name;
         this.brandID = brandID;
         this.countryID = countryID;
+        this.price = price;
         this.volume = volume;
         this.abv = abv;
         this.colorType = colorType;
         this.sugarType = sugarType;
+        this.grapeType = grapeType;
+    }
+
+    public Wine(@NonNull String name, @NonNull Brands brandID, @NonNull Countries countryID, @NonNull Float price, int discount, @NonNull Float volume, @NonNull Float abv, int year,
+                @NonNull String colorType, @NonNull String sugarType, @NonNull String grapeType) {
+        this.name = name;
+        this.brandID = brandID;
+        this.countryID = countryID;
+        this.price = price;
+        this.discount = discount;
+        this.volume = volume;
+        this.abv = abv;
+        this.year = year;
+        this.colorType = colorType;
+        this.sugarType = sugarType;
+        this.grapeType = grapeType;
     }
 }

@@ -26,10 +26,14 @@ CREATE TABLE wine (
     picture BYTEA,
     brand_id UUID REFERENCES brands(brand_id)  NOT NULL,
     country_id UUID REFERENCES countries(country_id)  NOT NULL,
+    price FLOAT NOT NULL DEFAULT 0.0,
+    discount INTEGER DEFAULT 0,
     volume FLOAT NOT NULL,
     abv FLOAT NOT NULL,
+    year INTEGER DEFAULT -1,
     color_type TEXT NOT NULL,
-    sugar_type TEXT NOT NULL
+    sugar_type TEXT NOT NULL,
+    grape_type TEXT NOT NULL
 );
 
 CREATE TABLE wine_grapes (
