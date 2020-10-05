@@ -122,7 +122,7 @@ public class MainController {
     }
 
     @ResponseBody
-    @RequestMapping(path = "/")
+    @GetMapping(path = "/")
     public String home() {
         String html = "";
         html += "<ul>";

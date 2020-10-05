@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class Parser {
     private final String URL = "https://simplewine.ru";
-    private final int PAGES_TO_PARSE = 100; // currently max 132, lower const value for testing purposes
+    private final int PAGES_TO_PARSE = 108; // currently max 132, lower const value for testing purposes
     private Document doc;
     private Document wineDocument;
     private ArrayList<String> wineURLs;
@@ -111,6 +111,7 @@ public class Parser {
 
                 newWine.writeInfoToFile();
 
+                //A price check. bottlePrice may be empty if the wine is not in stock
                 if (!bottlePrice.isEmpty())
                     putInfoToDB();
             }
