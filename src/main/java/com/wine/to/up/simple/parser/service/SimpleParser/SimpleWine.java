@@ -38,11 +38,10 @@ public class SimpleWine {
 
     @SneakyThrows(IOException.class)
     public void writeInfoToFile() {
-        FileWriter writer;
-        writer = new FileWriter("Wine.txt", true);
+        FileWriter writer = new FileWriter("Wine.txt", true);
         writer.write(this.toString() + "\n");
         writer.flush();
-
+        writer.close();
     }
 
     @Override

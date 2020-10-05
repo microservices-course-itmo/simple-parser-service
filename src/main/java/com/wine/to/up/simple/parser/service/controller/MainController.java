@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Validated
 @Slf4j
-@RequestMapping(path = "/simpleparser")
+@RequestMapping(path = "/simple-parser")
 public class MainController {
 
     @Autowired
@@ -55,11 +55,11 @@ public class MainController {
     @ResponseBody
     public String addWine(@RequestParam String name, @RequestParam String brandS, @RequestParam String countryS, @RequestParam float price,
                           @RequestParam Float volume, @RequestParam Float abv, @RequestParam String colorType,
-                          @RequestParam String sugarType, @RequestParam List<String> wineGrapes){
+                          @RequestParam String sugarType, @RequestParam List<String> wineGrapes, @RequestParam int discount, @RequestParam int year){
 
         Brands brand=brandsRepository.findBrandByBrandName(brandS);
         Countries country=countriesRepository.findCountryByCountryName(countryS);
-        Wine newWine = new Wine(name, brand, country, price, volume, abv, colorType, sugarType, wineGrapes.toString());
+        Wine newWine = new Wine(name, brand, country, price, discount, volume, abv, year, colorType, sugarType, wineGrapes.toString());
         wineRepository.save(newWine);
 
         for(String someGrape: wineGrapes){
@@ -101,9 +101,7 @@ public class MainController {
         for (Countries someCountry : countries) {
             html += someCountry + "<br>";
         }
-
         return html;
-
     }
 
 //    @GetMapping(path="/all-wine-grapes")
@@ -120,7 +118,6 @@ public class MainController {
         for (Wine someWine : wines) {
             html += someWine + "<br>";
         }
-
         return html;
     }
 
@@ -129,10 +126,10 @@ public class MainController {
     public String home() {
         String html = "";
         html += "<ul>";
-        html += " <li><a href='/simpleparser/all-wines'>Show All Wines</a></li>";
-        html += " <li><a href='/simpleparser/all-countries'>Show All Countries</a></li>";
-        html += " <li><a href='/simpleparser/all-brands'>Show All Brands</a></li>";
-        html += " <li><a href='/simpleparser/all-grapes'>Show All Grapes</a></li>";
+        html += " <li><a href='/simple-parser/all-wines'>Show All Wines</a></li>";
+        html += " <li><a href='/simple-parser/all-countries'>Show All Countries</a></li>";
+        html += " <li><a href='/simple-parser/all-brands'>Show All Brands</a></li>";
+        html += " <li><a href='/simple-parser/all-grapes'>Show All Grapes</a></li>";
         html += "</ul>";
         return html;
     }

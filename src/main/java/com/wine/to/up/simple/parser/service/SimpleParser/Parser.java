@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class Parser {
     private final String URL = "https://simplewine.ru";
-    private final int PAGES_TO_PARSE = 21; // currently max 132, lower const value for testing purposes
+    private final int PAGES_TO_PARSE = 100; // currently max 132, lower const value for testing purposes
     private Document doc;
     private Document wineDocument;
     private ArrayList<String> wineURLs;
@@ -32,7 +32,8 @@ public class Parser {
     private String countryID = "";
     private float bottleVolume = 0;
     private String bottlePrice = "";
-    private int bottleYear = 0;
+    private String bottleDiscount = "";
+    private String bottleYear = "";
     private float bottleABV = 0;
     private String colorType = "";
     private String sugarType = "";
@@ -52,8 +53,8 @@ public class Parser {
     private WineRepository wineRepository;
 
     public Parser() {
-        wineURLs = new ArrayList<String>();
-        wineCatalog = new ArrayList<SimpleWine>();
+        wineURLs = new ArrayList<>();
+        wineCatalog = new ArrayList<>();
     }
 
     @SneakyThrows(IOException.class)
@@ -109,7 +110,9 @@ public class Parser {
                 wineCatalog.add(newWine);
 
                 newWine.writeInfoToFile();
-                putInfoToDB();
+
+                if (!bottlePrice.isEmpty())
+                    putInfoToDB();
             }
         }
         log.info("\tEnd of adding information to the database.");
@@ -142,6 +145,8 @@ public class Parser {
             grapeEntity = grapesRepository.findGrapeByGrapeName(this.grapeType);
 
         Float price = Float.parseFloat(this.bottlePrice.replace(" ", "").replace("₽", ""));
+        //int year = Integer.parseInt(this.bottleYear.replace(" г.", ""));
+        //int discount = Integer.parseInt(this.bottleDiscount.replace("-","").replace("%", ""));
         Wine wineEntity;
         if(!wineRepository.existsWineByNameAndPriceAndVolumeAndColorTypeAndSugarType(this.wineName, price, this.bottleVolume, this.colorType, this.sugarType)){
             wineEntity = new Wine(this.wineName, brandEntity, countryEntity, price,
