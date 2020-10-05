@@ -1,34 +1,38 @@
 package com.wine.to.up.simple.parser.service;
 
-import java.io.IOException;
-import java.util.ArrayList;
-
 import com.wine.to.up.simple.parser.service.SimpleParser.Parser;
-import com.wine.to.up.simple.parser.service.SimpleParser.Wine;
 
+import io.micrometer.core.instrument.util.JsonUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication
 @ComponentScan("com.wine.to.up")
 @EnableSwagger2
-public class ServiceApplication {
+@Slf4j
+@EnableScheduling
+public class ServiceApplication  {
+
+    private final Parser parser;
+
+    public ServiceApplication(Parser parser){
+        this.parser = parser;
+    }
 
     public static void main(String[] args) {
         SpringApplication.run(ServiceApplication.class, args);
-        try {
-            Parser parser = new Parser();
-            ArrayList<Wine> wines = parser.startParser();
-            for (Wine w : wines)
-                w.writeInfoToFile();
+    }
 
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
+    @Scheduled(fixedDelayString = "PT12H") //run once in 12 hours
+    void scheduledRunParser(){
+        log.info("SCHEDULED PARSER START");
+        parser.startParser();
     }
 
 }

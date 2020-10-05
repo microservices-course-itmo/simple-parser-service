@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Validated
 @Slf4j
-@RequestMapping(path = "/simpleparser")
+@RequestMapping(path = "/simple-parser")
 public class MainController {
 
     @Autowired
@@ -53,13 +53,13 @@ public class MainController {
 
     @PostMapping(path="/wine")
     @ResponseBody
-    public String addWine(@RequestParam String name, @RequestParam String brandS, @RequestParam String countryS,
+    public String addWine(@RequestParam String name, @RequestParam String brandS, @RequestParam String countryS, @RequestParam float price,
                           @RequestParam Float volume, @RequestParam Float abv, @RequestParam String colorType,
-                          @RequestParam String sugarType, @RequestParam List<String> wineGrapes){
+                          @RequestParam String sugarType, @RequestParam List<String> wineGrapes, @RequestParam int discount, @RequestParam int year){
 
         Brands brand=brandsRepository.findBrandByBrandName(brandS);
         Countries country=countriesRepository.findCountryByCountryName(countryS);
-        Wine newWine = new Wine(name, brand, country, volume, abv, colorType, sugarType);
+        Wine newWine = new Wine(name, brand, country, price, discount, volume, abv, year, colorType, sugarType, wineGrapes.toString());
         wineRepository.save(newWine);
 
         for(String someGrape: wineGrapes){
@@ -71,20 +71,37 @@ public class MainController {
 
     @GetMapping(path="/all-grapes")
     @ResponseBody
-    public Iterable<Grapes> getAllGrapes() {
-        return grapesRepository.findAll();
+    public String getAllGrapes() {
+        Iterable<Grapes> grapes =  grapesRepository.findAll();
+        String html = "";
+        for (Grapes someGrape : grapes) {
+            html += someGrape + "<br>";
+        }
+
+        return html;
     }
 
     @GetMapping(path="/all-brands")
     @ResponseBody
-    public Iterable<Brands> getAllBrands() {
-        return brandsRepository.findAll();
+    public String getAllBrands() {
+        Iterable<Brands> brands =  brandsRepository.findAll();
+        String html = "";
+        for (Brands someBrand : brands) {
+            html += someBrand + "<br>";
+        }
+
+        return html;
     }
 
     @GetMapping(path="/all-countries")
     @ResponseBody
-    public Iterable<Countries> getAllCountries() {
-        return countriesRepository.findAll();
+    public String getAllCountries() {
+        Iterable<Countries> countries =  countriesRepository.findAll();
+        String html = "";
+        for (Countries someCountry : countries) {
+            html += someCountry + "<br>";
+        }
+        return html;
     }
 
 //    @GetMapping(path="/all-wine-grapes")
@@ -95,7 +112,25 @@ public class MainController {
 
     @GetMapping(path="/all-wines")
     @ResponseBody
-    public Iterable<Wine> getAllWines() {
-        return wineRepository.findAll();
+    public String getAllWines() {
+        Iterable<Wine> wines =  wineRepository.findAll();
+        String html = "";
+        for (Wine someWine : wines) {
+            html += someWine + "<br>";
+        }
+        return html;
+    }
+
+    @ResponseBody
+    @GetMapping(path = "/")
+    public String home() {
+        String html = "";
+        html += "<ul>";
+        html += " <li><a href='/simple-parser/all-wines'>Show All Wines</a></li>";
+        html += " <li><a href='/simple-parser/all-countries'>Show All Countries</a></li>";
+        html += " <li><a href='/simple-parser/all-brands'>Show All Brands</a></li>";
+        html += " <li><a href='/simple-parser/all-grapes'>Show All Grapes</a></li>";
+        html += "</ul>";
+        return html;
     }
 }
