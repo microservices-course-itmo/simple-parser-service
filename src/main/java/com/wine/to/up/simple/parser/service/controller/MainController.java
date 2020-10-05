@@ -1,5 +1,6 @@
 package com.wine.to.up.simple.parser.service.controller;
 
+import com.wine.to.up.simple.parser.service.SimpleParser.Parser;
 import com.wine.to.up.simple.parser.service.domain.entity.*;
 import com.wine.to.up.simple.parser.service.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,14 @@ public class MainController {
     private WineGrapesRepository wineGrapesRepository;
     @Autowired
     private WineRepository wineRepository;
+    @Autowired
+    private Parser parser;
 
+    @PostMapping(path="/run-parser")
+    public String runParser(){
+        parser.startParser();
+        return "Parser started by request";
+    }
 
     @PostMapping(path="/grape")
     @ResponseBody

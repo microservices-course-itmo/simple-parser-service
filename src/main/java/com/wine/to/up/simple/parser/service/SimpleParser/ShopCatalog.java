@@ -1,7 +1,6 @@
 package com.wine.to.up.simple.parser.service.SimpleParser;
 
 import lombok.*;
-import lombok.experimental.FieldDefaults;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -16,7 +15,7 @@ public class ShopCatalog {
     private int price;
     private WineShop newShop;
 
-    public void writeToFile(String filePath, ShopCatalog shopCatalog) {
+    public void writeToFile(String filePath) {
         try (FileWriter fileWriter = new FileWriter(filePath, true)) {
             fileWriter.write(this.toString());
 
