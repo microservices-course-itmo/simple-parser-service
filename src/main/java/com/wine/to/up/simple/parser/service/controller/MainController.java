@@ -32,7 +32,7 @@ public class MainController {
     @Autowired
     private Parser parser;
 
-    @PostMapping(path="/run-parser")
+    @GetMapping(path="/run-parser")
     public String runParser(){
         parser.startParser();
         return "Parser started by request";
