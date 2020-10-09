@@ -57,15 +57,22 @@ public class Parser {
         wineCatalog = new ArrayList<>();
     }
 
-    @SneakyThrows(IOException.class)
     public ArrayList<SimpleWine> startParser() {
-        doc = Jsoup.connect(URL + "/catalog/vino/").get();
+        try {
+            doc = Jsoup.connect(URL + "/catalog/vino/").get();
+        } catch (IOException e) {
+            log.error("Catalog main page can`t be reached");
+        }
         numberOfPages = Integer
                 .parseInt(doc.getElementsByAttributeValue("class", "pagination__navigation").get(0).child(7).text());
 
         log.info("\tStart of adding information to the database.");
         for (int i = 1; i < PAGES_TO_PARSE; i++) {
-            doc = Jsoup.connect(URL + "/catalog/vino/page" + i).get();
+            try {
+                doc = Jsoup.connect(URL + "/catalog/vino/page" + i).get();
+            } catch (IOException e) {
+                log.error("\"/catalog/vino/page\"" + i + " can`t be reached");
+            }
             Elements wines = doc.getElementsByAttributeValue("class", "catalog-grid__item");
 
             for (Element wine : wines) {
@@ -111,7 +118,7 @@ public class Parser {
 
                 newWine.writeInfoToFile();
 
-                //A price check. bottlePrice may be empty if the wine is not in stock
+                // A price check. bottlePrice may be empty if the wine is not in stock
                 if (!bottlePrice.isEmpty())
                     putInfoToDB();
             }
@@ -146,17 +153,19 @@ public class Parser {
             grapeEntity = grapesRepository.findGrapeByGrapeName(this.grapeType);
 
         Float price = Float.parseFloat(this.bottlePrice.replace(" ", "").replace("₽", ""));
-        //int year = Integer.parseInt(this.bottleYear.replace(" г.", ""));
-        //int discount = Integer.parseInt(this.bottleDiscount.replace("-","").replace("%", ""));
+        // int year = Integer.parseInt(this.bottleYear.replace(" г.", ""));
+        // int discount =
+        // Integer.parseInt(this.bottleDiscount.replace("-","").replace("%", ""));
         Wine wineEntity;
-        if(!wineRepository.existsWineByNameAndPriceAndVolumeAndColorTypeAndSugarType(this.wineName, price, this.bottleVolume, this.colorType, this.sugarType)){
-            wineEntity = new Wine(this.wineName, brandEntity, countryEntity, price,
-                    this.bottleVolume, this.bottleABV, this.colorType, this.sugarType, this.grapeType);
+        if (!wineRepository.existsWineByNameAndPriceAndVolumeAndColorTypeAndSugarType(this.wineName, price,
+                this.bottleVolume, this.colorType, this.sugarType)) {
+            wineEntity = new Wine(this.wineName, brandEntity, countryEntity, price, this.bottleVolume, this.bottleABV,
+                    this.colorType, this.sugarType, this.grapeType);
             wineRepository.save(wineEntity);
             log.info("New Wine was added to DB: " + wineEntity.toString());
         } else
-            wineEntity = wineRepository.findWineByNameAndPriceAndVolumeAndColorTypeAndSugarType(this.wineName, price, this.bottleVolume, this.colorType, this.sugarType);
-
+            wineEntity = wineRepository.findWineByNameAndPriceAndVolumeAndColorTypeAndSugarType(this.wineName, price,
+                    this.bottleVolume, this.colorType, this.sugarType);
 
         WineGrapes wineGrapeEntity;
         if (!wineGrapesRepository.existsWineGrapesByGrapeIdAndAndWineId(grapeEntity, wineEntity)) {

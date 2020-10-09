@@ -9,7 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.UUID;
 
-//@ToString
+@ToString
 @NoArgsConstructor
 public class SimpleWine {
     private UUID wineID = UUID.randomUUID();
@@ -24,8 +24,8 @@ public class SimpleWine {
     private String price;
     private String name;
 
-    public SimpleWine(String name, String brandID, String countryID, String price, Float volume, Float abv, String colorType,
-                      String sugarType) {
+    public SimpleWine(String name, String brandID, String countryID, String price, Float volume, Float abv,
+            String colorType, String sugarType) {
         this.name = name;
         this.brandID = brandID;
         this.price = price;
@@ -44,10 +44,4 @@ public class SimpleWine {
         writer.close();
     }
 
-    @Override
-    public String toString() {
-        return "{name=" + this.name + ", brandID=" + this.brandID + ", countryID=" + this.countryID + ", price="
-                + this.price + ", volume=" + this.volume + ", abv=" + this.abv + ", colorType=" + this.colorType
-                + ", sugarType=" + this.sugarType + '}';
-    }
 }
