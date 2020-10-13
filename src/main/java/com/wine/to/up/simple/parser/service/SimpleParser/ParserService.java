@@ -11,6 +11,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+import com.wine.to.up.commonlib.messaging.KafkaMessageSender;
 import com.wine.to.up.parser.common.api.schema.UpdateProducts;
 import com.wine.to.up.simple.parser.service.repository.*;
 import org.jsoup.*;
@@ -33,6 +34,8 @@ public class ParserService {
     private static final String HOME_URL = URL + "/catalog/vino/";
     private static final String WINE_URL = URL + "/catalog/vino/page";
 
+    @Autowired
+    KafkaMessageSender<UpdateProducts.UpdateProductsMessage> kafkaSendMessageService;
     @Autowired
     private GrapesRepository grapesRepository;
     @Autowired
@@ -103,9 +106,9 @@ public class ParserService {
         wineParserService.shutdown();
         log.info("\tEnd of adding information to the database.");
 
-        // TODO: message to Kafka
-        message = UpdateProducts.UpdateProductsMessage.newBuilder().setShopLink(URL).addAllProducts(products).build();
 
+        message = UpdateProducts.UpdateProductsMessage.newBuilder().setShopLink(URL).addAllProducts(products).build();
+        kafkaSendMessageService.sendMessage(message);
         log.info("End of parsing, {} wines collected", products.size());
 
     }
