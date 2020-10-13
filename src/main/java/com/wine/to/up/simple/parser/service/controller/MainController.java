@@ -62,14 +62,13 @@ public class MainController {
     @PostMapping(path = "/wine")
     @ResponseBody
     public String addWine(@RequestParam String name, @RequestParam String brandS, @RequestParam String countryS,
-            @RequestParam float price, @RequestParam Float volume, @RequestParam Float abv,
-            @RequestParam String colorType, @RequestParam String sugarType, @RequestParam List<String> wineGrapes,
-            @RequestParam int discount, @RequestParam int year) {
+                          @RequestParam float price, @RequestParam Float volume, @RequestParam Float abv,
+                          @RequestParam String colorType, @RequestParam String sugarType, @RequestParam List<String> wineGrapes,
+                          @RequestParam int discount, @RequestParam int year) {
 
         Brands brand = brandsRepository.findBrandByBrandName(brandS);
         Countries country = countriesRepository.findCountryByCountryName(countryS);
-        Wine newWine = new Wine(name, brand, country, price, discount, volume, abv, year, colorType, sugarType,
-                wineGrapes.toString());
+        Wine newWine = new Wine(name, brand, country, price, discount, volume, abv, year, colorType, sugarType, wineGrapes.toString());
         wineRepository.save(newWine);
 
         for (String someGrape : wineGrapes) {
