@@ -25,7 +25,7 @@ public class SimpleWine {
     private String colorType;
     private String sugarType;
     private Integer year;
-    private Integer discount = 0;
+    private Float discount;
     private Float price;
     private String name;
     private String grapeType;
