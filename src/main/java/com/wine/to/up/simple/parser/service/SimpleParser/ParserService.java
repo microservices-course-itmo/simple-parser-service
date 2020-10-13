@@ -33,6 +33,7 @@ public class ParserService {
     private static final int PAGES_TO_PARSE = 3; // currently max 132, lower const value for testing purposes
     private static final String HOME_URL = URL + "/catalog/vino/";
     private static final String WINE_URL = URL + "/catalog/vino/page";
+    private static UpdateProducts.UpdateProductsMessage messageToKafka;
 
     @Autowired
     KafkaMessageSender<UpdateProducts.UpdateProductsMessage> kafkaSendMessageService;
@@ -106,10 +107,17 @@ public class ParserService {
         wineParserService.shutdown();
         log.info("\tEnd of adding information to the database.");
 
-
         message = UpdateProducts.UpdateProductsMessage.newBuilder().setShopLink(URL).addAllProducts(products).build();
         kafkaSendMessageService.sendMessage(message);
         log.info("End of parsing, {} wines collected", products.size());
+        setMessage(message);
+    }
 
+    public void setMessage(UpdateProducts.UpdateProductsMessage message){
+        messageToKafka = message;
+    }
+
+    public UpdateProducts.UpdateProductsMessage getMessage(){
+        return messageToKafka;
     }
 }
