@@ -2,26 +2,41 @@ package com.wine.to.up.simple.parser.service.SimpleParser;
 
 import java.io.IOException;
 
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+@Slf4j
 public class Parser {
     private static final String URL = "https://simplewine.ru";
     private static final int PAGES_TO_PARSE = 108; // currently max 132, lower const value for testing purposes
     private static final String HOME_URL = URL + "/catalog/vino/";
     private static final String WINE_URL = URL + "/catalog/vino/page";
 
-    protected int parseNumberOfPages() throws IOException {
-        Document mainPage = Jsoup.connect(HOME_URL).get();
+    public static int parseNumberOfPages() {
+        Document mainPage = null;
+        try {
+            mainPage = Jsoup.connect(HOME_URL).get();
+        } catch (IOException e) {
+            log.error("Cannot parse number of pages");
+            throw new IllegalStateException("Cannot parse number of pages");
+        }
         int numberOfPager = Integer.parseInt(
                 mainPage.getElementsByAttributeValue("class", "pagination__navigation").get(0).child(7).text());
+
+        log.info("Number of pages to parse: {}", numberOfPager);
         return numberOfPager;
     }
 
     public static SimpleWine parseWine(String wineURL) throws IOException {
+        long wineParseStart = System.currentTimeMillis();
+
         Document wineDoc = Jsoup.connect(wineURL).get();
+        log.debug("Fetch wine position page takes : {}", System.currentTimeMillis() - wineParseStart);
+
+        wineParseStart = System.currentTimeMillis();
 
         String wineName = "";
         String brandID = "";
@@ -101,6 +116,8 @@ public class Parser {
 
             }
         }
+
+        log.debug("Wine parsing takes : {}", System.currentTimeMillis() - wineParseStart);
 
         return SimpleWine.builder().name(wineName).brandID(brandID).countryID(countryID).price(bottlePrice)
                 .year(bottleYear).volume(bottleVolume).abv(bottleABV).colorType(colorType).grapeType(grapeType)
