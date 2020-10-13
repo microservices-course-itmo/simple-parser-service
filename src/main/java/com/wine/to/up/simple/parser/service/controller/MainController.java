@@ -1,5 +1,6 @@
 package com.wine.to.up.simple.parser.service.controller;
 
+import com.wine.to.up.parser.common.api.schema.UpdateProducts;
 import com.wine.to.up.simple.parser.service.SimpleParser.Parser;
 import com.wine.to.up.simple.parser.service.SimpleParser.ParserService;
 import com.wine.to.up.simple.parser.service.domain.entity.*;
@@ -33,8 +34,9 @@ public class MainController {
     @Autowired
     private ParserService parserService;
 
+
     @GetMapping(path = "/run-parser")
-    public String runParser() throws IOException {
+    public String runParser() {
         parserService.startParser();
         return "Parser started by request";
     }
@@ -132,6 +134,29 @@ public class MainController {
         return html;
     }
 
+    @GetMapping(path = "/all-products")
+    @ResponseBody
+    public String getAllProducts() {
+        UpdateProducts.UpdateProductsMessage message = parserService.getMessage();
+        String html = "";
+        for (UpdateProducts.Product someProduct : message.getProductsList()) {
+            html += "<a>Name: </a>" + someProduct.getName() + "<br>";
+            html += "<a>Link: </a>" + someProduct.getLink() + "<br>";
+            html += "<a>Brand: </a>" + someProduct.getBrand() + "<br>";
+            html += "<a>Country: </a>" + someProduct.getCountry() + "<br>";
+            html += "<a>Region: </a>" + someProduct.getRegion(0)+ "<br>";
+            html += "<a>Year: </a>" + someProduct.getYear()+ "<br>";
+            html += "<a>Grapes: </a>" + someProduct.getGrapeSort(0)+ "<br>";
+            html += "<a>Volume: </a>" + someProduct.getCapacity()+ "<br>";
+            html += "<a>ABV: </a>" + someProduct.getStrength()+ "<br>";
+            html += "<a>Sugar: </a>" + someProduct.getSugar()+ "<br>";
+            html += "<a>Color: </a>" + someProduct.getColor()+ "<br>";
+            html += "<a>New Price: </a>" + someProduct.getNewPrice()+ "<br>";
+            html += "<a>Old Price: </a>" + someProduct.getOldPrice()+ "<br><br>";
+        }
+        return html;
+    }
+
     @ResponseBody
     @GetMapping(path = "/")
     public String home() {
@@ -142,6 +167,7 @@ public class MainController {
         html += " <li><a href='/simple-parser/all-countries'>Show All Countries</a></li>";
         html += " <li><a href='/simple-parser/all-brands'>Show All Brands</a></li>";
         html += " <li><a href='/simple-parser/all-grapes'>Show All Grapes</a></li>";
+        html += " <li><a href='/simple-parser/all-products'>Show All Products like Message to Kafka</a></li>";
         html += "</ul>";
         return html;
     }
