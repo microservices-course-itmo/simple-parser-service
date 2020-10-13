@@ -33,7 +33,7 @@ public class ParserService {
 
     private final ExecutorService pagesExecutor = Executors.newSingleThreadExecutor();
 
-    private final ExecutorService winesExecutor = Executors.newFixedThreadPool(15);
+    private final ExecutorService winesExecutor = Executors.newFixedThreadPool(10);
 
     public void startParser() {
         long start = System.currentTimeMillis();
@@ -65,7 +65,7 @@ public class ParserService {
         AtomicLong winesCounter = new AtomicLong(1);
 
         CopyOnWriteArrayList<SimpleWine> wines = new CopyOnWriteArrayList<>();
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 15; i++) {
             CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
                 try {
                     while (true) {
@@ -75,13 +75,16 @@ public class ParserService {
                         }
                         log.debug("Starting parse: {}, number {}", wineUrl, winesCounter.getAndIncrement());
 
-                        SimpleWine simpleWine = Parser.parseWine(URL + wineUrl);
+                        SimpleWine simpleWine = null;
+                        try {
+                            simpleWine = Parser.parseWine(URL + wineUrl);
+                        } catch (IOException e) {
+                            log.error("Error while parsing position :", e);
+                        }
                         wines.add(simpleWine);
                     }
                 } catch (InterruptedException e) {
                     log.error("Interrupt ", e);
-                } catch (IOException e) {
-                    log.error("Error while persing wine position", e);
                 }
             }, winesExecutor);
             futures.add(future);
@@ -89,7 +92,7 @@ public class ParserService {
 
         futures.forEach(CompletableFuture::join);
 
-        log.info("TIME : {}", TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - start));
+        log.info("TIME : {} minutes", TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - start));
 
         log.info("End of parsing, {} wines collected", wines.size());
     }
