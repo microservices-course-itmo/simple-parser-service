@@ -41,11 +41,9 @@ public class Parser {
         if (prices.get(0).childrenSize() > 1) {
             bottlePrice = Float.parseFloat(prices.get(0).child(1).text().replaceAll(" |₽", ""));
             bottleDiscount = Float.parseFloat(prices.get(0).child(2).text().replaceAll("-|%", ""));
-            System.out.println("with discount");
         } else {
             bottlePrice = Float.parseFloat(prices.get(0).child(0).text().replaceAll(" |₽", ""));
             bottleDiscount = 0;
-            System.out.println(wineURL);
         }
 
         Elements productFacts = wineDoc.getElementsByClass("product__facts-info-text");
@@ -53,8 +51,6 @@ public class Parser {
             if (productFact.childrenSize() > 0) {
                 String href = productFact.child(0).attr("href");
                 String fact = href.split("/")[4].split("(-|_)")[0];
-                // System.out.println(productFact.text());
-                // System.out.println(fact);
                 switch (fact) {
                     case "country":
                         countryID = productFact.text().split(",")[0];
@@ -106,10 +102,6 @@ public class Parser {
             }
         }
 
-        // System.out.println(colorType + ", " + sugarType);
-
-        // return new Wine(wineName, brandID, countryID, bottlePrice, bottleVolume,
-        // bottleABV, colorType, sugarType);
         return SimpleWine.builder().name(wineName).brandID(brandID).countryID(countryID).price(bottlePrice)
                 .year(bottleYear).volume(bottleVolume).abv(bottleABV).colorType(colorType).grapeType(grapeType)
                 .sugarType(sugarType).discount(bottleDiscount).build();
