@@ -13,19 +13,22 @@ import org.jsoup.select.Elements;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-// @PropertySource(value = "application.properties")
 public class Parser {
-
-    // @Value("${parser.url}")
-    private static final String URL = "https://simplewine.ru";
+    private static String URL;
     private static final int PAGES_TO_PARSE = 108; // currently max 132, lower const value for testing purposes
-    private static final String HOME_URL = URL + "/catalog/vino/";
-    private static final String WINE_URL = URL + "/catalog/vino/page";
+    private static String HOME_URL;
+    private static String WINE_URL;
+
+    @Value("${parser.url}")
+    public void setURLStatic(String URL_FROM_PROPERTY) {
+        URL = URL_FROM_PROPERTY;
+        HOME_URL = URL + "/catalog/vino/";
+        WINE_URL = URL + "/catalog/vino/page";
+    }
 
     @Autowired
     private GrapesRepository grapesRepository;
@@ -59,6 +62,7 @@ public class Parser {
         SimpleWine newWine;
 
         try {
+            log.info("URL = " + URL);
             Document doc = Jsoup.connect(HOME_URL).get();
 
             numberOfPages = Integer.parseInt(
@@ -114,10 +118,10 @@ public class Parser {
                     // newWine = new SimpleWine(wineName, brandID, countryID, bottlePrice,
                     // bottleVolume, bottleABV, colorType,
                     // sugarType);
-                    int year = Integer.parseInt(bottleYear.replace(" г.", ""));
+                    int year = 0; //wasn't parsed in spring-2
                     newWine = SimpleWine.builder().name(wineName).brandID(brandID).countryID(countryID)
                             .price(bottlePrice).year(year).volume(bottleVolume).abv(bottleABV).colorType(colorType)
-                            .grapeType(grapeType).build();
+                            .grapeType(grapeType).sugarType(sugarType).build();
 
                     wineCatalog.add(newWine);
 
