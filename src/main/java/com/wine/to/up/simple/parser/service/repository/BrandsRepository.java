@@ -9,4 +9,5 @@ import java.util.UUID;
 @Repository
 public interface BrandsRepository extends CrudRepository<Brands, UUID> {
     Brands findBrandByBrandName(String name);
+    Boolean existsBrandsByBrandName(String name);
 }
