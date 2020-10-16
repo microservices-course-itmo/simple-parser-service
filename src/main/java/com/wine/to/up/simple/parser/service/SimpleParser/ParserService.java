@@ -21,18 +21,25 @@ import org.jsoup.select.Elements;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-// @PropertySource(value = "application.properties")
+
 public class ParserService {
 
-    // @Value("${parser.url}")
-    private static final String URL = "https://simplewine.ru";
+    private static  String URL;
     private static final int PAGES_TO_PARSE = 3; // currently max 132, lower const value for testing purposes
-    private static final String HOME_URL = URL + "/catalog/vino/";
-    private static final String WINE_URL = URL + "/catalog/vino/page";
+    private static String HOME_URL;
+    private static String WINE_URL;
+
+    @Value("${parser.url}")
+    public void setURLStatic(String URL_FROM_PROPERTY) {
+        URL = URL_FROM_PROPERTY;
+        HOME_URL = URL + "/catalog/vino/";
+        WINE_URL = URL + "/catalog/vino/page";
+    }
 
     @Autowired
     KafkaMessageSender<UpdateProducts.UpdateProductsMessage> kafkaSendMessageService;
@@ -86,7 +93,7 @@ public class ParserService {
         ExecutorService wineParserService = Executors.newFixedThreadPool(30);
         Callable<String> wineTask = () -> {
             while (wineCounter.longValue() < wineURLs.size()) {
-                SimpleWine wine = Parser.parseWine(URL + wineURLs.get(wineCounter.getAndIncrement()));
+                SimpleWine wine = Parser.parseWine(Parser.URLToDocument(URL + wineURLs.get(wineCounter.getAndIncrement())));
                 dbHandler.putInfoToDB(wine);
                 UpdateProducts.Product newProduct = commonDbHandler.putInfoToCommonDb(wine);
                 if (!products.contains(newProduct))

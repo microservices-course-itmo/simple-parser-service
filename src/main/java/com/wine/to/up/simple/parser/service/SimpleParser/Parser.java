@@ -2,27 +2,43 @@ package com.wine.to.up.simple.parser.service.SimpleParser;
 
 import java.io.IOException;
 
+import lombok.NoArgsConstructor;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
+@Component
+@NoArgsConstructor
 public class Parser {
-    private static final String URL = "https://simplewine.ru";
+    private static String URL;
     private static final int PAGES_TO_PARSE = 108; // currently max 132, lower const value for testing purposes
-    private static final String HOME_URL = URL + "/catalog/vino/";
-    private static final String WINE_URL = URL + "/catalog/vino/page";
+    private static String HOME_URL;
+    private static String WINE_URL;
 
-    protected int parseNumberOfPages() throws IOException {
-        Document mainPage = Jsoup.connect(HOME_URL).get();
+    @Value("${parser.url}")
+    public void setURLStatic(String URL_FROM_PROPERTY) {
+        URL = URL_FROM_PROPERTY;
+        HOME_URL = URL + "/catalog/vino/";
+        WINE_URL = URL + "/catalog/vino/page";
+    }
+
+    public static Document URLToDocument(String someURL) throws IOException {
+        return Jsoup.connect(someURL).get();
+    }
+
+    protected int parseNumberOfPages(Document mainPage) {
+        //Document mainPage = Jsoup.connect(HOME_URL).get();
+
         int numberOfPager = Integer.parseInt(
                 mainPage.getElementsByAttributeValue("class", "pagination__navigation").get(0).child(7).text());
         return numberOfPager;
     }
 
-    public static SimpleWine parseWine(String wineURL) throws IOException {
-        Document wineDoc = Jsoup.connect(wineURL).get();
-
+    public static SimpleWine parseWine(Document wineDoc) {
+        //Document wineDoc = Jsoup.connect(wineURL).get();
         String wineName = "";
         String brandID = "";
         String countryID = "";
