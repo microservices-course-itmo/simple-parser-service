@@ -33,7 +33,7 @@ public class ParserService {
 
     private final ExecutorService pagesExecutor = Executors.newSingleThreadExecutor();
 
-    private final ExecutorService winesExecutor = Executors.newFixedThreadPool(10);
+    private final ExecutorService winesExecutor = Executors.newFixedThreadPool(17);
 
     public void startParser() {
         long start = System.currentTimeMillis();
@@ -65,7 +65,7 @@ public class ParserService {
         AtomicLong winesCounter = new AtomicLong(1);
 
         CopyOnWriteArrayList<SimpleWine> wines = new CopyOnWriteArrayList<>();
-        for (int i = 0; i < 15; i++) {
+        for (int i = 0; i < 16; i++) {
             CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
                 try {
                     while (true) {
