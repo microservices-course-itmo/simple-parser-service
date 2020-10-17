@@ -31,8 +31,6 @@ public class ParserService {
 
     private static  String URL;
     private static final int PAGES_TO_PARSE = 3; // currently max 132, lower const value for testing purposes
-    private static final String HOME_URL = URL + "/catalog/vino/";
-    private static final String WINE_URL = URL + "/catalog/vino/page";
     private static UpdateProducts.UpdateProductsMessage messageToKafka;
     private static String HOME_URL;
     private static String WINE_URL;
