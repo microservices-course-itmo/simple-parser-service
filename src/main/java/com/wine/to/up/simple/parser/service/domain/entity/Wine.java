@@ -21,7 +21,7 @@ public class Wine {
     private String name;
 
     @Column(name = "picture")
-    private File picture;
+    private String picture;
 
     @ManyToOne
     @JoinColumn(name = "brandId", referencedColumnName = "brandId")

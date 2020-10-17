@@ -1,7 +1,6 @@
 package com.wine.to.up.simple.parser.service.controller;
 
 import com.wine.to.up.parser.common.api.schema.UpdateProducts;
-import com.wine.to.up.simple.parser.service.SimpleParser.Parser;
 import com.wine.to.up.simple.parser.service.SimpleParser.ParserService;
 import com.wine.to.up.simple.parser.service.domain.entity.*;
 import com.wine.to.up.simple.parser.service.repository.*;
@@ -10,9 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -41,45 +37,58 @@ public class MainController {
         return "Parser started by request";
     }
 
+
     @PostMapping(path = "/grape")
     @ResponseBody
-    public String addGrape(@RequestParam String grapeName) {
-        grapesRepository.save(new Grapes(grapeName));
-        return "New Grape Added";
+    public Grapes addGrape(@ModelAttribute("grape") Grapes grape) {
+        Grapes newGrape = new Grapes(grape.getGrapeName());
+        grapesRepository.save(newGrape);
+        return newGrape;
     }
 
     @PostMapping(path = "/brand")
     @ResponseBody
-    public String addBrand(@RequestParam String brandName) {
-        brandsRepository.save(new Brands(brandName));
-        return "New Brand Added";
+    public Brands addBrand(@ModelAttribute("brand") Brands brand) {
+        Brands newBrand = new Brands(brand.getBrandName());
+        brandsRepository.save(newBrand);
+        return newBrand;
     }
 
     @PostMapping(path = "/country")
     @ResponseBody
-    public String addCountry(@RequestParam String countryName) {
-        countriesRepository.save(new Countries(countryName));
-        return "New Country Added";
+    public Countries addCountry(@ModelAttribute("country") Countries country) {
+        Countries newCountry = new Countries(country.getCountryName());
+        countriesRepository.save(newCountry);
+        return newCountry;
     }
 
     @PostMapping(path = "/wine")
     @ResponseBody
-    public String addWine(@RequestParam String name, @RequestParam String brandS, @RequestParam String countryS,
-            @RequestParam float price, @RequestParam Float volume, @RequestParam Float abv,
-            @RequestParam String colorType, @RequestParam String sugarType, @RequestParam List<String> wineGrapes,
-            @RequestParam Float discount, @RequestParam int year) {
-
-        Brands brand = brandsRepository.findBrandByBrandName(brandS);
-        Countries country = countriesRepository.findCountryByCountryName(countryS);
-        Wine newWine = new Wine(name, brand, country, price, discount, volume, abv, year, colorType, sugarType,
-                wineGrapes.toString());
-        wineRepository.save(newWine);
-
-        for (String someGrape : wineGrapes) {
-            wineGrapesRepository.save(new WineGrapes(newWine, grapesRepository.findGrapeByGrapeName(someGrape)));
+    public Wine addWine(@ModelAttribute("wine") Wine wine) {
+        Wine newWine = wine;
+        if (brandsRepository.existsBrandsByBrandName(wine.getBrandID().getBrandName())) {
+            newWine.setBrandID(brandsRepository.findBrandByBrandName(wine.getBrandID().getBrandName()));
+        } else {
+            brandsRepository.save(newWine.getBrandID());
         }
 
-        return "New Wine Added";
+        if (countriesRepository.existsCountriesByCountryName(wine.getCountryID().getCountryName())) {
+            newWine.setCountryID(countriesRepository.findCountryByCountryName(wine.getCountryID().getCountryName()));
+        } else {
+            countriesRepository.save(newWine.getCountryID());
+        }
+
+        Grapes grapes;
+        if (grapesRepository.existsGrapesByGrapeName(wine.getGrapeType())) {
+            grapes = grapesRepository.findGrapeByGrapeName(wine.getGrapeType());
+        } else {
+            grapes = new Grapes(wine.getGrapeType());
+            grapesRepository.save(grapes);
+        }
+        wineRepository.save(newWine);
+        wineGrapesRepository.save(new WineGrapes(newWine, grapes));
+
+        return wine;
     }
 
     @GetMapping(path = "/all-grapes")
@@ -117,12 +126,6 @@ public class MainController {
         return html;
     }
 
-    // @GetMapping(path="/all-wine-grapes")
-    // @ResponseBody
-    // public Iterable<WineGrapesInfo> getAllWineGrapesInfo() {
-    // return wineGrapesRepository.findAll();
-    // }
-
     @GetMapping(path = "/all-wines")
     @ResponseBody
     public String getAllWines() {
@@ -144,15 +147,15 @@ public class MainController {
             html += "<a>Link: </a>" + someProduct.getLink() + "<br>";
             html += "<a>Brand: </a>" + someProduct.getBrand() + "<br>";
             html += "<a>Country: </a>" + someProduct.getCountry() + "<br>";
-            html += "<a>Region: </a>" + someProduct.getRegion(0)+ "<br>";
-            html += "<a>Year: </a>" + someProduct.getYear()+ "<br>";
-            html += "<a>Grapes: </a>" + someProduct.getGrapeSort(0)+ "<br>";
-            html += "<a>Volume: </a>" + someProduct.getCapacity()+ "<br>";
-            html += "<a>ABV: </a>" + someProduct.getStrength()+ "<br>";
-            html += "<a>Sugar: </a>" + someProduct.getSugar()+ "<br>";
-            html += "<a>Color: </a>" + someProduct.getColor()+ "<br>";
-            html += "<a>New Price: </a>" + someProduct.getNewPrice()+ "<br>";
-            html += "<a>Old Price: </a>" + someProduct.getOldPrice()+ "<br><br>";
+            html += "<a>Region: </a>" + someProduct.getRegion(0) + "<br>";
+            html += "<a>Year: </a>" + someProduct.getYear() + "<br>";
+            html += "<a>Grapes: </a>" + someProduct.getGrapeSort(0) + "<br>";
+            html += "<a>Volume: </a>" + someProduct.getCapacity() + "<br>";
+            html += "<a>ABV: </a>" + someProduct.getStrength() + "<br>";
+            html += "<a>Sugar: </a>" + someProduct.getSugar() + "<br>";
+            html += "<a>Color: </a>" + someProduct.getColor() + "<br>";
+            html += "<a>New Price: </a>" + someProduct.getNewPrice() + "<br>";
+            html += "<a>Old Price: </a>" + someProduct.getOldPrice() + "<br><br>";
         }
         return html;
     }
