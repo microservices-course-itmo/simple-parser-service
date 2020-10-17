@@ -70,14 +70,12 @@ public class ParserTest {
     }
 
     @Test
-    public void testParseNumberOfPagesNoPages() throws IOException {
+    public void testParseNumberOfPagesNoPagesNavigation() throws IOException {
         File testCatalogPageFile = new File("src/test/test-resources/Wine_SimpleWine.html"); //wine page instead of catalog page
         Document testCatalogPage = Jsoup.parse(testCatalogPageFile, "UTF-8");
         thrown.expect(IndexOutOfBoundsException.class); //"pagination__navigation" in input file is absent, list in parseNumberOfPages() has length = 0
         int numberOfPages = parser.parseNumberOfPages(testCatalogPage);
-        assertTrue(numberOfPages > 0);
-        assertEquals(107, numberOfPages);
-
+        //assertEquals(0, numberOfPages);
     }
 
     @Test
