@@ -48,7 +48,7 @@ public class DbHandler {
         }
         countryEntity = new Countries(country);
         countriesRepository.save(countryEntity);
-        log.info("New Country was added to DB: " + country);
+        log.debug("New Country was added to DB: " + country);
         return countryEntity;
     }
 
@@ -60,7 +60,7 @@ public class DbHandler {
         }
         brandEntity = new Brands(brand);
         brandsRepository.save(brandEntity);
-        log.info("New Brand was added to DB: " + brand);
+        log.debug("New Brand was added to DB: " + brand);
         return brandEntity;
     }
 
@@ -72,7 +72,7 @@ public class DbHandler {
         }
         grapeEntity = new Grapes(grape);
         grapesRepository.save(grapeEntity);
-        log.info("New Grape was added to DB: " + grape);
+        log.debug("New Grape was added to DB: " + grape);
         return grapeEntity;
     }
 
@@ -91,7 +91,7 @@ public class DbHandler {
         wineEntity = new Wine(name, brandEntity, countryEntity, price, newWine.getDiscount(),
                 volume, newWine.getAbv(), newWine.getYear(), colorType, sugarType, newWine.getGrapeType());
         wineRepository.save(wineEntity);
-        log.info("New Wine was added to DB: " + wineEntity.toString());
+        log.debug("New Wine was added to DB: " + wineEntity.toString());
         return wineEntity;
     }
 
@@ -100,7 +100,7 @@ public class DbHandler {
         if (!wineGrapesRepository.existsWineGrapesByGrapeIdAndAndWineId(grapeEntity, wineEntity)) {
             wineGrapeEntity = new WineGrapes(wineEntity, grapeEntity);
             wineGrapesRepository.save(wineGrapeEntity);
-            log.info("New Connection between Wine and Grape was added to DB");
+            log.debug("New Connection between Wine and Grape was added to DB");
         }
     }
 
