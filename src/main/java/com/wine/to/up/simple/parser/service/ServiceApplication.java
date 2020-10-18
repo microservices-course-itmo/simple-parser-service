@@ -3,6 +3,7 @@ package com.wine.to.up.simple.parser.service;
 import java.io.IOException;
 
 import com.wine.to.up.simple.parser.service.SimpleParser.Parser;
+import com.wine.to.up.simple.parser.service.SimpleParser.ParserService;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
@@ -19,10 +20,10 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableScheduling
 public class ServiceApplication {
 
-    private final Parser parser;
+    private final ParserService parserService;
 
-    public ServiceApplication(Parser parser) {
-        this.parser = parser;
+    public ServiceApplication(ParserService parserService) {
+        this.parserService = parserService;
     }
 
     public static void main(String[] args) {
@@ -32,7 +33,7 @@ public class ServiceApplication {
     @Scheduled(fixedDelayString = "PT12H") // run once in 12 hours
     void scheduledRunParser() throws IOException {
         log.info("SCHEDULED PARSER START");
-        parser.startParser();
+        parserService.startParser();
     }
 
 }

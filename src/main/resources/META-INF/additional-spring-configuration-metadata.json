@@ -1,0 +1,9 @@
+{
+  "properties": [
+    {
+      "name": "parser.url",
+      "type": "java.lang.String",
+      "description": "SimpleWine base URL."
+    }
+  ]
+}

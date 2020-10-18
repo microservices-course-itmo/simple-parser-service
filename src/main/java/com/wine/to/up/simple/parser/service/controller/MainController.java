@@ -1,6 +1,7 @@
 package com.wine.to.up.simple.parser.service.controller;
 
 import com.wine.to.up.simple.parser.service.SimpleParser.Parser;
+import com.wine.to.up.simple.parser.service.SimpleParser.ParserService;
 import com.wine.to.up.simple.parser.service.domain.entity.*;
 import com.wine.to.up.simple.parser.service.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -30,11 +31,11 @@ public class MainController {
     @Autowired
     private WineRepository wineRepository;
     @Autowired
-    private Parser parser;
+    private ParserService parserService;
 
     @GetMapping(path = "/run-parser")
     public String runParser() throws IOException {
-        parser.startParser();
+        parserService.startParser();
         return "Parser started by request";
     }
 
@@ -64,7 +65,7 @@ public class MainController {
     public String addWine(@RequestParam String name, @RequestParam String brandS, @RequestParam String countryS,
             @RequestParam float price, @RequestParam Float volume, @RequestParam Float abv,
             @RequestParam String colorType, @RequestParam String sugarType, @RequestParam List<String> wineGrapes,
-            @RequestParam int discount, @RequestParam int year) {
+            @RequestParam Float discount, @RequestParam int year) {
 
         Brands brand = brandsRepository.findBrandByBrandName(brandS);
         Countries country = countriesRepository.findCountryByCountryName(countryS);

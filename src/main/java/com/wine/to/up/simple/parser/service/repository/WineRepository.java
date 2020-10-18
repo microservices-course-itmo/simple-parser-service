@@ -16,6 +16,6 @@ public interface WineRepository extends CrudRepository<Wine, UUID> {
     @Query("SELECT w.wineID FROM Wine w WHERE w.name=?1")
     UUID getIdByName(String name);
 
-    Boolean existsWineByNameAndPrice(String name, float price);
+    Boolean existsWineByNameAndPriceAndYear(String name, float price, int year);
     Boolean existsWineByNameAndPriceAndVolumeAndColorTypeAndSugarType(String name, Float price, Float volume, String ColorType, String SugarType);
 }

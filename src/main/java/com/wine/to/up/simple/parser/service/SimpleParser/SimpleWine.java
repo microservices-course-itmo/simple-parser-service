@@ -17,7 +17,6 @@ import java.util.UUID;
 @Getter
 @Setter
 public class SimpleWine {
-    private UUID wineID = UUID.randomUUID();
     private File picture;
     private String brandID;
     private String countryID;
@@ -25,9 +24,9 @@ public class SimpleWine {
     private Float abv; // alcohol by volume
     private String colorType;
     private String sugarType;
-    private int year;
-    private String price;
+    private Integer year;
+    private Float discount;
+    private Float price;
     private String name;
     private String grapeType;
-
 }

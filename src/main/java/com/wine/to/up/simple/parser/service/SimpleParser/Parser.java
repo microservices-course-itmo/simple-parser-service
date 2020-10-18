@@ -1,185 +1,123 @@
 package com.wine.to.up.simple.parser.service.SimpleParser;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
-import com.wine.to.up.simple.parser.service.domain.entity.*;
-import com.wine.to.up.simple.parser.service.repository.*;
-import org.jsoup.*;
+import lombok.NoArgsConstructor;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Slf4j
-@Service
-// @PropertySource(value = "application.properties")
+@Component
+@NoArgsConstructor
 public class Parser {
-
-    // @Value("${parser.url}")
-    private static final String URL = "https://simplewine.ru";
+    private static String URL;
     private static final int PAGES_TO_PARSE = 108; // currently max 132, lower const value for testing purposes
-    private static final String HOME_URL = URL + "/catalog/vino/";
-    private static final String WINE_URL = URL + "/catalog/vino/page";
+    public static String HOME_URL;
+    private static String WINE_URL;
 
-    @Autowired
-    private GrapesRepository grapesRepository;
-    @Autowired
-    private BrandsRepository brandsRepository;
-    @Autowired
-    private CountriesRepository countriesRepository;
-    @Autowired
-    private WineGrapesRepository wineGrapesRepository;
-    @Autowired
-    private WineRepository wineRepository;
+    @Value("${parser.url}")
+    public void setURLStatic(String URL_FROM_PROPERTY) {
+        URL = URL_FROM_PROPERTY;
+        HOME_URL = URL + "/catalog/vino/";
+        WINE_URL = URL + "/catalog/vino/page";
+    }
 
-    public ArrayList<SimpleWine> startParser() throws IOException {
-        ArrayList<String> wineURLs = new ArrayList<>();
-        ArrayList<SimpleWine> wineCatalog = new ArrayList<>();
+    public static Document URLToDocument(String someURL) throws IOException {
+        return Jsoup.connect(someURL).get();
+    }
 
-        int numberOfPages;
+    protected int parseNumberOfPages(Document mainPage) {
+        return Integer.parseInt(
+                //mainPage.getElementsByAttributeValue("class", "pagination__navigation").get(0).child(7).text()); //works only for catalogs with more than 7 pages
+                mainPage.getElementsByAttributeValue("class", "pagination__navigation").get(0).children().last().previousElementSibling().text()); //works for catalogs with 7 or less pages
+    }
 
+    public static SimpleWine parseWine(Document wineDoc) {
         String wineName = "";
         String brandID = "";
         String countryID = "";
         float bottleVolume = 0;
-        String bottlePrice = "";
-        String bottleDiscount = "";
-        String bottleYear = "";
+        float bottlePrice = 0;
+        float bottleDiscount = 0;
+        int bottleYear = 0;
         float bottleABV = 0;
         String colorType = "";
         String sugarType = "";
         String grapeType = "";
+        String region = "";
 
-        SimpleWine newWine;
+        wineName = wineDoc.getElementsByClass("product__header-russian-name").get(0).text();
+        Elements prices = wineDoc.getElementsByClass("product__buy-price");
+        if (prices.get(0).childrenSize() > 1) {
+            bottlePrice = Float.parseFloat(prices.get(0).child(1).text().replaceAll(" |₽", ""));
+            bottleDiscount = Float.parseFloat(prices.get(0).child(2).text().replaceAll("-|%", ""));
+        } else {
+            bottlePrice = Float.parseFloat(prices.get(0).child(0).text().replaceAll(" |₽", ""));
+            bottleDiscount = 0;
+        }
 
-        try {
-            Document doc = Jsoup.connect(HOME_URL).get();
+        Elements productFacts = wineDoc.getElementsByClass("product__facts-info-text");
+        for (Element productFact : productFacts) {
+            if (productFact.childrenSize() > 0) {
+                String href = productFact.child(0).attr("href");
+                String fact = href.split("/")[4].split("(-|_)")[0];
+                switch (fact) {
+                    case "country":
+                        countryID = productFact.text().split(",")[0];
+                        break;
+                    case "color":
+                        colorType = productFact.text();
+                        break;
+                    case "sugar":
+                        sugarType = productFact.text();
+                        break;
+                    case "grape":
+                        grapeType = productFact.text();
+                        break;
+                    case "aging":
+                        // grapeType = productFact.text();
+                        break;
 
-            numberOfPages = Integer.parseInt(
-                    doc.getElementsByAttributeValue("class", "pagination__navigation").get(0).child(7).text());
+                    default:
+                        break;
 
-            log.info("\tStart of adding information to the database.");
-            for (int i = 1; i < PAGES_TO_PARSE; i++) {
-                try {
-                    doc = Jsoup.connect(WINE_URL + i).get();
-                } catch (IOException e) {
-                    log.error(WINE_URL + i + " can`t be reached");
-                    continue;
-                }
-                Elements wines = doc.getElementsByAttributeValue("class", "catalog-grid__item");
-
-                for (Element wine : wines) {
-                    String[] NameAndYear = wine.getElementsByAttributeValue("class", "product-snippet__name").text()
-                            .split(", ");
-                    wineName = NameAndYear[0].replaceFirst("Вино ", "");
-                    bottlePrice = wine.getElementsByAttributeValue("class", "product-snippet__price").attr("content");
-
-                    Elements wine_Elements = wine.getElementsByAttributeValue("class", "product-snippet__info-item");
-
-                    for (Element wine_Element : wine_Elements) {
-
-                        switch (wine_Element.child(0).text()) {
-                            case "Страна:":
-                                countryID = wine_Element.child(1).text();
-                                break;
-                            case "Цвет:":
-                                colorType = wine_Element.child(1).text();
-                                break;
-                            case "Сахар:":
-                                sugarType = wine_Element.child(1).text();
-                                break;
-                            case "Объем:":
-                                bottleVolume = Float.parseFloat(wine_Element.child(1).text().split(" ")[0]);
-                                break;
-                            case "Производитель:":
-                                brandID = wine_Element.child(1).text();
-                                break;
-                            case "Виноград:":
-                                grapeType = wine_Element.child(1).text();
-                                break;
-
-                            default:
-                                break;
-
-                        }
-                    }
-                    wineURLs.add(wine.getElementsByAttributeValue("class", "product-snippet__name").attr("href"));
-
-                    // newWine = new SimpleWine(wineName, brandID, countryID, bottlePrice,
-                    // bottleVolume, bottleABV, colorType,
-                    // sugarType);
-                    int year = Integer.parseInt(bottleYear.replace(" г.", ""));
-                    newWine = SimpleWine.builder().name(wineName).brandID(brandID).countryID(countryID)
-                            .price(bottlePrice).year(year).volume(bottleVolume).abv(bottleABV).colorType(colorType)
-                            .grapeType(grapeType).build();
-
-                    wineCatalog.add(newWine);
-
-                    // A price check. bottlePrice may be empty if the wine is not in stock
-                    if (!bottlePrice.isEmpty())
-                        putInfoToDB(newWine);
                 }
             }
-            log.info("\tEnd of adding information to the database.");
-        } catch (IOException e) {
-            log.error("Catalog main page can`t be reached");
-            e.printStackTrace();
-            throw e;
         }
-        return wineCatalog;
-    }
 
-    private void putInfoToDB(SimpleWine newWine) {
-        Countries countryEntity;
-        if (!countriesRepository.existsCountriesByCountryName(newWine.getCountryID())) {
-            countryEntity = new Countries(newWine.getCountryID());
-            countriesRepository.save(countryEntity);
-            log.info("New Country was added to DB: " + newWine.getCountryID());
-        } else {
-            countryEntity = countriesRepository.findCountryByCountryName(newWine.getCountryID());
+        Elements productCharateristics = wineDoc.getElementsByClass("characteristics-params__item");
+        for (Element productCharateristic : productCharateristics) {
+            String charateristicTitle = productCharateristic.child(0).text();
+            // System.out.println(charateristicTitle);
+            switch (charateristicTitle) {
+                case "Регион:":
+                    region = productCharateristic.child(1).text();
+                    break;
+                case "Производитель:":
+                    brandID = productCharateristic.child(1).text();
+                    break;
+                case "Объем:":
+                    bottleVolume = Float.parseFloat(productCharateristic.child(1).text());
+                    break;
+                case "Год:":
+                    bottleYear = Integer.parseInt(productCharateristic.child(1).text());
+                    break;
+                case "Крепость:":
+                    bottleABV = Float.parseFloat(productCharateristic.child(1).text().replaceAll("%", ""));
+                    break;
+
+                default:
+                    break;
+
+            }
         }
-        Brands brandEntity;
-        if (!brandsRepository.existsBrandsByBrandName(newWine.getBrandID())) {
-            brandEntity = new Brands(newWine.getBrandID());
-            brandsRepository.save(brandEntity);
-            log.info("New Brand was added to DB: " + newWine.getBrandID());
-        } else {
-            brandEntity = brandsRepository.findBrandByBrandName(newWine.getBrandID());
-        }
-        Grapes grapeEntity;
-        if (!grapesRepository.existsGrapesByGrapeName(newWine.getGrapeType())) {
-            grapeEntity = new Grapes(newWine.getGrapeType());
-            grapesRepository.save(grapeEntity);
-            log.info("New Grape was added to DB: " + newWine.getGrapeType());
-        } else {
-            grapeEntity = grapesRepository.findGrapeByGrapeName(newWine.getGrapeType());
-        }
-        Float price = Float.parseFloat(newWine.getPrice().replace(" ", "").replace("₽", ""));
-        // int year = Integer.parseInt(newWine.bottleYear.replace(" г.", ""));
-        // int discount =
-        // Integer.parseInt(newWine.bottleDiscount.replace("-","").replace("%", ""));
-        Wine wineEntity;
-        if (!wineRepository.existsWineByNameAndPriceAndVolumeAndColorTypeAndSugarType(newWine.getName(), price,
-                newWine.getVolume(), newWine.getColorType(), newWine.getSugarType())) {
-            wineEntity = new Wine(newWine.getName(), brandEntity, countryEntity, price, newWine.getVolume(),
-                    newWine.getAbv(), newWine.getColorType(), newWine.getSugarType(), newWine.getGrapeType());
-            wineRepository.save(wineEntity);
-            log.info("New Wine was added to DB: " + wineEntity.toString());
-        } else {
-            wineEntity = wineRepository.findWineByNameAndPriceAndVolumeAndColorTypeAndSugarType(newWine.getName(),
-                    price, newWine.getVolume(), newWine.getColorType(), newWine.getSugarType());
-        }
-        WineGrapes wineGrapeEntity;
-        if (!wineGrapesRepository.existsWineGrapesByGrapeIdAndAndWineId(grapeEntity, wineEntity)) {
-            wineGrapeEntity = new WineGrapes(wineEntity, grapeEntity);
-            wineGrapesRepository.save(wineGrapeEntity);
-            log.info("New Connection between Wine and Grape was added to DB");
-        }
+
+        return SimpleWine.builder().name(wineName).brandID(brandID).countryID(countryID).price(bottlePrice)
+                .year(bottleYear).volume(bottleVolume).abv(bottleABV).colorType(colorType).grapeType(grapeType)
+                .sugarType(sugarType).discount(bottleDiscount).build();
+
     }
 }
