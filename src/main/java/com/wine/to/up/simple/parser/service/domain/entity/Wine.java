@@ -34,12 +34,14 @@ public class Wine {
     private Countries countryID;
 
     @Column(name = "price")
+    @NonNull
     private float price;
 
     @Column(name = "discount")
     private Float discount;
 
     @Column(name = "volume")
+    @NonNull
     private Float volume;
 
     @Column(name = "abv")
@@ -49,11 +51,9 @@ public class Wine {
     private int year;
 
     @Column(name = "colorType")
-    @NonNull
     private String colorType;
 
     @Column(name = "sugarType")
-    @NonNull
     private String sugarType;
 
     @Column(name = "grapeType")

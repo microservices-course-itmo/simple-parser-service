@@ -37,7 +37,6 @@ public class MainController {
         return "Parser started by request";
     }
 
-
     @PostMapping(path = "/grape")
     @ResponseBody
     public Grapes addGrape(@ModelAttribute("grape") Grapes grape) {
