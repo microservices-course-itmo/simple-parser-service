@@ -8,6 +8,7 @@ import com.wine.to.up.demo.service.api.message.KafkaMessageSentEventOuterClass.K
 import com.wine.to.up.parser.common.api.ParserCommonApiProperties;
 import com.wine.to.up.parser.common.api.schema.UpdateProducts;
 import com.wine.to.up.simple.parser.service.components.SimpleParserMetricsCollector;
+import com.wine.to.up.simple.parser.service.messaging.SmopikTopicKafkaMessageHandler;
 import com.wine.to.up.simple.parser.service.messaging.TestTopicKafkaMessageHandler;
 import com.wine.to.up.simple.parser.service.messaging.serialization.EventDeserializer;
 import com.wine.to.up.simple.parser.service.messaging.serialization.EventSerializer;
@@ -92,7 +93,7 @@ public class KafkaConfiguration {
     // your topic name
 
     @Bean
-    BaseKafkaHandler<UpdateProducts.UpdateProductsMessage> stringTopicMessagesHandler(Properties consumerProperties,
+    BaseKafkaHandler<UpdateProducts.UpdateProductsMessage> productTopicMessagesHandler(Properties consumerProperties,
                                                         ParserCommonApiProperties apiProperties, TestTopicKafkaMessageHandler handler) {
         // set appropriate deserializer for value
         consumerProperties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
@@ -104,14 +105,14 @@ public class KafkaConfiguration {
     }
 
 //    @Bean
-//    BaseKafkaHandler<KafkaMessageSentEvent> testTopicMessagesHandler(Properties consumerProperties,
-//            DemoServiceApiProperties demoServiceApiProperties, TestTopicKafkaMessageHandler handler) {
+//    BaseKafkaHandler<String> testTopicMessagesHandler(Properties consumerProperties,
+//                                                      ParserCommonApiProperties apiProperties, SmopikTopicKafkaMessageHandler handler) {
 //        // set appropriate deserializer for value
 //        consumerProperties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
 //                EventDeserializer.class.getName());
 //
 //        // bind consumer with topic name and with appropriate handler
-//        return new BaseKafkaHandler<>(demoServiceApiProperties.getMessageSentEventsTopicName(),
+//        return new BaseKafkaHandler<>(apiProperties.getParserWinePositionParsedEvents(),
 //                new KafkaConsumer<>(consumerProperties), handler);
 //    }
 
@@ -145,7 +146,8 @@ public class KafkaConfiguration {
 
     @Bean
     KafkaMessageSender<UpdateProducts.UpdateProductsMessage> productTopicKafkaMessageSender(Properties producerProperties,
-                                                                                            ParserCommonApiProperties apiProperties, SimpleParserMetricsCollector metricsCollector) {
+                                                                                            ParserCommonApiProperties apiProperties,
+                                                                                            SimpleParserMetricsCollector metricsCollector) {
         // set appropriate serializer for value
         producerProperties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, EventSerializer.class.getName());
 

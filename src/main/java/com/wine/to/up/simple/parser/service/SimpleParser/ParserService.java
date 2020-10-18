@@ -35,6 +35,7 @@ public class ParserService {
     private static final int PAGES_TO_PARSE = 3; // currently max 132, lower const value for testing purposes
     private static String HOME_URL;
     private static String WINE_URL;
+    private static int wine_from_url_counter = 0;
 
     @Value("${parser.url}")
     public void setURLStatic(String URL_FROM_PROPERTY) {
@@ -69,15 +70,21 @@ public class ParserService {
 
         Callable<String> callableTask = () -> {
             Document doc;
-            while (pageCounter.longValue() < PAGES_TO_PARSE) {
-                doc = Jsoup.connect(WINE_URL + pageCounter.getAndIncrement()).get();
-                Elements wines = doc.getElementsByAttributeValue("class", "catalog-grid__item");
-
-                for (Element wine : wines) {
-                    wineURLs.add(wine.getElementsByAttributeValue("class", "product-snippet__name").attr("href"));
-
+            try {
+                while (pageCounter.longValue() < PAGES_TO_PARSE) {
+                    doc = Jsoup.connect(WINE_URL + pageCounter.getAndIncrement()).get();
+                    Elements wines = doc.getElementsByAttributeValue("class", "catalog-grid__item");
+                    log.debug("Parsed {} wines from url {}", wines.size(), WINE_URL + pageCounter.getAndIncrement());
+                    wine_from_url_counter += wines.size();
+                    for (Element wine : wines) {
+                        wineURLs.add(wine.getElementsByAttributeValue("class", "product-snippet__name").attr("href"));
+                    }
+                    log.debug("Total {} wines", wine_from_url_counter);
                 }
+            } catch (IOException e) {
+                log.error("Error while parsing page: ", e);
             }
+
             return "URL`s task execution";
         };
 
@@ -87,13 +94,13 @@ public class ParserService {
             List<Future<String>> future = executorService.invokeAll(callableTasks);
         } catch (InterruptedException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            log.error("Error while adding tasks for threads: ", e);
         }
         executorService.shutdown();
 
         AtomicInteger wineCounter = new AtomicInteger(0);
-        ExecutorService wineParserService = Executors.newFixedThreadPool(30);
-        Callable<String> wineTask = () -> {
+        ExecutorService wineParserService = Executors.newFixedThreadPool(10);
+        Callable<String> wineTask = () -> {  
             while (true) {
                 String wineURL = wineURLs.poll(10, TimeUnit.SECONDS);
                 if (wineURL == null) {
@@ -101,6 +108,7 @@ public class ParserService {
                 }
                 SimpleWine wine = Parser.parseWine(Parser.URLToDocument(URL + wineURL));
                 dbHandler.putInfoToDB(wine);
+                log.trace("Wine: {} added to database", wineCounter);
                 UpdateProducts.Product newProduct = commonDbHandler.putInfoToCommonDb(wine);
                 if (!products.contains(newProduct))
                     products.add(newProduct);
@@ -112,14 +120,14 @@ public class ParserService {
             List<Future<String>> future = wineParserService.invokeAll(wineTasks);
         } catch (InterruptedException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            log.error("Interrupt", e);
         }
         wineParserService.shutdown();
-        log.info("\tEnd of adding information to the database.");
+        log.info("End of adding information to the database.");
 
         message = UpdateProducts.UpdateProductsMessage.newBuilder().setShopLink(URL).addAllProducts(products).build();
         kafkaSendMessageService.sendMessage(message);
-        log.info("End of parsing, {} wines collected", products.size());
+        log.info("End of parsing, {} wines collected and sent to Kafka", products.size());
 
     }
 }
