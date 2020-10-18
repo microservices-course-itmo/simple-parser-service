@@ -58,6 +58,7 @@ public class ParserService {
     private WineRepository wineRepository;
 
     public void startParser() {
+        long start = System.currentTimeMillis();
         ArrayBlockingQueue<String> wineURLs = new ArrayBlockingQueue<>(100_000);
         DbHandler dbHandler = new DbHandler(grapesRepository, brandsRepository, countriesRepository,
                 wineGrapesRepository, wineRepository);
@@ -71,10 +72,10 @@ public class ParserService {
         Callable<String> callableTask = () -> {
             Document doc;
             try {
-                while (pageCounter.longValue() < PAGES_TO_PARSE) {
+                while (pageCounter.longValue() <= PAGES_TO_PARSE) {
                     doc = Jsoup.connect(WINE_URL + pageCounter.getAndIncrement()).get();
                     Elements wines = doc.getElementsByAttributeValue("class", "catalog-grid__item");
-                    log.debug("Parsed {} wines from url {}", wines.size(), WINE_URL + pageCounter.getAndIncrement());
+                    log.debug("Parsed {} wines from url {}", wineURLs.size(), WINE_URL + pageCounter.get());
                     wine_from_url_counter += wines.size();
                     for (Element wine : wines) {
                         wineURLs.add(wine.getElementsByAttributeValue("class", "product-snippet__name").attr("href"));
@@ -127,6 +128,7 @@ public class ParserService {
 
         message = UpdateProducts.UpdateProductsMessage.newBuilder().setShopLink(URL).addAllProducts(products).build();
         kafkaSendMessageService.sendMessage(message);
+        log.info("TIME : {} minutes", TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - start));
         log.info("End of parsing, {} wines collected and sent to Kafka", products.size());
 
     }
