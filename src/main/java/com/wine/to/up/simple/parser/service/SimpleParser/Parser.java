@@ -1,91 +1,123 @@
 package com.wine.to.up.simple.parser.service.SimpleParser;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
-import org.jsoup.*;
+import lombok.NoArgsConstructor;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
+@Component
+@NoArgsConstructor
 public class Parser {
-    private final String URL = "https://simplewine.ru";
-    private final int PAGES_TO_PARSE = 21; // currently max 132, lower const value for testing purposes
-    private Document doc;
-    private Document wineDocument;
-    private ArrayList<String> wineURLs;
-    private ArrayList<Wine> wineCatalog;
-    private int numberOfPages;
+    private static String URL;
+    private static final int PAGES_TO_PARSE = 108; // currently max 132, lower const value for testing purposes
+    public static String HOME_URL;
+    private static String WINE_URL;
 
-    public Parser() {
-        wineURLs = new ArrayList<String>();
-        wineCatalog = new ArrayList<Wine>();
+    @Value("${parser.url}")
+    public void setURLStatic(String URL_FROM_PROPERTY) {
+        URL = URL_FROM_PROPERTY;
+        HOME_URL = URL + "/catalog/vino/";
+        WINE_URL = URL + "/catalog/vino/page";
     }
 
-    public ArrayList<Wine> startParser() throws IOException {
+    public static Document URLToDocument(String someURL) throws IOException {
+        return Jsoup.connect(someURL).get();
+    }
+
+    protected int parseNumberOfPages(Document mainPage) {
+        return Integer.parseInt(
+                //mainPage.getElementsByAttributeValue("class", "pagination__navigation").get(0).child(7).text()); //works only for catalogs with more than 7 pages
+                mainPage.getElementsByAttributeValue("class", "pagination__navigation").get(0).children().last().previousElementSibling().text()); //works for catalogs with 7 or less pages
+    }
+
+    public static SimpleWine parseWine(Document wineDoc) {
         String wineName = "";
         String brandID = "";
         String countryID = "";
         float bottleVolume = 0;
-        String bottlePrice = "";
+        float bottlePrice = 0;
+        float bottleDiscount = 0;
         int bottleYear = 0;
         float bottleABV = 0;
         String colorType = "";
         String sugarType = "";
         String grapeType = "";
+        String region = "";
 
-        doc = Jsoup.connect(URL + "/catalog/vino/").get();
-        numberOfPages = Integer
-                .parseInt(doc.getElementsByAttributeValue("class", "pagination__navigation").get(0).child(7).text());
+        wineName = wineDoc.getElementsByClass("product__header-russian-name").get(0).text();
+        Elements prices = wineDoc.getElementsByClass("product__buy-price");
+        if (prices.get(0).childrenSize() > 1) {
+            bottlePrice = Float.parseFloat(prices.get(0).child(1).text().replaceAll(" |₽", ""));
+            bottleDiscount = Float.parseFloat(prices.get(0).child(2).text().replaceAll("-|%", ""));
+        } else {
+            bottlePrice = Float.parseFloat(prices.get(0).child(0).text().replaceAll(" |₽", ""));
+            bottleDiscount = 0;
+        }
 
-        for (int i = 1; i < PAGES_TO_PARSE; i++) {
-            doc = Jsoup.connect(URL + "/catalog/vino/page" + i).get();
-            Elements wines = doc.getElementsByAttributeValue("class", "catalog-grid__item");
+        Elements productFacts = wineDoc.getElementsByClass("product__facts-info-text");
+        for (Element productFact : productFacts) {
+            if (productFact.childrenSize() > 0) {
+                String href = productFact.child(0).attr("href");
+                String fact = href.split("/")[4].split("(-|_)")[0];
+                switch (fact) {
+                    case "country":
+                        countryID = productFact.text().split(",")[0];
+                        break;
+                    case "color":
+                        colorType = productFact.text();
+                        break;
+                    case "sugar":
+                        sugarType = productFact.text();
+                        break;
+                    case "grape":
+                        grapeType = productFact.text();
+                        break;
+                    case "aging":
+                        // grapeType = productFact.text();
+                        break;
 
-            for (Element wine : wines) {
-                String[] NameAndYear = wine.getElementsByAttributeValue("class", "product-snippet__name").text()
-                        .split(", ");
-                wineName = NameAndYear[0].replaceFirst("Вино ", "");
-                bottlePrice = wine.getElementsByAttributeValue("class", "product-snippet__price").attr("content");
+                    default:
+                        break;
 
-                Elements wine_Elements = wine.getElementsByAttributeValue("class", "product-snippet__info-item");
-
-                for (Element wine_Element : wine_Elements) {
-
-                    switch (wine_Element.child(0).text()) {
-                        case "Страна:":
-                            countryID = wine_Element.child(1).text();
-                            break;
-                        case "Цвет:":
-                            colorType = wine_Element.child(1).text();
-                            break;
-                        case "Сахар:":
-                            sugarType = wine_Element.child(1).text();
-                            break;
-                        case "Объем:":
-                            bottleVolume = Float.parseFloat(wine_Element.child(1).text().split(" ")[0]);
-                            break;
-                        case "Производитель:":
-                            brandID = wine_Element.child(1).text();
-                            break;
-                        case "Виноград:":
-                            grapeType = wine_Element.child(1).text();
-                            break;
-
-                        default:
-                            break;
-
-                    }
                 }
-                wineURLs.add(wine.getElementsByAttributeValue("class", "product-snippet__name").attr("href"));
-                wineCatalog.add(new Wine(wineName, brandID, countryID, bottlePrice, bottleVolume, bottleABV, colorType,
-                        sugarType));
-                log.info("New wine was added to the catalog");
             }
         }
-        return wineCatalog;
+
+        Elements productCharateristics = wineDoc.getElementsByClass("characteristics-params__item");
+        for (Element productCharateristic : productCharateristics) {
+            String charateristicTitle = productCharateristic.child(0).text();
+            // System.out.println(charateristicTitle);
+            switch (charateristicTitle) {
+                case "Регион:":
+                    region = productCharateristic.child(1).text();
+                    break;
+                case "Производитель:":
+                    brandID = productCharateristic.child(1).text();
+                    break;
+                case "Объем:":
+                    bottleVolume = Float.parseFloat(productCharateristic.child(1).text());
+                    break;
+                case "Год:":
+                    bottleYear = Integer.parseInt(productCharateristic.child(1).text());
+                    break;
+                case "Крепость:":
+                    bottleABV = Float.parseFloat(productCharateristic.child(1).text().replaceAll("%", ""));
+                    break;
+
+                default:
+                    break;
+
+            }
+        }
+
+        return SimpleWine.builder().name(wineName).brandID(brandID).countryID(countryID).price(bottlePrice)
+                .year(bottleYear).volume(bottleVolume).abv(bottleABV).colorType(colorType).grapeType(grapeType)
+                .sugarType(sugarType).discount(bottleDiscount).build();
+
     }
 }
