@@ -27,7 +27,7 @@ public class TestTopicKafkaMessageHandler implements KafkaMessageHandler<UpdateP
     @Override
     public void handle(UpdateProducts.UpdateProductsMessage message) {
         counter.incrementAndGet();
-        log.info("Message received message of type {}, number of messages: {}", message.getClass().getSimpleName(),
+        log.debug("Message received message of type {}, number of messages: {}", message.getClass().getSimpleName(),
                 counter.get());
         //messageRepository.save(new Message(message));
     }
