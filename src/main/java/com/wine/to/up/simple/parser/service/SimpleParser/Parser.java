@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 public class Parser {
     private static String URL;
     private static final int PAGES_TO_PARSE = 108; // currently max 132, lower const value for testing purposes
-    private static String HOME_URL;
+    public static String HOME_URL;
     private static String WINE_URL;
 
     @Value("${parser.url}")
@@ -30,15 +30,12 @@ public class Parser {
     }
 
     protected int parseNumberOfPages(Document mainPage) {
-        //Document mainPage = Jsoup.connect(HOME_URL).get();
-
-        int numberOfPager = Integer.parseInt(
-                mainPage.getElementsByAttributeValue("class", "pagination__navigation").get(0).child(7).text());
-        return numberOfPager;
+        return Integer.parseInt(
+                //mainPage.getElementsByAttributeValue("class", "pagination__navigation").get(0).child(7).text()); //works only for catalogs with more than 7 pages
+                mainPage.getElementsByAttributeValue("class", "pagination__navigation").get(0).children().last().previousElementSibling().text()); //works for catalogs with 7 or less pages
     }
 
     public static SimpleWine parseWine(Document wineDoc) {
-        //Document wineDoc = Jsoup.connect(wineURL).get();
         String wineName = "";
         String brandID = "";
         String countryID = "";
