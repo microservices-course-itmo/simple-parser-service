@@ -5,8 +5,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.junit.*;
-import org.junit.rules.ExpectedException;
-import org.springframework.test.util.ReflectionTestUtils;
+
 
 import static org.junit.Assert.*;
 
@@ -15,22 +14,12 @@ import java.io.IOException;
 
 public class ParserTest {
 
-    private static final Parser parser = new Parser();
     private static final String URL = "https://simplewine.ru";
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
-    @BeforeClass
-    public static void beforeTest() {
-        ReflectionTestUtils.setField(parser, "URL", URL);
-        ReflectionTestUtils.setField(parser, "HOME_URL", URL + "/catalog/vino/");
-        ReflectionTestUtils.setField(parser, "WINE_URL", URL + "/catalog/vino/page");
-    }
 
     @Test
     public void testURLConnection() throws IOException {
-        Connection.Response res = Jsoup.connect(Parser.HOME_URL).followRedirects(false).execute();
+        Connection.Response res = Jsoup.connect(URL).followRedirects(false).execute();
         assertEquals(200, res.statusCode());
     }
 
@@ -42,8 +31,8 @@ public class ParserTest {
 
     @Test
     public void testParseNumberOfPagesIntegration() throws IOException {
-        Document testCatalogPage = Parser.URLToDocument(Parser.HOME_URL);
-        int numberOfPages = parser.parseNumberOfPages(testCatalogPage);
+        Document testCatalogPage = Parser.URLToDocument(URL + "/catalog/vino/");
+        int numberOfPages = Parser.parseNumberOfPages(testCatalogPage);
         assertTrue(numberOfPages > 0);
     }
 
@@ -52,7 +41,7 @@ public class ParserTest {
     public void testParseNumberOfPages1() throws IOException {
         File testCatalogPageFile = new File("src/test/test-resources/Catalog_1_page.html");
         Document testCatalogPage = Jsoup.parse(testCatalogPageFile, "UTF-8");
-        int numberOfPages = parser.parseNumberOfPages(testCatalogPage);
+        int numberOfPages = Parser.parseNumberOfPages(testCatalogPage);
         assertEquals(1, numberOfPages);
     }
 
@@ -60,7 +49,7 @@ public class ParserTest {
     public void testParseNumberOfPages3() throws IOException {
         File testCatalogPageFile = new File("src/test/test-resources/Catalog_3_pages.html");
         Document testCatalogPage = Jsoup.parse(testCatalogPageFile, "UTF-8");
-        int numberOfPages = parser.parseNumberOfPages(testCatalogPage);
+        int numberOfPages = Parser.parseNumberOfPages(testCatalogPage);
         assertEquals(3, numberOfPages);
     }
 
@@ -68,7 +57,7 @@ public class ParserTest {
     public void testParseNumberOfPages5() throws IOException {
         File testCatalogPageFile = new File("src/test/test-resources/Catalog_5_pages.html");
         Document testCatalogPage = Jsoup.parse(testCatalogPageFile, "UTF-8");
-        int numberOfPages = parser.parseNumberOfPages(testCatalogPage);
+        int numberOfPages = Parser.parseNumberOfPages(testCatalogPage);
         assertEquals(5, numberOfPages);
     }
 
@@ -76,7 +65,7 @@ public class ParserTest {
     public void testParseNumberOfPages107() throws IOException {
         File testCatalogPageFile = new File("src/test/test-resources/Catalog_107_pages.html");
         Document testCatalogPage = Jsoup.parse(testCatalogPageFile, "UTF-8");
-        int numberOfPages = parser.parseNumberOfPages(testCatalogPage);
+        int numberOfPages = Parser.parseNumberOfPages(testCatalogPage);
         assertEquals(107, numberOfPages);
     }
 
@@ -86,7 +75,7 @@ public class ParserTest {
         Document testCatalogPage = Jsoup.parse(testCatalogPageFile, "UTF-8");
         Elements elements = testCatalogPage.getElementsByAttributeValue("class", "pagination__navigation");
         assertTrue(elements.isEmpty()); //"pagination__navigation" in input file is absent
-        int numberOfPages = parser.parseNumberOfPages(testCatalogPage);
+        int numberOfPages = Parser.parseNumberOfPages(testCatalogPage);
         assertEquals(0, numberOfPages);
     }
 
@@ -104,11 +93,9 @@ public class ParserTest {
     public void testParseWineWrongPageFormat() throws IOException {
         File testWinePageFile = new File("src/test/test-resources/Catalog_107_pages.html"); //catalog page instead of wine page
         Document testWinePage = Jsoup.parse(testWinePageFile, "UTF-8");
-        SimpleWine testWine = SimpleWine.builder().name("Бин 50 Шираз").brandID("Lindeman's").countryID("Австралия").price((float) 952.0)
-                .year(2018).volume((float) 0.75).abv((float) 13.0).colorType("красное").grapeType("шираз")
-                .sugarType("полусухое").discount((float) 20.0).region("Новый Южный Уэльс").link(testWinePage.baseUri()).build();
-
-        thrown.expect(IndexOutOfBoundsException.class); //"product__header-russian-name" in input file is absent, list in ParseWine() has length = 0
-        assertNotEquals(testWine.toString(), Parser.parseWine(testWinePage).toString());
+        //"product__header-russian-name" in input file is absent
+        assertThrows(IndexOutOfBoundsException.class, () -> {
+            Parser.parseWine(testWinePage);
+        });
     }
 }

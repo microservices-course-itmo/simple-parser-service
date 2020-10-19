@@ -16,6 +16,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import com.wine.to.up.commonlib.messaging.KafkaMessageSender;
 import com.wine.to.up.parser.common.api.schema.UpdateProducts;
 import com.wine.to.up.simple.parser.service.repository.*;
+import lombok.Getter;
 import org.jsoup.*;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;

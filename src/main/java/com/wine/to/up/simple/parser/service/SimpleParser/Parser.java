@@ -8,30 +8,17 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
 @NoArgsConstructor
 public class Parser {
-    private static String URL;
-    private static final int PAGES_TO_PARSE = 108; // currently max 132, lower const value for testing purposes
-    public static String HOME_URL;
-    private static String WINE_URL;
-
-    @Value("${parser.url}")
-    public void setURLStatic(String URL_FROM_PROPERTY) {
-        URL = URL_FROM_PROPERTY;
-        HOME_URL = URL + "/catalog/vino/";
-        WINE_URL = URL + "/catalog/vino/page";
-    }
-
     public static Document URLToDocument(String someURL) throws IOException {
         return Jsoup.connect(someURL).get();
     }
 
-    protected int parseNumberOfPages(Document mainPage) {
+    public static int parseNumberOfPages(Document mainPage) {
         int numberOfPages = 0;
         try {
             numberOfPages = Integer.parseInt(
