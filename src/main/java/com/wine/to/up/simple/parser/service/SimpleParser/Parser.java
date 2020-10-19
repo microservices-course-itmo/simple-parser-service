@@ -10,6 +10,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
 @Slf4j
 @Component
 @NoArgsConstructor
@@ -32,8 +33,11 @@ public class Parser {
 
     protected int parseNumberOfPages(Document mainPage) {
         int numberOfPager = Integer.parseInt(
-                //mainPage.getElementsByAttributeValue("class", "pagination__navigation").get(0).child(7).text()); //works only for catalogs with more than 7 pages
-                mainPage.getElementsByAttributeValue("class", "pagination__navigation").get(0).children().last().previousElementSibling().text()); //works for catalogs with 7 or less pages
+                // mainPage.getElementsByAttributeValue("class",
+                // "pagination__navigation").get(0).child(7).text()); //works only for catalogs
+                // with more than 7 pages
+                mainPage.getElementsByAttributeValue("class", "pagination__navigation").get(0).children().last()
+                        .previousElementSibling().text()); // works for catalogs with 7 or less pages
 
         log.trace("Number of pages to parse: {}", numberOfPager);
         return numberOfPager;
@@ -54,8 +58,16 @@ public class Parser {
         String sugarType = "";
         String grapeType = "";
         String region = "";
+        float wineRating = 0;
+        String bottleImage = "";
+        boolean sparkling = false;
+        String wineGastronomy = "";
+        String wineTaste = "";
 
         wineName = wineDoc.getElementsByClass("product__header-russian-name").get(0).text();
+        wineRating = Float.parseFloat(wineDoc.getElementsByClass("ui-rating-stars__value").get(0).text());
+        bottleImage = wineDoc.getElementsByClass("product-slider__slide-img").first().attr("src");
+
         log.debug("Fetch wine position page takes : {}", System.currentTimeMillis() - wineParseStart);
         Elements prices = wineDoc.getElementsByClass("product__buy-price");
         if (prices.get(0).childrenSize() > 1) {
@@ -120,6 +132,25 @@ public class Parser {
                     break;
 
             }
+        }
+
+        Elements productDescriptions = wineDoc.getElementsByClass("characteristics-description__item");
+        for (Element productDescription : productDescriptions) {
+            String descriptionItem = productDescription.children().first().text();
+
+            switch (descriptionItem) {
+                case "Гастрономия:":
+                    wineGastronomy = productDescription.child(1).text();
+                    break;
+                case "Дегустационные характеристики:":
+                    wineTaste = productDescription.child(1).text();
+                    break;
+
+                default:
+                    break;
+
+            }
+
         }
 
         log.debug("Wine parsing takes : {}", System.currentTimeMillis() - wineParseStart);
