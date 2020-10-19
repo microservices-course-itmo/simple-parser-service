@@ -32,16 +32,17 @@ public class Parser {
     }
 
     protected int parseNumberOfPages(Document mainPage) {
-        int numberOfPager = Integer.parseInt(
-                // mainPage.getElementsByAttributeValue("class",
-                // "pagination__navigation").get(0).child(7).text()); //works only for catalogs
-                // with more than 7 pages
-                mainPage.getElementsByAttributeValue("class", "pagination__navigation").get(0).children().last()
-                        .previousElementSibling().text()); // works for catalogs with 7 or less pages
+        int numberOfPages = 0;
+        try {
+            numberOfPages = Integer.parseInt(
+                    mainPage.getElementsByAttributeValue("class", "pagination__navigation").get(0).children().last()
+                            .previousElementSibling().text()); // works for catalogs with 7 or less pages
+        } catch (IndexOutOfBoundsException e) {
+            log.error("No pagination__navigation was found on page: " + mainPage.baseUri());
+        }
 
-        log.trace("Number of pages to parse: {}", numberOfPager);
-        return numberOfPager;
-
+        log.trace("Number of pages to parse: {}", numberOfPages);
+        return numberOfPages;
     }
 
     public static SimpleWine parseWine(Document wineDoc) {
