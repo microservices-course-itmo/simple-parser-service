@@ -27,9 +27,12 @@ public class CommonDbHandler {
                 .setName(Wine.getName())
                 .addRegion(Wine.getRegion())
                 .setRegion(0, Wine.getRegion())
-                .setLink(Wine.getLink());
-
-
+                .setLink(Wine.getLink())
+                .setRating(Wine.getRating())
+                .setSparkling(Wine.isSparkling())
+                .setGastronomy(Wine.getGastronomy())
+                .setTaste(Wine.getTaste())
+                .setImage(Wine.getPicture());
         return product.build();
     }
 

@@ -107,11 +107,12 @@ public class ParserService {
                     return "Wine task execution";
                 }
                 SimpleWine wine = Parser.parseWine(Parser.URLToDocument(URL + wineURL));
-                dbHandler.putInfoToDB(wine);
-                log.trace("Wine: {} added to database", wineCounter);
                 UpdateProducts.Product newProduct = commonDbHandler.putInfoToCommonDb(wine);
-                if (!products.contains(newProduct))
+                if (!products.contains(newProduct)) {
                     products.add(newProduct);
+                }
+                dbHandler.putInfoToDB(wine);
+                log.trace("Wine: {} added to database", wineCounter.getAndIncrement());
             }
         };
         List<Callable<String>> wineTasks = Collections.nCopies(15, wineTask);
@@ -128,19 +129,20 @@ public class ParserService {
 
         if (products.size() == 0) {
             log.error("\t Z E R O\tP A R S I N G");
+        } else {
+            message = UpdateProducts.UpdateProductsMessage.newBuilder().addAllProducts(products).build();
+            kafkaSendMessageService.sendMessage(message);
+            log.info("TIME : {} seconds", TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - start));
+            log.info("End of parsing, {} wines collected and sent to Kafka", products.size());
+            setMessage(message);
         }
-
-        message = UpdateProducts.UpdateProductsMessage.newBuilder().addAllProducts(products).build();
-        kafkaSendMessageService.sendMessage(message);
-        log.info("TIME : {} seconds", TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - start));
-        log.info("End of parsing, {} wines collected and sent to Kafka", products.size());
-        setMessage(message);
     }
-    public void setMessage(UpdateProducts.UpdateProductsMessage message){
+
+    public void setMessage(UpdateProducts.UpdateProductsMessage message) {
         messageToKafka = message;
     }
 
-    public UpdateProducts.UpdateProductsMessage getMessage(){
+    public UpdateProducts.UpdateProductsMessage getMessage() {
         return messageToKafka;
     }
 }

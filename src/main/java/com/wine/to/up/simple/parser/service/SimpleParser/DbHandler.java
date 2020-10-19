@@ -80,16 +80,35 @@ public class DbHandler {
         Wine wineEntity;
         String name = newWine.getName();
         Float price = newWine.getPrice();
-        Float volume = newWine.getVolume();
-        String colorType = newWine.getColorType();
-        String sugarType = newWine.getSugarType();
-        if (wineRepository.existsWineByNameAndPriceAndVolumeAndColorTypeAndSugarType(name, price,
-                volume, colorType, sugarType)) {
-            wineEntity = wineRepository.findWineByNameAndPriceAndVolumeAndColorTypeAndSugarType(name, price, volume, colorType, sugarType);
+        String link = newWine.getLink();
+        String picture = newWine.getPicture();
+        int year = newWine.getYear();
+        if (wineRepository.existsWineByLinkAndPriceAndPicture(link, price, picture )) {
+            wineEntity = wineRepository.findWineByLinkAndPriceAndPicture(link, price, picture);
             return wineEntity;
         }
-        wineEntity = new Wine(name, brandEntity, countryEntity, price, newWine.getDiscount(),
-                volume, newWine.getAbv(), newWine.getYear(), colorType, sugarType, newWine.getGrapeType());
+        wineEntity = new Wine();
+        wineEntity = Wine.builder()
+                .wineID(wineEntity.getWineID())
+                .name(name)
+                .price(price)
+                .volume(newWine.getVolume())
+                .colorType(newWine.getColorType())
+                .sugarType(newWine.getSugarType())
+                .picture(picture)
+                .link(newWine.getLink())
+                .brandID(brandEntity)
+                .countryID(countryEntity)
+                .rating(newWine.getRating())
+                .grapeType(newWine.getGrapeType())
+                .abv(newWine.getAbv())
+                .year(newWine.getYear())
+                .discount(newWine.getDiscount())
+                .region(newWine.getRegion())
+                .gastronomy(newWine.getGastronomy())
+                .sparkling(newWine.isSparkling())
+                .taste(newWine.getTaste())
+                .build();
         wineRepository.save(wineEntity);
         log.trace("New Wine was added to DB: " + wineEntity.toString());
         return wineEntity;
