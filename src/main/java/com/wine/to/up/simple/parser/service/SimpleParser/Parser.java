@@ -3,13 +3,14 @@ package com.wine.to.up.simple.parser.service.SimpleParser;
 import java.io.IOException;
 
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
+@Slf4j
 @Component
 @NoArgsConstructor
 public class Parser {
@@ -30,12 +31,17 @@ public class Parser {
     }
 
     protected int parseNumberOfPages(Document mainPage) {
-        return Integer.parseInt(
+        int numberOfPager = Integer.parseInt(
                 //mainPage.getElementsByAttributeValue("class", "pagination__navigation").get(0).child(7).text()); //works only for catalogs with more than 7 pages
                 mainPage.getElementsByAttributeValue("class", "pagination__navigation").get(0).children().last().previousElementSibling().text()); //works for catalogs with 7 or less pages
+
+        log.trace("Number of pages to parse: {}", numberOfPager);
+        return numberOfPager;
+
     }
 
     public static SimpleWine parseWine(Document wineDoc) {
+        long wineParseStart = System.currentTimeMillis();
         String wineName = "";
         String brandID = "";
         String countryID = "";
@@ -50,6 +56,7 @@ public class Parser {
         String region = "";
 
         wineName = wineDoc.getElementsByClass("product__header-russian-name").get(0).text();
+        log.debug("Fetch wine position page takes : {}", System.currentTimeMillis() - wineParseStart);
         Elements prices = wineDoc.getElementsByClass("product__buy-price");
         if (prices.get(0).childrenSize() > 1) {
             bottlePrice = Float.parseFloat(prices.get(0).child(1).text().replaceAll(" |₽", ""));
@@ -114,6 +121,8 @@ public class Parser {
 
             }
         }
+
+        log.debug("Wine parsing takes : {}", System.currentTimeMillis() - wineParseStart);
 
         return SimpleWine.builder().name(wineName).brandID(brandID).countryID(countryID).price(bottlePrice)
                 .year(bottleYear).volume(bottleVolume).abv(bottleABV).colorType(colorType).grapeType(grapeType)
