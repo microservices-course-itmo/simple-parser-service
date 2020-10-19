@@ -33,6 +33,7 @@ public class ParserService {
 
     private static String URL;
     private static final int PAGES_TO_PARSE = 3; // currently max 132, lower const value for testing purposes
+    private static UpdateProducts.UpdateProductsMessage messageToKafka;
     private static String HOME_URL;
     private static String WINE_URL;
     private static int wine_from_url_counter = 0;
@@ -101,7 +102,7 @@ public class ParserService {
 
         AtomicInteger wineCounter = new AtomicInteger(0);
         ExecutorService wineParserService = Executors.newFixedThreadPool(10);
-        Callable<String> wineTask = () -> {  
+        Callable<String> wineTask = () -> {
             while (true) {
                 String wineURL = wineURLs.poll(10, TimeUnit.SECONDS);
                 if (wineURL == null) {
@@ -130,6 +131,13 @@ public class ParserService {
         kafkaSendMessageService.sendMessage(message);
         log.info("TIME : {} minutes", TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - start));
         log.info("End of parsing, {} wines collected and sent to Kafka", products.size());
+        setMessage(message);
+    }
+    public void setMessage(UpdateProducts.UpdateProductsMessage message){
+        messageToKafka = message;
+    }
 
+    public UpdateProducts.UpdateProductsMessage getMessage(){
+        return messageToKafka;
     }
 }
