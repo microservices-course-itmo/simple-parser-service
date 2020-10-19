@@ -12,6 +12,8 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor
 @ToString
+@AllArgsConstructor
+@Builder
 public class Wine {
     @Id
     @Column(name = "wineId")
@@ -34,12 +36,14 @@ public class Wine {
     private Countries countryID;
 
     @Column(name = "price")
+    @NonNull
     private float price;
 
     @Column(name = "discount")
     private Float discount;
 
     @Column(name = "volume")
+    @NonNull
     private Float volume;
 
     @Column(name = "abv")
@@ -49,29 +53,29 @@ public class Wine {
     private int year;
 
     @Column(name = "colorType")
-    @NonNull
     private String colorType;
 
     @Column(name = "sugarType")
-    @NonNull
     private String sugarType;
 
     @Column(name = "grapeType")
     private String grapeType;
 
-    public Wine(@NonNull String name, @NonNull Brands brandID, @NonNull Countries countryID, @NonNull Float price,
-            Float discount, @NonNull Float volume, @NonNull Float abv, int year, @NonNull String colorType,
-            @NonNull String sugarType, @NonNull String grapeType) {
-        this.name = name;
-        this.brandID = brandID;
-        this.countryID = countryID;
-        this.price = price;
-        this.volume = volume;
-        this.abv = abv;
-        this.colorType = colorType;
-        this.sugarType = sugarType;
-        this.grapeType = grapeType;
-        this.year = year;
-        this.discount = discount;
-    }
+    @Column(name = "region")
+    private String region;
+
+    @Column(name = "link")
+    private String link;
+
+    @Column(name = "rating")
+    private float rating;
+
+    @Column(name = "sparkling")
+    private boolean sparkling;
+
+    @Column(name = "gastronomy")
+    private String gastronomy;
+
+    @Column(name = "taste")
+    private  String taste;
 }
