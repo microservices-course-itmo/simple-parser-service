@@ -29,4 +29,6 @@ public class SimpleWine {
     private Float price;
     private String name;
     private String grapeType;
+    private String region;
+    private String link;
 }

@@ -24,7 +24,11 @@ public class CommonDbHandler {
                 .setYear(Wine.getYear())
                 .setOldPrice(100 * Wine.getPrice() / (100 - Wine.getDiscount()))
                 .setStrength(Wine.getAbv())
-                .setName(Wine.getName());
+                .setName(Wine.getName())
+                .addRegion(Wine.getRegion())
+                .setRegion(0, Wine.getRegion())
+                .setLink(Wine.getLink());
+
 
         return product.build();
     }
@@ -32,6 +36,9 @@ public class CommonDbHandler {
     private UpdateProducts.Product.Color defineColor(@NonNull String color) {
         UpdateProducts.Product.Color colorType;
         switch (color) {
+            case "красное":
+                colorType = UpdateProducts.Product.Color.RED;
+                break;
             case "белое":
                 colorType = UpdateProducts.Product.Color.WHITE;
                 break;
@@ -42,7 +49,7 @@ public class CommonDbHandler {
                 colorType = UpdateProducts.Product.Color.ORANGE;
                 break;
             default:
-                colorType = UpdateProducts.Product.Color.RED;
+                colorType = UpdateProducts.Product.Color.UNRECOGNIZED;
                 break;
         }
         return colorType;
@@ -51,6 +58,9 @@ public class CommonDbHandler {
     private UpdateProducts.Product.Sugar defineSugar(@NonNull String sugar) {
         UpdateProducts.Product.Sugar sugarType;
         switch (sugar) {
+            case "сухое":
+                sugarType = UpdateProducts.Product.Sugar.DRY;
+                break;
             case "полусухое":
                 sugarType = UpdateProducts.Product.Sugar.MEDIUM_DRY;
                 break;
@@ -61,7 +71,7 @@ public class CommonDbHandler {
                 sugarType = UpdateProducts.Product.Sugar.MEDIUM;
                 break;
             default:
-                sugarType = UpdateProducts.Product.Sugar.DRY;
+                sugarType = UpdateProducts.Product.Sugar.UNRECOGNIZED;
                 break;
         }
         return sugarType;
