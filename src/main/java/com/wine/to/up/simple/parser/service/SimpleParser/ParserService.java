@@ -102,19 +102,21 @@ public class ParserService {
                         if (wineURL == null) {
                             return;
                         }
-                        SimpleWine wine = Parser.parseWine(Parser.URLToDocument(URL + wineURL));
-                        UpdateProducts.Product newProduct = commonDbHandler.putInfoToCommonDb(wine);
-                        if (!products.contains(newProduct)) {
-                            products.add(newProduct);
+                        try {
+                            SimpleWine wine = Parser.parseWine(Parser.URLToDocument(URL + wineURL));
+                            // UpdateProducts.Product newProduct = commonDbHandler.putInfoToCommonDb(wine);
+                            // if (!products.contains(newProduct)) {
+                            // products.add(newProduct);
+                            // }
+                            dbHandler.putInfoToDB(wine);
+                            log.trace("Wine: {} added to database", wineCounter.getAndIncrement());
+                        } catch (IOException e) {
+                            log.error("Error while parsing page: ", e);
                         }
-                        dbHandler.putInfoToDB(wine);
-                        log.trace("Wine: {} added to database", wineCounter.getAndIncrement());
                     }
 
                 } catch (InterruptedException e) {
                     log.error("Interrupt ", e);
-                } catch (IOException e) {
-                    log.error("Error while parsing page: ", e);
                 }
 
             }, winesExecutor);
@@ -126,17 +128,17 @@ public class ParserService {
 
         log.info("End of adding information to the database.");
 
-        if (products.size() == 0)
+        // if (products.size() == 0)
 
-        {
-            log.error("\t Z E R O\tP A R S I N G");
-        } else {
-            message = UpdateProducts.UpdateProductsMessage.newBuilder().addAllProducts(products).build();
-            kafkaSendMessageService.sendMessage(message);
-            log.info("TIME : {} seconds", TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - start));
-            log.info("End of parsing, {} wines collected and sent to Kafka", products.size());
-            setMessage(message);
-        }
+        // {
+        // log.error("\t Z E R O\tP A R S I N G");
+        // } else {
+        message = UpdateProducts.UpdateProductsMessage.newBuilder().addAllProducts(products).build();
+        kafkaSendMessageService.sendMessage(message);
+        log.info("TIME : {} seconds", TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - start));
+        log.info("End of parsing, {} wines collected and sent to Kafka", products.size());
+        setMessage(message);
+        // }
     }
 
     public void setMessage(UpdateProducts.UpdateProductsMessage message) {
