@@ -37,7 +37,6 @@ public class MainController {
         return "Parser started by request";
     }
 
-
     @PostMapping(path = "/grape")
     @ResponseBody
     public Grapes addGrape(@ModelAttribute("grape") Grapes grape) {
@@ -170,7 +169,7 @@ public class MainController {
         html += " <li><a href='/simple-parser/all-countries'>Show All Countries</a></li>";
         html += " <li><a href='/simple-parser/all-brands'>Show All Brands</a></li>";
         html += " <li><a href='/simple-parser/all-grapes'>Show All Grapes</a></li>";
-        html += " <li><a href='/simple-parser/all-products'>Show All Products like Message to Kafka</a></li>";
+        html += " <li><a href='/simple-parser/all-products'>Show All Products as a Message to Kafka</a></li>";
         html += "</ul>";
         return html;
     }

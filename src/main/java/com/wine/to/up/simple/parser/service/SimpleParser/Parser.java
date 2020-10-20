@@ -8,36 +8,28 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
 @Slf4j
 @Component
 @NoArgsConstructor
 public class Parser {
-    private static String URL;
-    private static final int PAGES_TO_PARSE = 108; // currently max 132, lower const value for testing purposes
-    public static String HOME_URL;
-    private static String WINE_URL;
-
-    @Value("${parser.url}")
-    public void setURLStatic(String URL_FROM_PROPERTY) {
-        URL = URL_FROM_PROPERTY;
-        HOME_URL = URL + "/catalog/vino/";
-        WINE_URL = URL + "/catalog/vino/page";
-    }
-
     public static Document URLToDocument(String someURL) throws IOException {
         return Jsoup.connect(someURL).get();
     }
 
-    protected int parseNumberOfPages(Document mainPage) {
-        int numberOfPager = Integer.parseInt(
-                //mainPage.getElementsByAttributeValue("class", "pagination__navigation").get(0).child(7).text()); //works only for catalogs with more than 7 pages
-                mainPage.getElementsByAttributeValue("class", "pagination__navigation").get(0).children().last().previousElementSibling().text()); //works for catalogs with 7 or less pages
+    public static int parseNumberOfPages(Document mainPage) {
+        int numberOfPages = 0;
+        try {
+            numberOfPages = Integer.parseInt(
+                    mainPage.getElementsByAttributeValue("class", "pagination__navigation").get(0).children().last()
+                            .previousElementSibling().text()); // works for catalogs with 7 or less pages
+        } catch (IndexOutOfBoundsException e) {
+            log.error("No pagination__navigation was found on page: " + mainPage.baseUri());
+        }
 
-        log.trace("Number of pages to parse: {}", numberOfPager);
-        return numberOfPager;
-
+        log.trace("Number of pages to parse: {}", numberOfPages);
+        return numberOfPages;
     }
 
     public static SimpleWine parseWine(Document wineDoc) {
@@ -54,8 +46,16 @@ public class Parser {
         String sugarType = "";
         String grapeType = "";
         String region = "";
+        float wineRating = 0;
+        String bottleImage = "";
+        boolean sparkling = false;
+        String wineGastronomy = "";
+        String wineTaste = "";
 
         wineName = wineDoc.getElementsByClass("product__header-russian-name").get(0).text();
+        wineRating = Float.parseFloat(wineDoc.getElementsByClass("ui-rating-stars__value").get(0).text());
+        bottleImage = wineDoc.getElementsByClass("product-slider__slide-img").first().attr("src");
+
         log.debug("Fetch wine position page takes : {}", System.currentTimeMillis() - wineParseStart);
         Elements prices = wineDoc.getElementsByClass("product__buy-price");
         if (prices.get(0).childrenSize() > 1) {
@@ -122,11 +122,31 @@ public class Parser {
             }
         }
 
+        Elements productDescriptions = wineDoc.getElementsByClass("characteristics-description__item");
+        for (Element productDescription : productDescriptions) {
+            String descriptionItem = productDescription.children().first().text();
+
+            switch (descriptionItem) {
+                case "Гастрономия:":
+                    wineGastronomy = productDescription.child(1).text();
+                    break;
+                case "Дегустационные характеристики:":
+                    wineTaste = productDescription.child(1).text();
+                    break;
+
+                default:
+                    break;
+
+            }
+
+        }
+
         log.debug("Wine parsing takes : {}", System.currentTimeMillis() - wineParseStart);
 
         return SimpleWine.builder().name(wineName).brandID(brandID).countryID(countryID).price(bottlePrice)
                 .year(bottleYear).volume(bottleVolume).abv(bottleABV).colorType(colorType).grapeType(grapeType)
-                .sugarType(sugarType).discount(bottleDiscount).region(region).link(wineDoc.baseUri()).build();
+                .sugarType(sugarType).discount(bottleDiscount).region(region).link(wineDoc.baseUri()).picture(bottleImage)
+                .rating(wineRating).sparkling(sparkling).taste(wineTaste).gastronomy(wineGastronomy).build();
 
     }
 }
