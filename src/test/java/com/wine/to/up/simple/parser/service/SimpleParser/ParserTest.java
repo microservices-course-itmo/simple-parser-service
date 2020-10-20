@@ -33,7 +33,7 @@ public class ParserTest {
     public void testParseNumberOfPagesIntegration() throws IOException {
         Document testCatalogPage = Parser.URLToDocument(URL + "/catalog/vino/");
         int numberOfPages = Parser.parseNumberOfPages(testCatalogPage);
-        assertTrue(numberOfPages > 0);
+        assertTrue(numberOfPages >= 0);
     }
 
 
@@ -83,9 +83,27 @@ public class ParserTest {
     public void testParseWineHTML() throws IOException {
         File testWinePageFile = new File("src/test/test-resources/Wine_SimpleWine.html");
         Document testWinePage = Jsoup.parse(testWinePageFile, "UTF-8");
-        SimpleWine testWine = SimpleWine.builder().name("Бин 50 Шираз").brandID("Lindeman's").countryID("Австралия").price((float) 952.0)
-                .year(2018).volume((float) 0.75).abv((float) 13.0).colorType("красное").grapeType("шираз")
-                .sugarType("полусухое").discount((float) 20.0).region("Новый Южный Уэльс").link(testWinePage.baseUri()).build();
+        SimpleWine testWine = SimpleWine.builder().
+                name("Бин 50 Шираз").
+                brandID("Lindeman's").
+                countryID("Австралия").
+                price((float) 952.0).
+                year(2018).
+                volume((float) 0.75).
+                abv((float) 13.0).
+                colorType("красное").
+                grapeType("шираз").
+                sugarType("полусухое").
+                discount((float) 20.0).
+                region("Новый Южный Уэльс").
+                link(testWinePage.baseUri()).
+                rating((float) 4.6).
+                picture("https://static.simplewine.ru/upload/iblock/3ce/vino-bin-50-shiraz-lindeman-s-2018_1.png@x303").
+                gastronomy("Прекрасно в сочетании с жареным ягненком, свининой с овощами и сырами средней выдержки.").
+                taste("Вино блестящего фиолетово-красного цвета с яркими ароматами темных спелых ягод, ванили, лакрицы и легкими перечными нотками. " +
+                        "Среднетелое, насыщенное и хорошо структурированное во вкусе, с бархатистыми танинами и оттенками черной смородины, сливы и ванили в послевкусии.").
+                sparkling(false).
+                build();
         assertEquals(testWine.toString(), Parser.parseWine(testWinePage).toString());
     }
 
@@ -94,8 +112,8 @@ public class ParserTest {
         File testWinePageFile = new File("src/test/test-resources/Catalog_107_pages.html"); //catalog page instead of wine page
         Document testWinePage = Jsoup.parse(testWinePageFile, "UTF-8");
         //"product__header-russian-name" in input file is absent
-        assertThrows(IndexOutOfBoundsException.class, () -> {
-            Parser.parseWine(testWinePage);
-        });
+        assertThrows(IndexOutOfBoundsException.class, () ->
+                Parser.parseWine(testWinePage)
+        );
     }
 }
