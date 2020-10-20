@@ -30,7 +30,7 @@ import org.springframework.stereotype.Service;
 public class ParserService {
 
     private static String URL;
-    private static final int PAGES_TO_PARSE = 5; // currently max 132, lower const value for testing purposes
+    private static final int PAGES_TO_PARSE = 3; // currently max 132, lower const value for testing purposes
     private static UpdateProducts.UpdateProductsMessage messageToKafka;
     private static String HOME_URL;
     private static String WINE_URL;
@@ -104,10 +104,10 @@ public class ParserService {
                         }
                         try {
                             SimpleWine wine = Parser.parseWine(Parser.URLToDocument(URL + wineURL));
-                            // UpdateProducts.Product newProduct = commonDbHandler.putInfoToCommonDb(wine);
-                            // if (!products.contains(newProduct)) {
-                            // products.add(newProduct);
-                            // }
+                            UpdateProducts.Product newProduct = commonDbHandler.putInfoToCommonDb(wine);
+                            if (!products.contains(newProduct)) {
+                                products.add(newProduct);
+                            }
                             dbHandler.putInfoToDB(wine);
                             log.trace("Wine: {} added to database", wineCounter.getAndIncrement());
                         } catch (IOException e) {
@@ -122,23 +122,21 @@ public class ParserService {
             }, winesExecutor);
             futures.add(future);
         }
-        // log.debug("Total {} wines", wineURLs.size());
+        log.debug("Total {} wines", wineURLs.size());
 
         futures.forEach(CompletableFuture::join);
 
         log.info("End of adding information to the database.");
 
-        // if (products.size() == 0)
-
-        // {
-        // log.error("\t Z E R O\tP A R S I N G");
-        // } else {
-        message = UpdateProducts.UpdateProductsMessage.newBuilder().addAllProducts(products).build();
-        kafkaSendMessageService.sendMessage(message);
-        log.info("TIME : {} seconds", TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - start));
-        log.info("End of parsing, {} wines collected and sent to Kafka", products.size());
-        setMessage(message);
-        // }
+        if (products.size() == 0) {
+            log.error("\t Z E R O\tP A R S I N G");
+        } else {
+            message = UpdateProducts.UpdateProductsMessage.newBuilder().addAllProducts(products).build();
+            kafkaSendMessageService.sendMessage(message);
+            log.info("TIME : {} seconds", TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - start));
+            log.info("End of parsing, {} wines collected and sent to Kafka", products.size());
+            setMessage(message);
+        }
     }
 
     public void setMessage(UpdateProducts.UpdateProductsMessage message) {
