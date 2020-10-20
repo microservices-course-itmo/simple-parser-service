@@ -145,7 +145,8 @@ public class Parser {
 
         return SimpleWine.builder().name(wineName).brandID(brandID).countryID(countryID).price(bottlePrice)
                 .year(bottleYear).volume(bottleVolume).abv(bottleABV).colorType(colorType).grapeType(grapeType)
-                .sugarType(sugarType).discount(bottleDiscount).region(region).link(wineDoc.baseUri()).build();
+                .sugarType(sugarType).discount(bottleDiscount).region(region).link(wineDoc.baseUri()).picture(bottleImage)
+                .rating(wineRating).sparkling(sparkling).taste(wineTaste).gastronomy(wineGastronomy).build();
 
     }
 }
