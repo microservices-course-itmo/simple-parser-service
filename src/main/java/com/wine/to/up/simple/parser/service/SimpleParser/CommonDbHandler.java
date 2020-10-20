@@ -39,9 +39,6 @@ public class CommonDbHandler {
     private UpdateProducts.Product.Color defineColor(@NonNull String color) {
         UpdateProducts.Product.Color colorType;
         switch (color) {
-            case "красное":
-                colorType = UpdateProducts.Product.Color.RED;
-                break;
             case "белое":
                 colorType = UpdateProducts.Product.Color.WHITE;
                 break;
@@ -52,7 +49,7 @@ public class CommonDbHandler {
                 colorType = UpdateProducts.Product.Color.ORANGE;
                 break;
             default:
-                colorType = UpdateProducts.Product.Color.UNRECOGNIZED;
+                colorType = UpdateProducts.Product.Color.RED;
                 break;
         }
         return colorType;
@@ -61,9 +58,6 @@ public class CommonDbHandler {
     private UpdateProducts.Product.Sugar defineSugar(@NonNull String sugar) {
         UpdateProducts.Product.Sugar sugarType;
         switch (sugar) {
-            case "сухое":
-                sugarType = UpdateProducts.Product.Sugar.DRY;
-                break;
             case "полусухое":
                 sugarType = UpdateProducts.Product.Sugar.MEDIUM_DRY;
                 break;
@@ -74,7 +68,7 @@ public class CommonDbHandler {
                 sugarType = UpdateProducts.Product.Sugar.MEDIUM;
                 break;
             default:
-                sugarType = UpdateProducts.Product.Sugar.UNRECOGNIZED;
+                sugarType = UpdateProducts.Product.Sugar.DRY;
                 break;
         }
         return sugarType;
