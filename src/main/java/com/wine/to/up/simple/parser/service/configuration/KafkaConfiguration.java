@@ -100,7 +100,7 @@ public class KafkaConfiguration {
                 EventDeserializer.class.getName());
 
         // bind consumer with topic name and with appropriate handler
-        return new BaseKafkaHandler<>(apiProperties.getParserWinePositionParsedEvents(),
+        return new BaseKafkaHandler<>(apiProperties.getWineParsedEventsTopicName(),
                 new KafkaConsumer<>(consumerProperties), handler);
     }
 
@@ -141,7 +141,7 @@ public class KafkaConfiguration {
         producerProperties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, EventSerializer.class.getName());
 
         return new KafkaMessageSender<>(new KafkaProducer<>(producerProperties),
-                apiProperties.getParserWinePositionParsedEvents(), metricsCollector);
+                apiProperties.getWineParsedEventsTopicName(), metricsCollector);
     }
 
     @Bean
@@ -152,6 +152,6 @@ public class KafkaConfiguration {
         producerProperties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, EventSerializer.class.getName());
 
         return new KafkaMessageSender<>(new KafkaProducer<>(producerProperties),
-                apiProperties.getParserWinePositionParsedEvents(), metricsCollector);
+                apiProperties.getWineParsedEventsTopicName(), metricsCollector);
     }
 }
