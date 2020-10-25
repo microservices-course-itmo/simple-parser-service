@@ -104,19 +104,6 @@ public class KafkaConfiguration {
                 new KafkaConsumer<>(consumerProperties), handler);
     }
 
-//    @Bean
-//    BaseKafkaHandler<String> testTopicMessagesHandler(Properties consumerProperties,
-//                                                      ParserCommonApiProperties apiProperties, SmopikTopicKafkaMessageHandler handler) {
-//        // set appropriate deserializer for value
-//        consumerProperties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
-//                EventDeserializer.class.getName());
-//
-//        // bind consumer with topic name and with appropriate handler
-//        return new BaseKafkaHandler<>(apiProperties.getParserWinePositionParsedEvents(),
-//                new KafkaConsumer<>(consumerProperties), handler);
-//    }
-
-
     /**
      * Creates sender based on general properties. It helps to send single message
      * to designated topic.
