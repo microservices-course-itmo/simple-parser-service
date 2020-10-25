@@ -54,7 +54,9 @@ public class Parser {
 
         wineName = wineDoc.getElementsByClass("product__header-russian-name").get(0).text();
         wineRating = Float.parseFloat(wineDoc.getElementsByClass("ui-rating-stars__value").get(0).text());
-        bottleImage = wineDoc.getElementsByClass("product-slider__slide-img").first().attr("src");
+        if (wineDoc.hasClass("product-slider__slide-img")){
+            bottleImage = wineDoc.getElementsByClass("product-slider__slide-img").first().attr("src");
+        }
 
         log.debug("Fetch wine position page takes : {}", System.currentTimeMillis() - wineParseStart);
         Elements prices = wineDoc.getElementsByClass("product__buy-price");
