@@ -27,9 +27,7 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-
 public class ParserService {
-
     private static String URL;
     private static final int PAGES_TO_PARSE = 3; // currently max 107, lower const value for testing purposes
     private static UpdateProducts.UpdateProductsMessage messageToKafka;
@@ -58,6 +56,10 @@ public class ParserService {
     private WineGrapesRepository wineGrapesRepository;
     @Autowired
     private WineRepository wineRepository;
+
+    public static Document URLToDocument(String someURL) throws IOException {
+        return Jsoup.connect(someURL).get();
+    }
 
     public void startParser() {
         long start = System.currentTimeMillis();
@@ -103,7 +105,7 @@ public class ParserService {
                             return;
                         }
                         try {
-                            SimpleWine wine = Parser.parseWine(Parser.URLToDocument(URL + wineURL));
+                            SimpleWine wine = Parser.parseWine(URLToDocument(URL + wineURL));
                             UpdateProducts.Product newProduct = wineToDTO.getProtoWine(wine);
                             if (!products.contains(newProduct)) {
                                 products.add(newProduct);
@@ -114,20 +116,15 @@ public class ParserService {
                             log.error("Error while parsing page: ", e);
                         }
                     }
-
                 } catch (InterruptedException e) {
                     log.error("Interrupt ", e);
                 }
-
             }, winesExecutor);
             futures.add(future);
         }
         log.debug("Total {} wines", wineURLs.size());
-
         futures.forEach(CompletableFuture::join);
-
         log.info("End of adding information to the database.");
-
         if (products.size() == 0) {
             log.error("\t Z E R O\tP A R S I N G");
         } else {

@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RequestMapping(path = "/simple-parser")
 public class MainController {
-
     @Autowired
     private GrapesRepository grapesRepository;
     @Autowired
@@ -29,7 +28,6 @@ public class MainController {
     private WineRepository wineRepository;
     @Autowired
     private ParserService parserService;
-
 
     @GetMapping(path = "/run-parser")
     public String runParser() {
@@ -98,7 +96,6 @@ public class MainController {
         for (Grapes someGrape : grapes) {
             html += someGrape + "<br>";
         }
-
         return html;
     }
 
@@ -110,7 +107,6 @@ public class MainController {
         for (Brands someBrand : brands) {
             html += someBrand + "<br>";
         }
-
         return html;
     }
 
