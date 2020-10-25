@@ -10,4 +10,5 @@ import java.util.UUID;
 public interface BrandsRepository extends CrudRepository<Brands, UUID> {
     Brands findBrandByBrandName(String name);
     Boolean existsBrandsByBrandName(String name);
+    Boolean existsBrandsByBrandNameEquals(String name);
 }

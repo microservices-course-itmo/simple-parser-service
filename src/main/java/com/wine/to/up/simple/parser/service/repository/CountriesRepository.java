@@ -10,4 +10,5 @@ import java.util.UUID;
 public interface CountriesRepository extends CrudRepository<Countries, UUID> {
     Countries findCountryByCountryName(String name);
     Boolean existsCountriesByCountryName(String name);
+    Boolean existsCountriesByCountryNameEquals(String name);
 }

@@ -10,4 +10,5 @@ import java.util.UUID;
 public interface GrapesRepository extends CrudRepository<Grapes, UUID> {
     Grapes findGrapeByGrapeName(String name);
     Boolean existsGrapesByGrapeName(String name);
+    Boolean existsGrapesByGrapeNameEquals(String name);
 }

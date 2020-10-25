@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import com.wine.to.up.commonlib.messaging.KafkaMessageSender;
 import com.wine.to.up.parser.common.api.schema.UpdateProducts;
+import com.wine.to.up.simple.parser.service.SimpleParser.DbHandler.WineService;
 import com.wine.to.up.simple.parser.service.repository.*;
 import org.jsoup.*;
 import org.jsoup.nodes.Document;
@@ -30,7 +31,7 @@ import org.springframework.stereotype.Service;
 public class ParserService {
 
     private static String URL;
-    private static final int PAGES_TO_PARSE = 3; // currently max 132, lower const value for testing purposes
+    private static final int PAGES_TO_PARSE = 3; // currently max 107, lower const value for testing purposes
     private static UpdateProducts.UpdateProductsMessage messageToKafka;
     private static String HOME_URL;
     private static String WINE_URL;
@@ -64,14 +65,13 @@ public class ParserService {
         List<CompletableFuture<?>> futures = new ArrayList<>();
         ArrayBlockingQueue<String> wineURLs = new ArrayBlockingQueue<>(100_000);
 
-        DbHandler dbHandler = new DbHandler(grapesRepository, brandsRepository, countriesRepository,
+        WineService dbHandler = new WineService(grapesRepository, brandsRepository, countriesRepository,
                 wineGrapesRepository, wineRepository);
-        CommonDbHandler commonDbHandler = new CommonDbHandler();
+        WineToDTO wineToDTO = new WineToDTO();
         List<UpdateProducts.Product> products = new ArrayList<>();
         UpdateProducts.UpdateProductsMessage message;
 
         AtomicLong pageCounter = new AtomicLong(1);
-
         for (int i = 0; i < 15; i++) {
             CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
                 Document doc;
@@ -104,11 +104,11 @@ public class ParserService {
                         }
                         try {
                             SimpleWine wine = Parser.parseWine(Parser.URLToDocument(URL + wineURL));
-                            UpdateProducts.Product newProduct = commonDbHandler.putInfoToCommonDb(wine);
+                            UpdateProducts.Product newProduct = wineToDTO.getProtoWine(wine);
                             if (!products.contains(newProduct)) {
                                 products.add(newProduct);
                             }
-                            dbHandler.putInfoToDB(wine);
+                            dbHandler.saveAllWineParsedInfo(wine);
                             log.trace("Wine: {} added to database", wineCounter.getAndIncrement());
                         } catch (IOException e) {
                             log.error("Error while parsing page: ", e);
@@ -133,7 +133,7 @@ public class ParserService {
         } else {
             message = UpdateProducts.UpdateProductsMessage.newBuilder().addAllProducts(products).build();
             kafkaSendMessageService.sendMessage(message);
-            log.info("TIME : {} seconds", TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - start));
+            log.info("TIME : {} min {} seconds", TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - start), TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - start));
             log.info("End of parsing, {} wines collected and sent to Kafka", products.size());
             setMessage(message);
         }
