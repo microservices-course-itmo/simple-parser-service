@@ -31,7 +31,7 @@ import org.springframework.stereotype.Service;
 public class ParserService {
 
     private static String URL;
-    private static final int PAGES_TO_PARSE = 3; // currently max 132, lower const value for testing purposes
+    private static final int PAGES_TO_PARSE = 3; // currently max 107, lower const value for testing purposes
     private static UpdateProducts.UpdateProductsMessage messageToKafka;
     private static String HOME_URL;
     private static String WINE_URL;
@@ -133,7 +133,7 @@ public class ParserService {
         } else {
             message = UpdateProducts.UpdateProductsMessage.newBuilder().addAllProducts(products).build();
             kafkaSendMessageService.sendMessage(message);
-            log.info("TIME : {} seconds", TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - start));
+            log.info("TIME : {} min {} seconds", TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - start), TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - start));
             log.info("End of parsing, {} wines collected and sent to Kafka", products.size());
             setMessage(message);
         }
