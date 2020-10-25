@@ -15,20 +15,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Component
 @Slf4j
 public class TestTopicKafkaMessageHandler implements KafkaMessageHandler<UpdateProducts.UpdateProductsMessage> {
-    //private final MessageRepository messageRepository;
 
     private final AtomicInteger counter = new AtomicInteger(0);
-
-//    @Autowired
-//    public StringTopicKafkaMessageHandler(MessageRepository messageRepository) {
-//        this.messageRepository = messageRepository;
-//    }
 
     @Override
     public void handle(UpdateProducts.UpdateProductsMessage message) {
         counter.incrementAndGet();
         log.debug("Message received message of type {}, number of messages: {}", message.getClass().getSimpleName(),
                 counter.get());
-        //messageRepository.save(new Message(message));
     }
 }

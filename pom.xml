@@ -18,12 +18,12 @@
 
     <properties>
         <!--        TODO create-service: set version to initial (0.1.0)-->
-        <current-version>0.3.0</current-version>
+        <current-version>0.4.0</current-version>
 
         <service.commonlib.version>0.2.1-SNAPSHOT</service.commonlib.version>
         <!--        TODO create-service: replace-->
         <demo.service.api.version>0.3.0-SNAPSHOT</demo.service.api.version>
-        <parser.common.api.version>0.2.1-SNAPSHOT</parser.common.api.version>
+        <parser.common.api.version>0.2.2-SNAPSHOT</parser.common.api.version>
 
         
         <org.jsoup.version>1.13.1</org.jsoup.version>

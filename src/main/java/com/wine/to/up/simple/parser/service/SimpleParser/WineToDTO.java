@@ -3,36 +3,41 @@ package com.wine.to.up.simple.parser.service.SimpleParser;
 
 import com.wine.to.up.parser.common.api.schema.UpdateProducts;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-//send what we have
 @Service
-public class CommonDbHandler {
+@Slf4j
+public class WineToDTO {
 
-    public UpdateProducts.Product putInfoToCommonDb(SimpleWine Wine) {
-        UpdateProducts.Product.Color color = defineColor(Wine.getColorType());
-        UpdateProducts.Product.Sugar sugar = defineSugar(Wine.getSugarType());
+    public UpdateProducts.Product getProtoWine(SimpleWine wine) {
+        UpdateProducts.Product.Color color = defineColor(wine.getColorType());
+        UpdateProducts.Product.Sugar sugar = defineSugar(wine.getSugarType());
         UpdateProducts.Product.Builder product = UpdateProducts.Product.newBuilder()
-                .setColor(color)
-                .setSugar(sugar)
-                .addGrapeSort(Wine.getGrapeType())
-                .setGrapeSort(0, Wine.getGrapeType())
-                .setBrand(Wine.getBrandID())
-                .setCapacity(Wine.getVolume())
-                .setCountry(Wine.getCountryID())
-                .setNewPrice(Wine.getPrice())
-                .setYear(Wine.getYear())
-                .setOldPrice(100 * Wine.getPrice() / (100 - Wine.getDiscount()))
-                .setStrength(Wine.getAbv())
-                .setName(Wine.getName())
-                .addRegion(Wine.getRegion())
-                .setRegion(0, Wine.getRegion())
-                .setLink(Wine.getLink())
-                .setRating(Wine.getRating())
-                .setSparkling(Wine.isSparkling())
-                .setGastronomy(Wine.getGastronomy())
-                .setTaste(Wine.getTaste())
-                .setImage(Wine.getPicture());
+                .addGrapeSort(wine.getGrapeType())
+                .setGrapeSort(0, wine.getGrapeType())
+                .setBrand(wine.getBrandID())
+                .setCapacity(wine.getVolume())
+                .setCountry(wine.getCountryID())
+                .setNewPrice(wine.getPrice())
+                .setYear(wine.getYear())
+                .setOldPrice(100 * wine.getPrice() / (100 - wine.getDiscount()))
+                .setStrength(wine.getAbv())
+                .setName(wine.getName())
+                .addRegion(wine.getRegion())
+                .setRegion(0, wine.getRegion())
+                .setLink(wine.getLink())
+                .setRating(wine.getRating())
+                .setSparkling(wine.isSparkling())
+                .setGastronomy(wine.getGastronomy())
+                .setTaste(wine.getTaste())
+                .setImage(wine.getPicture());
+        if (sugar != null) {
+            product.setSugar(sugar);
+        }
+        if (color != null) {
+            product.setColor(color);
+        }
         return product.build();
     }
 
@@ -52,7 +57,8 @@ public class CommonDbHandler {
                 colorType = UpdateProducts.Product.Color.ORANGE;
                 break;
             default:
-                colorType = UpdateProducts.Product.Color.UNRECOGNIZED;
+                log.error("The wine color was not defined.");
+                colorType = null;
                 break;
         }
         return colorType;
@@ -74,7 +80,8 @@ public class CommonDbHandler {
                 sugarType = UpdateProducts.Product.Sugar.MEDIUM;
                 break;
             default:
-                sugarType = UpdateProducts.Product.Sugar.UNRECOGNIZED;
+                log.error("The wine sugar was not defined.");
+                sugarType = null;
                 break;
         }
         return sugarType;
