@@ -1,23 +1,24 @@
+/**
+ * com.wine.to.up.simple.parser.service.messaging is a package for handling messages from kafka.
+ */
 package com.wine.to.up.simple.parser.service.messaging;
 
 import com.wine.to.up.commonlib.messaging.KafkaMessageHandler;
-import com.wine.to.up.commonlib.messaging.KafkaMessageSender;
-import com.wine.to.up.demo.service.api.message.KafkaMessageSentEventOuterClass.KafkaMessageSentEvent;
 import com.wine.to.up.parser.common.api.schema.UpdateProducts;
-import com.wine.to.up.simple.parser.service.domain.entity.Message;
-import com.wine.to.up.simple.parser.service.repository.MessageRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.util.concurrent.atomic.AtomicInteger;
-
+/**
+ * Counting number of messages from Kafka (about adding new Product).
+ */
 @Component
 @Slf4j
 public class TestTopicKafkaMessageHandler implements KafkaMessageHandler<UpdateProducts.UpdateProductsMessage> {
-
+    /** Counter of messages */
     private final AtomicInteger counter = new AtomicInteger(0);
-
+    /**
+     * Function for getting {@link TestTopicKafkaMessageHandler#counter}
+     */
     @Override
     public void handle(UpdateProducts.UpdateProductsMessage message) {
         counter.incrementAndGet();
