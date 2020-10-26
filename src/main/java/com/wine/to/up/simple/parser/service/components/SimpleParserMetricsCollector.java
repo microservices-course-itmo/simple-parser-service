@@ -1,4 +1,3 @@
-//TODO create-service: move classes to correct package. F.e. for order-service all classes should be in "com.wine.to.up.order.service.*"
 package com.wine.to.up.simple.parser.service.components;
 
 import com.wine.to.up.commonlib.metrics.CommonMetricsCollector;

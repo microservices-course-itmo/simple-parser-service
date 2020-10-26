@@ -30,12 +30,13 @@ import org.springframework.stereotype.Service;
 public class ParserService {
     private static String URL;
     private static final int PAGES_TO_PARSE = 3; // currently max 107, lower const value for testing purposes
+    private final int NUMBER_OF_THREADS = 15;
     private static UpdateProducts.UpdateProductsMessage messageToKafka;
     private static String HOME_URL;
     private static String WINE_URL;
 
     private final ExecutorService pagesExecutor = Executors.newSingleThreadExecutor();
-    private final ExecutorService winesExecutor = Executors.newFixedThreadPool(10);
+    private final ExecutorService winesExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
 
     @Value("${parser.url}")
     public void setURLStatic(String URL_FROM_PROPERTY) {
@@ -74,7 +75,7 @@ public class ParserService {
         UpdateProducts.UpdateProductsMessage message;
 
         AtomicLong pageCounter = new AtomicLong(1);
-        for (int i = 0; i < 15; i++) {
+        for (int i = 0; i < NUMBER_OF_THREADS; i++) {
             CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
                 Document doc;
                 try {
@@ -130,7 +131,8 @@ public class ParserService {
         } else {
             message = UpdateProducts.UpdateProductsMessage.newBuilder().addAllProducts(products).build();
             kafkaSendMessageService.sendMessage(message);
-            log.info("TIME : {} min {} seconds", TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - start), TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - start));
+            log.info("TIME : {} min {} seconds", TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - start),
+                    TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - start));
             log.info("End of parsing, {} wines collected and sent to Kafka", products.size());
             setMessage(message);
         }
