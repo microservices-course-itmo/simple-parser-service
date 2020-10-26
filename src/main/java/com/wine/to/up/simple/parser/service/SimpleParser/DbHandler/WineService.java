@@ -4,7 +4,6 @@ import com.wine.to.up.simple.parser.service.SimpleParser.SimpleWine;
 import com.wine.to.up.simple.parser.service.domain.entity.*;
 import com.wine.to.up.simple.parser.service.repository.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,7 +15,6 @@ public class WineService {
     private final GrapesService grapesService;
     private final WineGrapesService wineGrapesService;
 
-    @Autowired
     public WineService(GrapesRepository grapesRepository, BrandsRepository brandsRepository, CountriesRepository countriesRepository, WineGrapesRepository wineGrapesRepository, WineRepository wineRepository) {
         brandsService = new BrandsService(brandsRepository);
         countriesService = new CountriesService(countriesRepository);
@@ -32,16 +30,33 @@ public class WineService {
             return;
         }
         String brand = newWine.getBrandID();
-        Brands brandEntity = brandsService.saveBrand(brand);
+        Brands brandEntity = null;
+        try {
+            brandEntity = brandsService.saveBrand(brand);
+        } catch (Exception e) {
+            log.error("DB error: problem with saveBrand");
+        }
 
         String country = newWine.getCountryID();
-        Countries countryEntity = countriesService.saveCountry(country);
+        Countries countryEntity = null;
+        try {
+            countryEntity = countriesService.saveCountry(country);
+        } catch (Exception e) {
+            log.error("DB error: problem with saveCountry");
+        }
 
         String grape = newWine.getGrapeType();
-        Grapes grapeEntity = grapesService.saveGrape(grape);
+        Grapes grapeEntity = null;
+        try {
+            grapeEntity = grapesService.saveGrape(grape);
+        } catch (Exception e) {
+            log.error("DB error: problem with saveGrape");
+        }
 
-        Wine wineEntity = saveWine(newWine, brandEntity, countryEntity);
-        wineGrapesService.saveWineGrapes(grapeEntity, wineEntity);
+        if (!(brandEntity == null) && !(countryEntity == null) && !(grapeEntity == null)) {
+            Wine wineEntity = saveWine(newWine, brandEntity, countryEntity);
+            wineGrapesService.saveWineGrapes(grapeEntity, wineEntity);
+        }
     }
 
     private Wine saveWine(SimpleWine newWine, Brands brandEntity, Countries countryEntity) {

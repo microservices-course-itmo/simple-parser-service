@@ -1,9 +1,10 @@
 package com.wine.to.up.simple.parser.service.SimpleParser.DbHandler;
 
+import com.wine.to.up.simple.parser.service.domain.entity.Brands;
 import com.wine.to.up.simple.parser.service.domain.entity.Countries;
 import com.wine.to.up.simple.parser.service.repository.CountriesRepository;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -11,20 +12,16 @@ import org.springframework.stereotype.Service;
 public class CountriesService {
     private final CountriesRepository countriesRepository;
 
-    @Autowired
-    public CountriesService(CountriesRepository countriesRepository) {
+    public CountriesService(@NonNull CountriesRepository countriesRepository) {
         this.countriesRepository = countriesRepository;
     }
 
-    protected Countries saveCountry(String country) {
-        Countries countryEntity;
-        if (countriesRepository.existsCountriesByCountryNameEquals(country)) {
-            countryEntity = countriesRepository.findCountryByCountryName(country);
-            return countryEntity;
+    protected Countries saveCountry(@NonNull String country) {
+        if (!countriesRepository.existsCountriesByCountryName(country)) {
+            countriesRepository.save(new Countries(country));
+            log.trace("New Brand was added to DB: " + country);
         }
-        countryEntity = new Countries(country);
-        countriesRepository.save(countryEntity);
-        log.trace("New Country was added to DB: " + country);
-        return countryEntity;
+
+        return countriesRepository.findCountryByCountryName(country);
     }
 }
