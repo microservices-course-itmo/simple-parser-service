@@ -24,23 +24,15 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class ParserService {
-    private static String URL;
+    @Value("${parser.url}")
+    private String URL;
+    @Value("${parser.wineurl}")
+    private String WINE_URL;
     private static final int PAGES_TO_PARSE = 106; // currently max 106, lower const value for testing purposes
     private final int NUMBER_OF_THREADS = 15;
     private static UpdateProducts.UpdateProductsMessage messageToKafka;
-    private static String HOME_URL;
-    private static String WINE_URL;
-
     private final ExecutorService pagesExecutor = Executors.newSingleThreadExecutor();
     private final ExecutorService winesExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
-
-
-    @Value("${parser.url}")
-    public void setURLStatic(String URL_FROM_PROPERTY) {
-        URL = URL_FROM_PROPERTY;
-        HOME_URL = URL + "/catalog/vino/";
-        WINE_URL = URL + "/catalog/vino/page";
-    }
 
     @Autowired
     KafkaMessageSender<UpdateProducts.UpdateProductsMessage> kafkaSendMessageService;
