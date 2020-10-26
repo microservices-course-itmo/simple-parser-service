@@ -26,12 +26,14 @@ import org.springframework.stereotype.Service;
 public class ParserService {
     private static String URL;
     private static final int PAGES_TO_PARSE = 106; // currently max 106, lower const value for testing purposes
+    private final int NUMBER_OF_THREADS = 15;
     private static UpdateProducts.UpdateProductsMessage messageToKafka;
     private static String HOME_URL;
     private static String WINE_URL;
 
     private final ExecutorService pagesExecutor = Executors.newSingleThreadExecutor();
-    private final ExecutorService winesExecutor = Executors.newFixedThreadPool(15);
+    private final ExecutorService winesExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
+
 
     @Value("${parser.url}")
     public void setURLStatic(String URL_FROM_PROPERTY) {
@@ -69,7 +71,7 @@ public class ParserService {
         List<UpdateProducts.Product> products = new ArrayList<>();
 
         AtomicLong pageCounter = new AtomicLong(1);
-        for (int i = 0; i < 15; i++) {
+        for (int i = 0; i < NUMBER_OF_THREADS; i++) {
             CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
                 Document doc;
                 try {
