@@ -83,7 +83,6 @@
         </dependency>
 
         <!--Our custom artifacts-->
-        <!--        TODO create-service: replace-->
         <dependency>
             <groupId>com.wine.to.up</groupId>
             <artifactId>parser-common-api</artifactId>
