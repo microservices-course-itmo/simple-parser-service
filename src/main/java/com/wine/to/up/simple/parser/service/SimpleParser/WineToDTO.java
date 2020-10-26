@@ -15,7 +15,6 @@ public class WineToDTO {
         UpdateProducts.Product.Sugar sugar = defineSugar(wine.getSugarType());
         UpdateProducts.Product.Builder product = UpdateProducts.Product.newBuilder()
                 .addGrapeSort(wine.getGrapeType())
-                .setGrapeSort(0, wine.getGrapeType())
                 .setBrand(wine.getBrandID())
                 .setCapacity(wine.getVolume())
                 .setCountry(wine.getCountryID())
@@ -38,6 +37,8 @@ public class WineToDTO {
         if (color != null) {
             product.setColor(color);
         }
+        if (wine.getGrapeType() != null)
+            product.setGrapeSort(0, wine.getGrapeType());
         return product.build();
     }
 
