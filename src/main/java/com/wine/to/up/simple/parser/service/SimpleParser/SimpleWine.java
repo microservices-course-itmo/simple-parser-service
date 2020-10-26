@@ -7,9 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.io.File;
-import java.util.UUID;
-
 @ToString
 @Builder
 @AllArgsConstructor
@@ -34,5 +31,5 @@ public class SimpleWine {
     private float rating;
     private boolean sparkling;
     private String gastronomy;
-    private  String taste;
+    private String taste;
 }

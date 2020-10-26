@@ -37,7 +37,7 @@ public class Wine {
 
     @Column(name = "price")
     @NonNull
-    private float price;
+    private Float price;
 
     @Column(name = "discount")
     private Float discount;
@@ -68,7 +68,7 @@ public class Wine {
     private String link;
 
     @Column(name = "rating")
-    private float rating;
+    private Float rating;
 
     @Column(name = "sparkling")
     private boolean sparkling;

@@ -1,10 +1,7 @@
 package com.wine.to.up.simple.parser.service.SimpleParser;
 
-import java.io.IOException;
-
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -14,20 +11,15 @@ import org.springframework.stereotype.Component;
 @Component
 @NoArgsConstructor
 public class Parser {
-    public static Document URLToDocument(String someURL) throws IOException {
-        return Jsoup.connect(someURL).get();
-    }
-
     public static int parseNumberOfPages(Document mainPage) {
         int numberOfPages = 0;
         try {
             numberOfPages = Integer.parseInt(
                     mainPage.getElementsByAttributeValue("class", "pagination__navigation").get(0).children().last()
-                            .previousElementSibling().text()); // works for catalogs with 7 or less pages
+                            .previousElementSibling().text());
         } catch (IndexOutOfBoundsException e) {
             log.error("No pagination__navigation was found on page: " + mainPage.baseUri());
         }
-
         log.trace("Number of pages to parse: {}", numberOfPages);
         return numberOfPages;
     }
@@ -54,7 +46,9 @@ public class Parser {
 
         wineName = wineDoc.getElementsByClass("product__header-russian-name").get(0).text();
         wineRating = Float.parseFloat(wineDoc.getElementsByClass("ui-rating-stars__value").get(0).text());
-        bottleImage = wineDoc.getElementsByClass("product-slider__slide-img").first().attr("src");
+        if (wineDoc.select("img").hasClass("product-slider__slide-img")) {
+            bottleImage = wineDoc.getElementsByClass("product-slider__slide-img").first().attr("src");
+        }
 
         log.debug("Fetch wine position page takes : {}", System.currentTimeMillis() - wineParseStart);
         Elements prices = wineDoc.getElementsByClass("product__buy-price");
@@ -90,7 +84,6 @@ public class Parser {
 
                     default:
                         break;
-
                 }
             }
         }
@@ -118,7 +111,6 @@ public class Parser {
 
                 default:
                     break;
-
             }
         }
 
@@ -136,17 +128,13 @@ public class Parser {
 
                 default:
                     break;
-
             }
-
         }
 
         log.debug("Wine parsing takes : {}", System.currentTimeMillis() - wineParseStart);
-
         return SimpleWine.builder().name(wineName).brandID(brandID).countryID(countryID).price(bottlePrice)
                 .year(bottleYear).volume(bottleVolume).abv(bottleABV).colorType(colorType).grapeType(grapeType)
                 .sugarType(sugarType).discount(bottleDiscount).region(region).link(wineDoc.baseUri()).picture(bottleImage)
                 .rating(wineRating).sparkling(sparkling).taste(wineTaste).gastronomy(wineGastronomy).build();
-
     }
 }

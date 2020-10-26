@@ -6,16 +6,13 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.junit.*;
 
-
 import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
 
 public class ParserTest {
-
     private static final String URL = "https://simplewine.ru";
-
 
     @Test
     public void testURLConnection() throws IOException {
@@ -25,17 +22,16 @@ public class ParserTest {
 
     @Test
     public void testURLtoDocument() throws IOException {
-        Document doc = Parser.URLToDocument(URL);
+        Document doc = ParserService.URLToDocument(URL);
         assertTrue(doc.title().contains("Интернет-витрина магазина SimpleWine: продажа хорошего алкоголя в Москве и Санкт-Петербурге, цены на сайте"));
     }
 
     @Test
     public void testParseNumberOfPagesIntegration() throws IOException {
-        Document testCatalogPage = Parser.URLToDocument(URL + "/catalog/vino/");
+        Document testCatalogPage = ParserService.URLToDocument(URL + "/catalog/vino/");
         int numberOfPages = Parser.parseNumberOfPages(testCatalogPage);
         assertTrue(numberOfPages >= 0);
     }
-
 
     @Test
     public void testParseNumberOfPages1() throws IOException {
