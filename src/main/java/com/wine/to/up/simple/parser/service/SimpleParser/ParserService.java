@@ -120,7 +120,6 @@ public class ParserService {
             }, winesExecutor);
             futures.add(future);
         }
-        log.debug("Total {} wines", wineURLs.size());
         futures.forEach(CompletableFuture::join);
         log.info("End of adding information to the database.");
         if (products.size() == 0) {
