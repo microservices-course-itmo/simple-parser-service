@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
  * /actuator/prometheus Prometheus' metrics exposed at /metrics-prometheus
  *
  */
-// TODO create-service: rename
 @Component
 public class SimpleParserMetricsCollector extends CommonMetricsCollector {
 }

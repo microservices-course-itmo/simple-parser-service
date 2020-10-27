@@ -1,9 +1,7 @@
-#TODO create-service: rename file
 version: "3"
 
 services:
   service:
-    #TODO create-service: rename
     image: simple-parser-service:latest
     ports:
       - 8080:8080

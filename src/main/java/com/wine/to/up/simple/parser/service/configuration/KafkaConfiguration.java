@@ -117,7 +117,6 @@ public class KafkaConfiguration {
          * @param metricsCollector   class encapsulating the logic of the metrics
          *                           collecting and publishing
          */
-
         @Bean
         KafkaMessageSender<KafkaMessageSentEvent> testTopicKafkaMessageSender(Properties producerProperties,
                         ParserCommonApiProperties apiProperties, SimpleParserMetricsCollector metricsCollector) {
