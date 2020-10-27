@@ -24,23 +24,15 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class ParserService {
-    private static String URL;
+    @Value("${parser.url}")
+    private String URL;
+    @Value("${parser.wineurl}")
+    private String WINE_URL;
     private static final int PAGES_TO_PARSE = 106; // currently max 106, lower const value for testing purposes
     private final int NUMBER_OF_THREADS = 15;
     private static UpdateProducts.UpdateProductsMessage messageToKafka;
-    private static String HOME_URL;
-    private static String WINE_URL;
-
     private final ExecutorService pagesExecutor = Executors.newSingleThreadExecutor();
     private final ExecutorService winesExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
-
-
-    @Value("${parser.url}")
-    public void setURLStatic(String URL_FROM_PROPERTY) {
-        URL = URL_FROM_PROPERTY;
-        HOME_URL = URL + "/catalog/vino/";
-        WINE_URL = URL + "/catalog/vino/page";
-    }
 
     @Autowired
     KafkaMessageSender<UpdateProducts.UpdateProductsMessage> kafkaSendMessageService;
@@ -137,16 +129,11 @@ public class ParserService {
             UpdateProducts.UpdateProductsMessage message;
             if (products.size() >= 1000) {
                 int messageSize = Math.round(products.size() / 4);
-                int fromIndex;
-                int toIndex;
                 for (int i = 0; i < 4; i++) {
-                    fromIndex = i * messageSize;
                     if (i == 3)
-                        toIndex = products.size() - 1;
+                        message = UpdateProducts.UpdateProductsMessage.newBuilder().addAllProducts(products.subList(i * messageSize, products.size() - 1)).build();
                     else
-                        toIndex = (i + 1) * messageSize - 1;
-
-                    message = UpdateProducts.UpdateProductsMessage.newBuilder().addAllProducts(products.subList(fromIndex, toIndex)).build();
+                        message = UpdateProducts.UpdateProductsMessage.newBuilder().addAllProducts(products.subList(i * messageSize, (i + 1) * messageSize - 1)).build();
                     kafkaSendMessageService.sendMessage(message);
                 }
             } else {
