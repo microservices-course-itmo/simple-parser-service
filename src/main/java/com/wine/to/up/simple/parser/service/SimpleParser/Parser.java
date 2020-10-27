@@ -7,16 +7,25 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
+/**
+ * Parses wine and counts number of pages with wines
+ * 
+ */
+
 @Slf4j
 @Component
 @NoArgsConstructor
 public class Parser {
+    /**
+     * 
+     * @param mainPage URL of simplewine main page
+     * @return Number of pages with wines
+     */
     public static int parseNumberOfPages(Document mainPage) {
         int numberOfPages = 0;
         try {
-            numberOfPages = Integer.parseInt(
-                    mainPage.getElementsByAttributeValue("class", "pagination__navigation").get(0).children().last()
-                            .previousElementSibling().text());
+            numberOfPages = Integer.parseInt(mainPage.getElementsByAttributeValue("class", "pagination__navigation")
+                    .get(0).children().last().previousElementSibling().text());
         } catch (IndexOutOfBoundsException e) {
             log.error("No pagination__navigation was found on page: " + mainPage.baseUri());
         }
@@ -24,6 +33,11 @@ public class Parser {
         return numberOfPages;
     }
 
+    /**
+     * 
+     * @param wineDoc Jsoup Document of wine
+     * @return
+     */
     public static SimpleWine parseWine(Document wineDoc) {
         long wineParseStart = System.currentTimeMillis();
         String wineName = "";
@@ -134,7 +148,8 @@ public class Parser {
         log.debug("Wine parsing takes : {}", System.currentTimeMillis() - wineParseStart);
         return SimpleWine.builder().name(wineName).brandID(brandID).countryID(countryID).price(bottlePrice)
                 .year(bottleYear).volume(bottleVolume).abv(bottleABV).colorType(colorType).grapeType(grapeType)
-                .sugarType(sugarType).discount(bottleDiscount).region(region).link(wineDoc.baseUri()).picture(bottleImage)
-                .rating(wineRating).sparkling(sparkling).taste(wineTaste).gastronomy(wineGastronomy).build();
+                .sugarType(sugarType).discount(bottleDiscount).region(region).link(wineDoc.baseUri())
+                .picture(bottleImage).rating(wineRating).sparkling(sparkling).taste(wineTaste)
+                .gastronomy(wineGastronomy).build();
     }
 }
