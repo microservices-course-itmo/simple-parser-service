@@ -85,7 +85,7 @@ public class ParserService {
         }
 
         AtomicInteger wineCounter = new AtomicInteger(1);
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < NUMBER_OF_THREADS; i++) {
             CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
                 try {
                     while (true) {
@@ -101,7 +101,8 @@ public class ParserService {
                             }
 
                             try {
-                                if (!(wine.getBrandID() == null) && !(wine.getCountryID() == null) && !(wine.getBrandID().equals(""))) {
+                                if (!(wine.getBrandID() == null) && !(wine.getCountryID() == null)
+                                        && !(wine.getBrandID().equals(""))) {
                                     Thread.sleep((long) (Math.random() * 1500));
                                     dbHandler.saveAllWineParsedInfo(wine);
                                 }
@@ -138,7 +139,8 @@ public class ParserService {
                     else
                         toIndex = (i + 1) * messageSize - 1;
 
-                    message = UpdateProducts.UpdateProductsMessage.newBuilder().addAllProducts(products.subList(fromIndex, toIndex)).build();
+                    message = UpdateProducts.UpdateProductsMessage.newBuilder()
+                            .addAllProducts(products.subList(fromIndex, toIndex)).build();
                     kafkaSendMessageService.sendMessage(message);
                 }
             } else {
@@ -146,7 +148,9 @@ public class ParserService {
                 kafkaSendMessageService.sendMessage(message);
             }
 
-            log.info("TIME : {} min {} seconds", TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - start), TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - start) * 60000 - start));
+            log.info("TIME : {} min {} seconds", TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - start),
+                    TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()
+                            - TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - start) * 60000 - start));
             log.info("End of parsing, {} wines collected and sent to Kafka", products.size());
 
             setMessage(UpdateProducts.UpdateProductsMessage.newBuilder().addAllProducts(products).build());
