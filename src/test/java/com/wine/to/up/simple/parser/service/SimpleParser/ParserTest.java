@@ -1,6 +1,5 @@
 package com.wine.to.up.simple.parser.service.SimpleParser;
 
-import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -11,21 +10,22 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * Class for testing {@link Parser}
+ */
 public class ParserTest {
+    /**
+     * SimpleWine base URL
+     */
     private static final String URL = "https://simplewine.ru";
 
-    @Test
-    public void testURLConnection() throws IOException {
-        Connection.Response res = Jsoup.connect(URL).followRedirects(false).execute();
-        assertEquals(200, res.statusCode());
-    }
-
-    @Test
-    public void testURLtoDocument() throws IOException {
-        Document doc = ParserService.URLToDocument(URL);
-        assertTrue(doc.title().contains("Интернет-витрина магазина SimpleWine: продажа хорошего алкоголя в Москве и Санкт-Петербурге, цены на сайте"));
-    }
-
+    /**
+     * Testing {@link Parser#parseNumberOfPages(Document)} method<br>
+     * Trying to get number of pages from SimpleWine catalog page by URL<br>
+     * Using {@link ParserService#URLToDocument(String)} to get Document from URL
+     *
+     * @throws IOException Wrong input for {@link ParserService#URLToDocument(String)}
+     */
     @Test
     public void testParseNumberOfPagesIntegration() throws IOException {
         Document testCatalogPage = ParserService.URLToDocument(URL + "/catalog/vino/");
@@ -33,6 +33,12 @@ public class ParserTest {
         assertTrue(numberOfPages >= 0);
     }
 
+    /**
+     * Testing {@link Parser#parseNumberOfPages(Document)} method<br>
+     * Trying to get number of pages from downloaded SimpleWine HTML catalog page with 1 page
+     *
+     * @throws IOException Wrong input for {@link Jsoup#parse(File, String)}
+     */
     @Test
     public void testParseNumberOfPages1() throws IOException {
         File testCatalogPageFile = new File("src/test/test-resources/Catalog_1_page.html");
@@ -41,6 +47,12 @@ public class ParserTest {
         assertEquals(1, numberOfPages);
     }
 
+    /**
+     * Testing {@link Parser#parseNumberOfPages(Document)} method<br>
+     * Trying to get number of pages from downloaded SimpleWine HTML catalog page with 3 pages
+     *
+     * @throws IOException Wrong input for {@link Jsoup#parse(File, String)}
+     */
     @Test
     public void testParseNumberOfPages3() throws IOException {
         File testCatalogPageFile = new File("src/test/test-resources/Catalog_3_pages.html");
@@ -49,6 +61,12 @@ public class ParserTest {
         assertEquals(3, numberOfPages);
     }
 
+    /**
+     * Testing {@link Parser#parseNumberOfPages(Document)} method<br>
+     * Trying to get number of pages from downloaded SimpleWine HTML catalog page with 5 pages
+     *
+     * @throws IOException Wrong input for {@link Jsoup#parse(File, String)}
+     */
     @Test
     public void testParseNumberOfPages5() throws IOException {
         File testCatalogPageFile = new File("src/test/test-resources/Catalog_5_pages.html");
@@ -57,6 +75,12 @@ public class ParserTest {
         assertEquals(5, numberOfPages);
     }
 
+    /**
+     * Testing {@link Parser#parseNumberOfPages(Document)} method<br>
+     * Trying to get number of pages from downloaded SimpleWine HTML catalog page with 107 pages
+     *
+     * @throws IOException Wrong input for {@link Jsoup#parse(File, String)}
+     */
     @Test
     public void testParseNumberOfPages107() throws IOException {
         File testCatalogPageFile = new File("src/test/test-resources/Catalog_107_pages.html");
@@ -65,6 +89,12 @@ public class ParserTest {
         assertEquals(107, numberOfPages);
     }
 
+    /**
+     * Testing {@link Parser#parseNumberOfPages(Document)} method<br>
+     * Trying to get number of pages from downloaded SimpleWine HTML catalog page with no pages
+     *
+     * @throws IOException Wrong input for {@link Jsoup#parse(File, String)}
+     */
     @Test
     public void testParseNumberOfPagesNoPagesNavigation() throws IOException {
         File testCatalogPageFile = new File("src/test/test-resources/Wine_SimpleWine.html"); //wine page instead of catalog page
@@ -75,6 +105,12 @@ public class ParserTest {
         assertEquals(0, numberOfPages);
     }
 
+    /**
+     * Testing {@link Parser#parseWine(Document)} method<br>
+     * Trying to parse wine from downloaded SimpleWine HTML wine page
+     *
+     * @throws IOException Wrong input for {@link Jsoup#parse(File, String)}
+     */
     @Test
     public void testParseWineHTML() throws IOException {
         File testWinePageFile = new File("src/test/test-resources/Wine_SimpleWine.html");
@@ -103,11 +139,17 @@ public class ParserTest {
         assertEquals(testWine.toString(), Parser.parseWine(testWinePage).toString());
     }
 
+    /**
+     * Testing {@link Parser#parseWine(Document)} method<br>
+     * Trying to parse wine from wrong page<br>
+     *
+     * @throws IOException               Wrong input for {@link Jsoup#parse(File, String)}
+     * @throws IndexOutOfBoundsException "product__header-russian-name" in input file is absent
+     */
     @Test
     public void testParseWineWrongPageFormat() throws IOException {
         File testWinePageFile = new File("src/test/test-resources/Catalog_107_pages.html"); //catalog page instead of wine page
         Document testWinePage = Jsoup.parse(testWinePageFile, "UTF-8");
-        //"product__header-russian-name" in input file is absent
         assertThrows(IndexOutOfBoundsException.class, () ->
                 Parser.parseWine(testWinePage)
         );
