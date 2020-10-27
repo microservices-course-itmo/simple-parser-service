@@ -129,16 +129,11 @@ public class ParserService {
             UpdateProducts.UpdateProductsMessage message;
             if (products.size() >= 1000) {
                 int messageSize = Math.round(products.size() / 4);
-                int fromIndex;
-                int toIndex;
                 for (int i = 0; i < 4; i++) {
-                    fromIndex = i * messageSize;
                     if (i == 3)
-                        toIndex = products.size() - 1;
+                        message = UpdateProducts.UpdateProductsMessage.newBuilder().addAllProducts(products.subList(i * messageSize, products.size() - 1)).build();
                     else
-                        toIndex = (i + 1) * messageSize - 1;
-
-                    message = UpdateProducts.UpdateProductsMessage.newBuilder().addAllProducts(products.subList(fromIndex, toIndex)).build();
+                        message = UpdateProducts.UpdateProductsMessage.newBuilder().addAllProducts(products.subList(i * messageSize, (i + 1) * messageSize - 1)).build();
                     kafkaSendMessageService.sendMessage(message);
                 }
             } else {
