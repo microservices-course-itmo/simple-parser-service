@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.UUID;
 
+/** The 'Brands' entity that is matched to the 'brands' DB table  */
 @Entity
 @Table(name = "brands")
 @Setter
@@ -18,14 +19,18 @@ import java.util.UUID;
 @NoArgsConstructor
 @ToString
 public class Brands {
+
+    /** Unique identifier */
     @Id
     @Column(name = "brandId")
     private UUID brandID = UUID.randomUUID();
 
+    /** Name of brand*/
     @Column(name = "brandName")
     private String brandName;
 
-    public Brands(String grapeName) {
-        this.brandName = grapeName;
+    /**  The entity instance creation. */
+    public Brands(String brandName) {
+        this.brandName = brandName;
     }
 }

@@ -6,9 +6,16 @@ import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
+/**The repository that stores brands info (Brands entities).*/
 @Repository
 public interface BrandsRepository extends CrudRepository<Brands, UUID> {
+
+    /** Finding a brand by name
+     * @param name brand name
+     * @return found instance of the Brands entity.*/
     Brands findBrandByBrandName(String name);
+
+    /** Existence check by name
+     * @param name brand name*/
     Boolean existsBrandsByBrandName(String name);
-    Boolean existsBrandsByBrandNameEquals(String name);
 }

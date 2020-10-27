@@ -10,31 +10,53 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * REST Controller that processes user requests to parser and to DB
+ */
 @RestController
 @RequiredArgsConstructor
 @Validated
 @Slf4j
 @RequestMapping(path = "/simple-parser")
 public class MainController {
+
+    /** The repository that stores grapes (name, id) info. It's autowired by Spring.*/
     @Autowired
     private GrapesRepository grapesRepository;
+
+    /** The repository that stores brands info (name, id). It's autowired by Spring.*/
     @Autowired
     private BrandsRepository brandsRepository;
+
+    /** The repository that stores countries info (name, id). It's autowired by Spring.*/
     @Autowired
     private CountriesRepository countriesRepository;
+
+    /** The repository that stores the connections between wine and its grapes. It's autowired by Spring.*/
     @Autowired
     private WineGrapesRepository wineGrapesRepository;
+
+    /** The repository that stores all info about wine. It's autowired by Spring.*/
     @Autowired
     private WineRepository wineRepository;
+
+    /** The service that is responsible for parser start up. It's autowired by Spring.*/
     @Autowired
     private ParserService parserService;
 
+    /** The method based on a GET request. The parser runs when the request is received.
+     * @return message about successful execution. */
     @GetMapping(path = "/run-parser")
     public String runParser() {
         parserService.startParser();
         return "Parser started by request";
     }
 
+    /** The method based on a POST request. A new grape type is added to the database when the request is received.
+     * @param grape Grape type model. All arguments will be taken from this model.
+     * @return instance of the Grape entity.
+     * @see Grapes
+     */
     @PostMapping(path = "/grape")
     @ResponseBody
     public Grapes addGrape(@ModelAttribute("grape") Grapes grape) {
@@ -43,6 +65,11 @@ public class MainController {
         return newGrape;
     }
 
+    /** The method based on a POST request. A new brand is added to the database when the request is received.
+     * @param brand Brand model. All arguments will be taken from this model.
+     * @return instance of the Brand entity.
+     * @see Brands
+     */
     @PostMapping(path = "/brand")
     @ResponseBody
     public Brands addBrand(@ModelAttribute("brand") Brands brand) {
@@ -51,6 +78,11 @@ public class MainController {
         return newBrand;
     }
 
+    /** The method based on a POST request. A new country is added to the database when the request is received.
+     * @param country Country model. All arguments will be taken from this model.
+     * @return instance of the Countries entity.
+     * @see Countries
+     */
     @PostMapping(path = "/country")
     @ResponseBody
     public Countries addCountry(@ModelAttribute("country") Countries country) {
@@ -59,6 +91,11 @@ public class MainController {
         return newCountry;
     }
 
+    /** The method based on a POST request. All info about new wine is added to the database when the request is received.
+     * @param wine Wine type model. All arguments will be taken from this model.
+     * @return instance of the Wine entity.
+     * @see Wine
+     */
     @PostMapping(path = "/wine")
     @ResponseBody
     public Wine addWine(@ModelAttribute("wine") Wine wine) {
@@ -88,6 +125,8 @@ public class MainController {
         return wine;
     }
 
+    /** The method based on a GET request. Output of all grape types stored in the grapesRepository {@link GrapesRepository}.
+     * @return list of all grape types as HTML*/
     @GetMapping(path = "/all-grapes")
     @ResponseBody
     public String getAllGrapes() {
@@ -99,6 +138,8 @@ public class MainController {
         return html;
     }
 
+    /** The method based on a GET request. Output of all brands stored in the {@link BrandsRepository}.
+     * @return list of all brands as HTML*/
     @GetMapping(path = "/all-brands")
     @ResponseBody
     public String getAllBrands() {
@@ -110,6 +151,8 @@ public class MainController {
         return html;
     }
 
+    /** The method based on a GET request. Output of all countries stored in the {@link CountriesRepository}.
+     * @return list of all countries as HTML*/
     @GetMapping(path = "/all-countries")
     @ResponseBody
     public String getAllCountries() {
@@ -121,6 +164,8 @@ public class MainController {
         return html;
     }
 
+    /** A method based on a GET request. Output of all wines stored in the {@link WineRepository}.
+     * @return list of all wines as HTML*/
     @GetMapping(path = "/all-wines")
     @ResponseBody
     public String getAllWines() {
@@ -132,6 +177,8 @@ public class MainController {
         return html;
     }
 
+    /** The method based on a GET request. Output of a message created to be sent to Kafka, contains all parsed wine information.
+     * @return list of all parsed wine info as HTML*/
     @GetMapping(path = "/all-products")
     @ResponseBody
     public String getAllProducts() {
@@ -155,6 +202,8 @@ public class MainController {
         return html;
     }
 
+    /** Parser's homepage which contains links to some methods.
+     * @return HTML page with links*/
     @ResponseBody
     @GetMapping(path = "/")
     public String home() {

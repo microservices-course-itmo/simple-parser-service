@@ -6,15 +6,19 @@ import com.wine.to.up.simple.parser.service.repository.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+/** The service is responsible for adding all info to DB.*/
 @Service
 @Slf4j
 public class WineService {
+    /** The repository that stores all info about wine. */
     private final WineRepository wineRepository;
     private final BrandsService brandsService;
     private final CountriesService countriesService;
     private final GrapesService grapesService;
     private final WineGrapesService wineGrapesService;
 
+
+    /**  The service instance creation. */
     public WineService(GrapesRepository grapesRepository, BrandsRepository brandsRepository, CountriesRepository countriesRepository, WineGrapesRepository wineGrapesRepository, WineRepository wineRepository) {
         brandsService = new BrandsService(brandsRepository);
         countriesService = new CountriesService(countriesRepository);
@@ -23,6 +27,9 @@ public class WineService {
         this.wineRepository = wineRepository;
     }
 
+    /** Adding all parsed info to the corresponding DB tables/repositories.)
+     * @param newWine {@link SimpleWine} class instance containing all wine parsed info
+     * */
     public void saveAllWineParsedInfo(SimpleWine newWine) {
         Float price = newWine.getPrice();
         String link = newWine.getLink();
@@ -59,6 +66,10 @@ public class WineService {
         }
     }
 
+    /** Adding wine to DB ({@link WineRepository})
+     * @param newWine {@link SimpleWine} class instance containing all wine parsed info
+     * @return instance of the {@link Wine} entity
+     * */
     private Wine saveWine(SimpleWine newWine, Brands brandEntity, Countries countryEntity) {
         Wine wineEntity;
         wineEntity = new Wine();
