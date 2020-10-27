@@ -4,19 +4,21 @@ import com.wine.to.up.simple.parser.service.SimpleParser.SimpleWine;
 import com.wine.to.up.simple.parser.service.domain.entity.*;
 import com.wine.to.up.simple.parser.service.repository.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/** The service is responsible for adding all info to DB.*/
 @Service
 @Slf4j
 public class WineService {
+    /** The repository that stores all info about wine. */
     private final WineRepository wineRepository;
     private final BrandsService brandsService;
     private final CountriesService countriesService;
     private final GrapesService grapesService;
     private final WineGrapesService wineGrapesService;
 
-    @Autowired
+
+    /**  The service instance creation. */
     public WineService(GrapesRepository grapesRepository, BrandsRepository brandsRepository, CountriesRepository countriesRepository, WineGrapesRepository wineGrapesRepository, WineRepository wineRepository) {
         brandsService = new BrandsService(brandsRepository);
         countriesService = new CountriesService(countriesRepository);
@@ -25,6 +27,9 @@ public class WineService {
         this.wineRepository = wineRepository;
     }
 
+    /** Adding all parsed info to the corresponding DB tables/repositories.)
+     * @param newWine {@link SimpleWine} class instance containing all wine parsed info
+     * */
     public void saveAllWineParsedInfo(SimpleWine newWine) {
         Float price = newWine.getPrice();
         String link = newWine.getLink();
@@ -32,18 +37,39 @@ public class WineService {
             return;
         }
         String brand = newWine.getBrandID();
-        Brands brandEntity = brandsService.saveBrand(brand);
+        Brands brandEntity = null;
+        try {
+            brandEntity = brandsService.saveBrand(brand);
+        } catch (Exception e) {
+            log.error("DB error: problem with saveBrand");
+        }
 
         String country = newWine.getCountryID();
-        Countries countryEntity = countriesService.saveCountry(country);
+        Countries countryEntity = null;
+        try {
+            countryEntity = countriesService.saveCountry(country);
+        } catch (Exception e) {
+            log.error("DB error: problem with saveCountry");
+        }
 
         String grape = newWine.getGrapeType();
-        Grapes grapeEntity = grapesService.saveGrape(grape);
+        Grapes grapeEntity = null;
+        try {
+            grapeEntity = grapesService.saveGrape(grape);
+        } catch (Exception e) {
+            log.error("DB error: problem with saveGrape");
+        }
 
-        Wine wineEntity = saveWine(newWine, brandEntity, countryEntity);
-        wineGrapesService.saveWineGrapes(grapeEntity, wineEntity);
+        if (!(brandEntity == null) && !(countryEntity == null) && !(grapeEntity == null)) {
+            Wine wineEntity = saveWine(newWine, brandEntity, countryEntity);
+            wineGrapesService.saveWineGrapes(grapeEntity, wineEntity);
+        }
     }
 
+    /** Adding wine to DB ({@link WineRepository})
+     * @param newWine {@link SimpleWine} class instance containing all wine parsed info
+     * @return instance of the {@link Wine} entity
+     * */
     private Wine saveWine(SimpleWine newWine, Brands brandEntity, Countries countryEntity) {
         Wine wineEntity;
         wineEntity = new Wine();

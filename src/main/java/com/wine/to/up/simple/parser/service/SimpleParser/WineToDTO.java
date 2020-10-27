@@ -6,16 +6,24 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+/**
+ * The class designed for wrapping wine parsed information into the common-api UpdateProducts.Product class.
+ * The Proto3 protocol is used to transfer data to Kafka.
+ */
 @Service
 @Slf4j
 public class WineToDTO {
 
+    /**
+     * The function is designed to get parsed wine information which is wrapped into a common-api UpdateProducts.Product class for subsequent transfer to Kafka.
+     * @param wine instance of the SimpleWine class which contains parsed wine information.
+     * @return instance of UpdateProducts.Product
+     **/
     public UpdateProducts.Product getProtoWine(SimpleWine wine) {
         UpdateProducts.Product.Color color = defineColor(wine.getColorType());
         UpdateProducts.Product.Sugar sugar = defineSugar(wine.getSugarType());
         UpdateProducts.Product.Builder product = UpdateProducts.Product.newBuilder()
                 .addGrapeSort(wine.getGrapeType())
-                .setGrapeSort(0, wine.getGrapeType())
                 .setBrand(wine.getBrandID())
                 .setCapacity(wine.getVolume())
                 .setCountry(wine.getCountryID())
@@ -38,9 +46,16 @@ public class WineToDTO {
         if (color != null) {
             product.setColor(color);
         }
+        if (wine.getGrapeType() != null)
+            product.setGrapeSort(0, wine.getGrapeType());
         return product.build();
     }
 
+    /**
+     * The method using to define the type of wine color relative to enum common-api.
+     * @param color type of color received during wine parsing.
+     * @return value of UpdateProducts.Product.Color enum
+     **/
     private UpdateProducts.Product.Color defineColor(@NonNull String color) {
         UpdateProducts.Product.Color colorType;
         switch (color) {
@@ -64,6 +79,11 @@ public class WineToDTO {
         return colorType;
     }
 
+    /**
+     * The method using to define the type of wine sugar relative to enum common-api.
+     * @param sugar type of sugar received during wine parsing.
+     * @return  value of UpdateProducts.Product.Sugar enum
+     **/
     private UpdateProducts.Product.Sugar defineSugar(@NonNull String sugar) {
         UpdateProducts.Product.Sugar sugarType;
         switch (sugar) {
