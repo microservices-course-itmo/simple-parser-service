@@ -1,6 +1,5 @@
 package com.wine.to.up.simple.parser.service.SimpleParser.DbHandler;
 
-import com.wine.to.up.simple.parser.service.domain.entity.Brands;
 import com.wine.to.up.simple.parser.service.domain.entity.Countries;
 import com.wine.to.up.simple.parser.service.repository.CountriesRepository;
 import lombok.NonNull;
