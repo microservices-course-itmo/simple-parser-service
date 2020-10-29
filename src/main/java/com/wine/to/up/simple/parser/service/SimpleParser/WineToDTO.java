@@ -1,6 +1,5 @@
 package com.wine.to.up.simple.parser.service.SimpleParser;
 
-
 import com.wine.to.up.parser.common.api.schema.UpdateProducts;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -71,8 +70,12 @@ public class WineToDTO {
             case "оранжевое":
                 colorType = UpdateProducts.Product.Color.ORANGE;
                 break;
-            default:
+            case "":
                 log.error("The wine color was not defined.");
+                colorType = null;
+                break;
+            default:
+                log.debug("Color is not from the list: {}", color);
                 colorType = null;
                 break;
         }
@@ -99,8 +102,12 @@ public class WineToDTO {
             case "полусладкое":
                 sugarType = UpdateProducts.Product.Sugar.MEDIUM;
                 break;
-            default:
+            case "":
                 log.error("The wine sugar was not defined.");
+                sugarType = null;
+                break;
+            default:
+                log.debug("Sugar is not from the list: {}", sugar);
                 sugarType = null;
                 break;
         }

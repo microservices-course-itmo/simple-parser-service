@@ -28,7 +28,7 @@ public class ParserService {
     private String URL;
     @Value("${parser.wineurl}")
     private String WINE_URL;
-    private static final int PAGES_TO_PARSE = 106; // currently max 106, lower const value for testing purposes
+    private static final int PAGES_TO_PARSE = 10; // currently max 108, lower const value for testing purposes
     private final int NUMBER_OF_THREADS = 15;
     private static UpdateProducts.UpdateProductsMessage messageToKafka;
     private final ExecutorService pagesExecutor = Executors.newSingleThreadExecutor();
@@ -48,7 +48,7 @@ public class ParserService {
     private WineRepository wineRepository;
 
     /**
-     * 
+     *
      * @param someURL URL to get jsoup Document
      * @return Jsoup Document class
      * @throws IOException IDK
@@ -142,11 +142,9 @@ public class ParserService {
                 int messageSize = Math.round(products.size() / 4);
                 for (int i = 0; i < 4; i++) {
                     if (i == 3)
-                        message = UpdateProducts.UpdateProductsMessage.newBuilder()
-                                .addAllProducts(products.subList(i * messageSize, products.size() - 1)).build();
+                        message = UpdateProducts.UpdateProductsMessage.newBuilder().addAllProducts(products.subList(i * messageSize, products.size() - 1)).build();
                     else
-                        message = UpdateProducts.UpdateProductsMessage.newBuilder()
-                                .addAllProducts(products.subList(i * messageSize, (i + 1) * messageSize - 1)).build();
+                        message = UpdateProducts.UpdateProductsMessage.newBuilder().addAllProducts(products.subList(i * messageSize, (i + 1) * messageSize - 1)).build();
                     kafkaSendMessageService.sendMessage(message);
                 }
             } else {
@@ -159,22 +157,13 @@ public class ParserService {
                             - TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - start) * 60000 - start));
             log.info("End of parsing, {} wines collected and sent to Kafka", products.size());
 
-            setMessage(UpdateProducts.UpdateProductsMessage.newBuilder().addAllProducts(products).build());
+            messageToKafka = UpdateProducts.UpdateProductsMessage.newBuilder().addAllProducts(products).build();
         }
     }
 
     /**
-     * Forming message for Kafka
-     * 
-     * @param message
-     */
-    public void setMessage(UpdateProducts.UpdateProductsMessage message) {
-        messageToKafka = message;
-    }
-
-    /**
      * Getting of all products
-     * 
+     *
      * @return Message to Kafka
      */
     public UpdateProducts.UpdateProductsMessage getMessage() {
