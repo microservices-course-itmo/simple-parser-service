@@ -1,6 +1,5 @@
 package com.wine.to.up.simple.parser.service.SimpleParser;
 
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -9,7 +8,6 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@NoArgsConstructor
 public class Parser {
     public static int parseNumberOfPages(Document mainPage) {
         int numberOfPages = 0;
