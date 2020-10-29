@@ -145,7 +145,8 @@ public class ParserService {
             }
 
             log.info("TIME : {} min {} seconds", TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - start),
-                    TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - start) * 60000 - start));
+                    TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()
+                            - TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - start) * 60000 - start));
             log.info("End of parsing, {} wines collected and sent to Kafka", products.size());
 
             messageToKafka = UpdateProducts.UpdateProductsMessage.newBuilder().addAllProducts(products).build();
