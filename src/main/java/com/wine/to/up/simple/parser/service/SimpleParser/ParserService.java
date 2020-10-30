@@ -28,7 +28,7 @@ public class ParserService {
     private String URL;
     @Value("${parser.wineurl}")
     private String WINE_URL;
-    private static final int PAGES_TO_PARSE = 106; // currently max 106, lower const value for testing purposes
+    private static final int PAGES_TO_PARSE = 10; // currently max 108, lower const value for testing purposes
     private final int NUMBER_OF_THREADS = 15;
     private static UpdateProducts.UpdateProductsMessage messageToKafka;
     private final ExecutorService pagesExecutor = Executors.newSingleThreadExecutor();
@@ -130,17 +130,13 @@ public class ParserService {
             UpdateProducts.UpdateProductsMessage message;
             if (products.size() >= 1000) {
                 int messageSize = Math.round(products.size() / 4);
-                int fromIndex;
-                int toIndex;
                 for (int i = 0; i < 4; i++) {
-                    fromIndex = i * messageSize;
                     if (i == 3)
-                        toIndex = products.size() - 1;
+                        message = UpdateProducts.UpdateProductsMessage.newBuilder()
+                                .addAllProducts(products.subList(i * messageSize, products.size() - 1)).build();
                     else
-                        toIndex = (i + 1) * messageSize - 1;
+                        message = UpdateProducts.UpdateProductsMessage.newBuilder().addAllProducts(products.subList(i * messageSize, (i + 1) * messageSize - 1)).build();
 
-                    message = UpdateProducts.UpdateProductsMessage.newBuilder()
-                            .addAllProducts(products.subList(fromIndex, toIndex)).build();
                     kafkaSendMessageService.sendMessage(message);
                 }
             } else {
@@ -153,12 +149,8 @@ public class ParserService {
                             - TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - start) * 60000 - start));
             log.info("End of parsing, {} wines collected and sent to Kafka", products.size());
 
-            setMessage(UpdateProducts.UpdateProductsMessage.newBuilder().addAllProducts(products).build());
+            messageToKafka = UpdateProducts.UpdateProductsMessage.newBuilder().addAllProducts(products).build();
         }
-    }
-
-    public void setMessage(UpdateProducts.UpdateProductsMessage message) {
-        messageToKafka = message;
     }
 
     public UpdateProducts.UpdateProductsMessage getMessage() {
