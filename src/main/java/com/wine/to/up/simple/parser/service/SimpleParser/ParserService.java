@@ -48,14 +48,19 @@ public class ParserService {
     private WineRepository wineRepository;
 
     /**
-     * 
+     *
      * @param someURL URL to get jsoup Document
      * @return Jsoup Document class
      * @throws IOException IDK
      */
 
-    public static Document urlToDocument(String someURL) throws IOException {
-        return Jsoup.connect(someURL).get();
+    public static Document URLToDocument(String someURL) throws IOException {
+        Document wineDoc = Jsoup.connect(someURL).get();
+        while (!(wineDoc.getElementsByClass("product-page").first().children().first().className().equals("product"))) {
+            log.error("Doing re-request...");
+            wineDoc = Jsoup.connect(someURL).get();
+        }
+        return wineDoc;
     }
 
     /**
@@ -159,22 +164,13 @@ public class ParserService {
                             - TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - start) * 60000 - start));
             log.info("End of parsing, {} wines collected and sent to Kafka", products.size());
 
-            setMessage(UpdateProducts.UpdateProductsMessage.newBuilder().addAllProducts(products).build());
+            messageToKafka = UpdateProducts.UpdateProductsMessage.newBuilder().addAllProducts(products).build();
         }
     }
 
     /**
-     * Forming message for Kafka
-     * 
-     * @param message
-     */
-    public static void setMessage(UpdateProducts.UpdateProductsMessage message) {
-        messageToKafka = message;
-    }
-
-    /**
      * Getting of all products
-     * 
+     *
      * @return Message to Kafka
      */
     public UpdateProducts.UpdateProductsMessage getMessage() {
