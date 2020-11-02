@@ -17,7 +17,7 @@ public interface WineRepository extends CrudRepository<Wine, UUID> {
      *
      * @return found instance of the Wine entity.
      */
-    Wine findWineByNameAndPriceAndVolumeAndColorTypeAndSugarType(String name, Float price, Float volume, String colorType, String sugarType);
+    Wine findWineByNameAndNewPriceAndCapacityAndColorAndSugar(String name, Float price, Float volume, String ColorType, String SugarType);
 
     /**
      * Finding a wine by link and price. One wine has one link.
@@ -26,7 +26,7 @@ public interface WineRepository extends CrudRepository<Wine, UUID> {
      * @param price wine price
      * @return found instance of the Wine entity.
      */
-    Wine findWineByLinkAndPrice(String link, float price);
+    Wine findWineByLinkAndNewPrice(String link, float price);
 
     /**
      * Existence check by link and price. One wine has one link.
@@ -34,10 +34,10 @@ public interface WineRepository extends CrudRepository<Wine, UUID> {
      * @param link  link to the wine page
      * @param price wine price
      */
-    Boolean existsWineByLinkAndPrice(String link, float price);
+    Boolean existsWineByLinkAndNewPrice(String link, float price);
 
     /**
      * Existence check by name, price, volume, colo, sugar. Full compliance.
      */
-    Boolean existsWineByNameAndPriceAndVolumeAndColorTypeAndSugarTypeAndYear(String name, Float price, Float volume, String colorType, String sugarType, int year);
+    Boolean existsWineByNameAndNewPriceAndCapacityAndColorAndSugarAndYear(String name, Float price, Float volume, String ColorType, String SugarType, int year);
 }

@@ -11,6 +11,7 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 
 /**
  * Class for testing {@link Parser}
@@ -81,18 +82,18 @@ class ParserTest {
                 name("Бин 50 Шираз").
                 brandID("Lindeman's").
                 countryID("Австралия").
-                price((float) 952.0).
+                newPrice((float) 952.0).
                 year(2018).
-                volume((float) 0.75).
-                abv((float) 13.0).
-                colorType("красное").
-                grapeType("шираз").
-                sugarType("полусухое").
+                capacity((float) 0.75).
+                strength((float) 13.0).
+                color("красное").
+                grapeSort(Collections.singleton("шираз")).
+                sugar("полусухое").
                 discount((float) 20.0).
                 region("Новый Южный Уэльс").
                 link(testWinePage.baseUri()).
                 rating((float) 4.6).
-                picture("https://static.simplewine.ru/upload/iblock/3ce/vino-bin-50-shiraz-lindeman-s-2018_1.png@x303").
+                image("https://static.simplewine.ru/upload/iblock/3ce/vino-bin-50-shiraz-lindeman-s-2018_1.png@x303").
                 gastronomy("Прекрасно в сочетании с жареным ягненком, свининой с овощами и сырами средней выдержки.").
                 taste("Вино блестящего фиолетово-красного цвета с яркими ароматами темных спелых ягод, ванили, лакрицы и легкими перечными нотками. " +
                         "Среднетелое, насыщенное и хорошо структурированное во вкусе, с бархатистыми танинами и оттенками черной смородины, сливы и ванили в послевкусии.").

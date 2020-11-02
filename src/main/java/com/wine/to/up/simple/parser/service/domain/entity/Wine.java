@@ -27,7 +27,7 @@ public class Wine {
 
     /** Link to a wine picture */
     @Column(name = "picture")
-    private String picture;
+    private String image;
 
     /** Foreign key that refers to the {@link Brands} entity */
     @ManyToOne
@@ -44,7 +44,7 @@ public class Wine {
     /**Wine price*/
     @Column(name = "price")
     @NonNull
-    private Float price;
+    private Float newPrice;
 
     /** Wine discount. By default 0. */
     @Column(name = "discount")
@@ -53,11 +53,11 @@ public class Wine {
     /** Wine bottle volume */
     @Column(name = "volume")
     @NonNull
-    private Float volume;
+    private Float capacity;
 
     /** Alcohol by volume */
     @Column(name = "abv")
-    private Float abv;
+    private Float strength;
 
     /** A wine vintage is the year in which the grapes were harvested. */
     @Column(name = "year")
@@ -65,15 +65,15 @@ public class Wine {
 
     /**Color of wine. Characteristics of wine.*/
     @Column(name = "colorType")
-    private String colorType;
+    private String color;
 
     /**Sugar of wine. Characteristics of wine.*/
     @Column(name = "sugarType")
-    private String sugarType;
+    private String sugar;
 
     /**Grape types used to make wine*/
     @Column(name = "grapeType")
-    private String grapeType;
+    private String grapeSort;
 
     /**Grape-growing and wine manufacturing region*/
     @Column(name = "region")
