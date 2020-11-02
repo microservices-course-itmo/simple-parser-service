@@ -24,7 +24,7 @@ public class WineGrapesService {
      * @see WineGrapesRepository
      * */
     protected void saveWineGrapes(Grapes grapeEntity, Wine wineEntity) {
-        if (!wineGrapesRepository.existsWineGrapesByGrapeIdAndAndWineId(grapeEntity, wineEntity)) {
+        if (Boolean.FALSE.equals(wineGrapesRepository.existsWineGrapesByGrapeIdAndAndWineId(grapeEntity, wineEntity))) {
             wineGrapesRepository.save(new WineGrapes(wineEntity, grapeEntity));
             log.trace("New Connection between Wine and Grape was added to DB");
         }

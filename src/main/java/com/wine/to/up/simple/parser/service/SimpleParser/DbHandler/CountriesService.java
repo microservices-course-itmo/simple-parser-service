@@ -24,7 +24,7 @@ public class CountriesService {
      * @see CountriesRepository
      * */
     protected Countries saveCountry(@NonNull String country) {
-        if (!countriesRepository.existsCountriesByCountryName(country)) {
+        if (Boolean.FALSE.equals(countriesRepository.existsCountriesByCountryName(country))) {
             countriesRepository.save(new Countries(country));
             log.trace("New Brand was added to DB: " + country);
         }

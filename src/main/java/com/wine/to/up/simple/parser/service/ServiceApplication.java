@@ -1,7 +1,5 @@
 package com.wine.to.up.simple.parser.service;
 
-import java.io.IOException;
-
 import com.wine.to.up.simple.parser.service.SimpleParser.ParserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
@@ -29,7 +27,7 @@ public class ServiceApplication {
 
     @Scheduled(fixedDelayString = "PT12H")
         // run once in 12 hours
-    void scheduledRunParser() throws IOException {
+    void scheduledRunParser() {
         log.info("SCHEDULED PARSER START");
         parserService.startParser();
     }

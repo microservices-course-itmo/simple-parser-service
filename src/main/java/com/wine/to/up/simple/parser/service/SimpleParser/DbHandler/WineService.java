@@ -34,7 +34,7 @@ public class WineService {
     public void saveAllWineParsedInfo(SimpleWine newWine) {
         Float price = newWine.getPrice();
         String link = newWine.getLink();
-        if (wineRepository.existsWineByLinkAndPrice(link, price)) {
+        if (Boolean.TRUE.equals(wineRepository.existsWineByLinkAndPrice(link, price))) {
             return;
         }
         String brand = newWine.getBrandID();
@@ -61,7 +61,7 @@ public class WineService {
             log.error("DB error: problem with saveGrape: ", e);
         }
 
-        if (!(brandEntity == null) && !(countryEntity == null) && !(grapeEntity == null)) {
+        if ((brandEntity != null) && (countryEntity != null) && (grapeEntity != null)) {
             Wine wineEntity = saveWine(newWine, brandEntity, countryEntity);
             wineGrapesService.saveWineGrapes(grapeEntity, wineEntity);
         }
