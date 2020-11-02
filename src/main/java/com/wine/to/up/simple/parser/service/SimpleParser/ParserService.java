@@ -25,11 +25,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class ParserService {
     @Value("${parser.url}")
-    private String URL;
+    private String url;
     @Value("${parser.wineurl}")
-    private String WINE_URL;
-    private static final int PAGES_TO_PARSE = 10; // currently max 108, lower const value for testing purposes
-    private final int NUMBER_OF_THREADS = 15;
+    private String wineUrl;
+    private static final int PAGES_TO_PARSE = 106; // currently max 106, lower const value for testing purposes
+    private static final int NUMBER_OF_THREADS = 15;
     private static UpdateProducts.UpdateProductsMessage messageToKafka;
     private final ExecutorService pagesExecutor = Executors.newSingleThreadExecutor();
     private final ExecutorService winesExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
@@ -83,14 +83,14 @@ public class ParserService {
                 Document doc;
                 try {
                     while (pageCounter.longValue() <= PAGES_TO_PARSE) {
-                        doc = Jsoup.connect(WINE_URL + pageCounter.get()).get();
+                        doc = Jsoup.connect(wineUrl + pageCounter.get()).get();
                         Elements wines = doc.getElementsByClass("catalog-grid__item");
                         for (Element wine : wines) {
                             if (!wineURLs.contains(wine.getElementsByClass("product-snippet__name").attr("href")))
                                 wineURLs.add(wine.getElementsByClass("product-snippet__name").attr("href"));
                         }
                         log.debug("Parsed {} wines from url {}", wines.size(),
-                                WINE_URL + pageCounter.getAndIncrement());
+                                wineUrl + pageCounter.getAndIncrement());
                     }
                 } catch (IOException e) {
                     log.error("Error while parsing page: ", e);
@@ -109,14 +109,14 @@ public class ParserService {
                             return;
                         }
                         try {
-                            SimpleWine wine = Parser.parseWine(URLToDocument(URL + wineURL));
+                            SimpleWine wine = Parser.parseWine(urlToDocument(url + wineURL));
                             UpdateProducts.Product newProduct = wineToDTO.getProtoWine(wine);
                             if (!products.contains(newProduct)) {
                                 products.add(newProduct);
                             }
 
                             try {
-                                if (!(wine.getBrandID() == null) && !(wine.getCountryID() == null)
+                                if ((wine.getBrandID() != null) && (wine.getCountryID() != null)
                                         && !(wine.getBrandID().equals(""))) {
                                     Thread.sleep((long) (Math.random() * 1500));
                                     dbHandler.saveAllWineParsedInfo(wine);
@@ -132,19 +132,19 @@ public class ParserService {
                     }
                 } catch (InterruptedException e) {
                     log.error("Interrupt ", e);
+                    Thread.currentThread().interrupt();
                 }
             }, winesExecutor);
             futures.add(future);
         }
-        log.debug("Total {} wines", wineURLs.size());
         futures.forEach(CompletableFuture::join);
         log.info("End of adding information to the database.");
-        if (products.size() == 0) {
+        if (products.isEmpty()) {
             log.error("\t Z E R O\tP A R S I N G");
         } else {
             UpdateProducts.UpdateProductsMessage message;
             if (products.size() >= 1000) {
-                int messageSize = Math.round(products.size() / 4);
+                int messageSize = (int) Math.round(products.size() / 4.0);
                 for (int i = 0; i < 4; i++) {
                     if (i == 3)
                         message = UpdateProducts.UpdateProductsMessage.newBuilder()

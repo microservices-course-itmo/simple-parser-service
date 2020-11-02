@@ -14,6 +14,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class Parser {
+    private Parser() {
+    }
+
     /**
      * 
      * @param mainPage URL of simplewine main page
@@ -91,7 +94,6 @@ public class Parser {
                         grapeType = productFact.text();
                         break;
                     case "aging":
-                        // grapeType = productFact.text();
                         break;
 
                     default:
@@ -103,7 +105,6 @@ public class Parser {
         Elements productCharateristics = wineDoc.getElementsByClass("characteristics-params__item");
         for (Element productCharateristic : productCharateristics) {
             String charateristicTitle = productCharateristic.child(0).text();
-            // System.out.println(charateristicTitle);
             switch (charateristicTitle) {
                 case "Регион:":
                     region = productCharateristic.child(1).text();
@@ -118,7 +119,7 @@ public class Parser {
                     bottleYear = Integer.parseInt(productCharateristic.child(1).text());
                     break;
                 case "Крепость:":
-                    bottleABV = Float.parseFloat(productCharateristic.child(1).text().replaceAll("%", ""));
+                    bottleABV = Float.parseFloat(productCharateristic.child(1).text().replace("%", ""));
                     break;
 
                 default:

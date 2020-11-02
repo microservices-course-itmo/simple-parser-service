@@ -32,13 +32,13 @@ public class ParserServiceTest {
     }
 
     /**
-     * Testing {@link ParserService#URLToDocument(String)} method
+     * Testing {@link ParserService#urlToDocument(String)} method
      *
      * @throws IOException Wrong input URL string value
      */
     @Test
     public void testURLtoDocument() throws IOException {
-        Document doc = ParserService.URLToDocument(URL);
+        Document doc = ParserService.urlToDocument(URL);
         assertTrue(doc.title().contains("Интернет-витрина магазина SimpleWine: продажа хорошего алкоголя в Москве и Санкт-Петербурге, цены на сайте"));
     }
 }

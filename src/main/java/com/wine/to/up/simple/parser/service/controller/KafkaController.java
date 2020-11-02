@@ -90,6 +90,7 @@ public class KafkaController {
             } catch (InterruptedException | ExecutionException e) {
                 log.error("Error while sending in Kafka ", e);
                 eventLogger.warn(CommonNotableEvents.W_KAFKA_SEND_MESSAGE_FAILED, e);
+                Thread.currentThread().interrupt();
                 return 0;
             }
         }).mapToInt(Integer::intValue).sum();
