@@ -55,7 +55,12 @@ public class ParserService {
      */
 
     public static Document URLToDocument(String someURL) throws IOException {
-        return Jsoup.connect(someURL).get();
+        Document wineDoc = Jsoup.connect(someURL).get();
+        while (!(wineDoc.getElementsByClass("product-page").first().children().first().className().equals("product"))) {
+            log.error("Doing re-request...");
+            wineDoc = Jsoup.connect(someURL).get();
+        }
+        return wineDoc;
     }
 
     /**
@@ -142,9 +147,11 @@ public class ParserService {
                 int messageSize = Math.round(products.size() / 4);
                 for (int i = 0; i < 4; i++) {
                     if (i == 3)
-                        message = UpdateProducts.UpdateProductsMessage.newBuilder().addAllProducts(products.subList(i * messageSize, products.size() - 1)).build();
+                        message = UpdateProducts.UpdateProductsMessage.newBuilder()
+                                .addAllProducts(products.subList(i * messageSize, products.size() - 1)).build();
                     else
-                        message = UpdateProducts.UpdateProductsMessage.newBuilder().addAllProducts(products.subList(i * messageSize, (i + 1) * messageSize - 1)).build();
+                        message = UpdateProducts.UpdateProductsMessage.newBuilder()
+                                .addAllProducts(products.subList(i * messageSize, (i + 1) * messageSize - 1)).build();
                     kafkaSendMessageService.sendMessage(message);
                 }
             } else {
