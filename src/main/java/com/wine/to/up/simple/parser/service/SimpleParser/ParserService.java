@@ -54,7 +54,7 @@ public class ParserService {
      * @throws IOException IDK
      */
 
-    public static Document URLToDocument(String someURL) throws IOException {
+    public static Document urlToDocument(String someURL) throws IOException {
         Document wineDoc = Jsoup.connect(someURL).get();
         while (!(wineDoc.getElementsByClass("product-page").first().children().first().className().equals("product"))) {
             log.error("Doing re-request...");
