@@ -1,6 +1,5 @@
 package com.wine.to.up.simple.parser.service.SimpleParser;
 
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -14,8 +13,10 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@NoArgsConstructor
 public class Parser {
+    private Parser() {
+    }
+
     /**
      * 
      * @param mainPage URL of simplewine main page
@@ -93,7 +94,6 @@ public class Parser {
                         grapeType = productFact.text();
                         break;
                     case "aging":
-                        // grapeType = productFact.text();
                         break;
 
                     default:
@@ -105,7 +105,6 @@ public class Parser {
         Elements productCharateristics = wineDoc.getElementsByClass("characteristics-params__item");
         for (Element productCharateristic : productCharateristics) {
             String charateristicTitle = productCharateristic.child(0).text();
-            // System.out.println(charateristicTitle);
             switch (charateristicTitle) {
                 case "Регион:":
                     region = productCharateristic.child(1).text();
@@ -120,7 +119,7 @@ public class Parser {
                     bottleYear = Integer.parseInt(productCharateristic.child(1).text());
                     break;
                 case "Крепость:":
-                    bottleABV = Float.parseFloat(productCharateristic.child(1).text().replaceAll("%", ""));
+                    bottleABV = Float.parseFloat(productCharateristic.child(1).text().replace("%", ""));
                     break;
 
                 default:

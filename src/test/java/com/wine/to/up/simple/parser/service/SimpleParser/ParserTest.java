@@ -22,13 +22,13 @@ public class ParserTest {
     /**
      * Testing {@link Parser#parseNumberOfPages(Document)} method<br>
      * Trying to get number of pages from SimpleWine catalog page by URL<br>
-     * Using {@link ParserService#URLToDocument(String)} to get Document from URL
+     * Using {@link ParserService#urlToDocument(String)} to get Document from URL
      *
-     * @throws IOException Wrong input for {@link ParserService#URLToDocument(String)}
+     * @throws IOException Wrong input for {@link ParserService#urlToDocument(String)}
      */
     @Test
     public void testParseNumberOfPagesIntegration() throws IOException {
-        Document testCatalogPage = ParserService.URLToDocument(URL + "/catalog/vino/");
+        Document testCatalogPage = ParserService.urlToDocument(URL + "/catalog/vino/");
         int numberOfPages = Parser.parseNumberOfPages(testCatalogPage);
         assertTrue(numberOfPages >= 0);
     }
