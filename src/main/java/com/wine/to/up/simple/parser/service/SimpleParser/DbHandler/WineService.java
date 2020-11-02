@@ -5,6 +5,7 @@ import com.wine.to.up.simple.parser.service.domain.entity.*;
 import com.wine.to.up.simple.parser.service.repository.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import java.util.UUID;
 
 /** The service is responsible for adding all info to DB.*/
 @Service
@@ -41,7 +42,7 @@ public class WineService {
         try {
             brandEntity = brandsService.saveBrand(brand);
         } catch (Exception e) {
-            log.error("DB error: problem with saveBrand");
+            log.error("DB error: problem with saveBrand: ", e);
         }
 
         String country = newWine.getCountryID();
@@ -49,7 +50,7 @@ public class WineService {
         try {
             countryEntity = countriesService.saveCountry(country);
         } catch (Exception e) {
-            log.error("DB error: problem with saveCountry");
+            log.error("DB error: problem with saveCountry: ", e);
         }
 
         String grape = newWine.getGrapeType();
@@ -57,7 +58,7 @@ public class WineService {
         try {
             grapeEntity = grapesService.saveGrape(grape);
         } catch (Exception e) {
-            log.error("DB error: problem with saveGrape");
+            log.error("DB error: problem with saveGrape: ", e);
         }
 
         if (!(brandEntity == null) && !(countryEntity == null) && !(grapeEntity == null)) {
@@ -71,10 +72,8 @@ public class WineService {
      * @return instance of the {@link Wine} entity
      * */
     private Wine saveWine(SimpleWine newWine, Brands brandEntity, Countries countryEntity) {
-        Wine wineEntity;
-        wineEntity = new Wine();
-        wineEntity = Wine.builder()
-                .wineID(wineEntity.getWineID())
+        Wine wineEntity = Wine.builder()
+                .wineID(UUID.randomUUID())
                 .name(newWine.getName())
                 .price(newWine.getPrice())
                 .volume(newWine.getVolume())
