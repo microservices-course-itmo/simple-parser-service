@@ -24,7 +24,7 @@ public class GrapesService {
      * @see GrapesRepository
      * */
     protected Grapes saveGrape(String grape) {
-        if (!grapesRepository.existsGrapesByGrapeName(grape)) {
+        if (Boolean.FALSE.equals(grapesRepository.existsGrapesByGrapeName(grape))) {
             grapesRepository.save(new Grapes(grape));
             log.trace("New Brand was added to DB: " + grape);
         }

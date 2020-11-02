@@ -3,7 +3,7 @@ package com.wine.to.up.simple.parser.service.SimpleParser;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.junit.*;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.Assert.*;
 
@@ -12,7 +12,7 @@ import java.io.IOException;
 /**
  * Class for testing {@link ParserService}
  */
-public class ParserServiceTest {
+class ParserServiceTest {
     /**
      * SimpleWine base URL
      */
@@ -26,7 +26,7 @@ public class ParserServiceTest {
      * @throws IOException Wrong input URL string value
      */
     @Test
-    public void testURLConnection() throws IOException {
+    void testURLConnection() throws IOException {
         Connection.Response res = Jsoup.connect(URL).followRedirects(false).execute();
         assertEquals(200, res.statusCode());
     }
@@ -37,7 +37,7 @@ public class ParserServiceTest {
      * @throws IOException Wrong input URL string value
      */
     @Test
-    public void testURLtoDocument() throws IOException {
+    void testURLtoDocument() throws IOException {
         Document doc = ParserService.URLToDocument(URL);
         assertTrue(doc.title().contains("Интернет-витрина магазина SimpleWine: продажа хорошего алкоголя в Москве и Санкт-Петербурге, цены на сайте"));
     }

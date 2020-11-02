@@ -25,7 +25,7 @@ public class BrandsService {
      * @see BrandsRepository
      * */
     protected Brands saveBrand(@NonNull String brand) {
-        if (!brandsRepository.existsBrandsByBrandName(brand)) {
+        if (Boolean.FALSE.equals(brandsRepository.existsBrandsByBrandName(brand))) {
             brandsRepository.save(new Brands(brand));
             log.trace("New Brand was added to DB: " + brand);
         }
