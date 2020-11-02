@@ -100,20 +100,20 @@ public class MainController {
     @ResponseBody
     public Wine addWine(@ModelAttribute("wine") Wine wine) {
         Wine newWine = wine;
-        if (brandsRepository.existsBrandsByBrandName(wine.getBrandID().getBrandName())) {
+        if (Boolean.TRUE.equals(brandsRepository.existsBrandsByBrandName(wine.getBrandID().getBrandName()))) {
             newWine.setBrandID(brandsRepository.findBrandByBrandName(wine.getBrandID().getBrandName()));
         } else {
             brandsRepository.save(newWine.getBrandID());
         }
 
-        if (countriesRepository.existsCountriesByCountryName(wine.getCountryID().getCountryName())) {
+        if (Boolean.TRUE.equals(countriesRepository.existsCountriesByCountryName(wine.getCountryID().getCountryName()))) {
             newWine.setCountryID(countriesRepository.findCountryByCountryName(wine.getCountryID().getCountryName()));
         } else {
             countriesRepository.save(newWine.getCountryID());
         }
 
         Grapes grapes;
-        if (grapesRepository.existsGrapesByGrapeName(wine.getGrapeType())) {
+        if (Boolean.TRUE.equals(grapesRepository.existsGrapesByGrapeName(wine.getGrapeType()))) {
             grapes = grapesRepository.findGrapeByGrapeName(wine.getGrapeType());
         } else {
             grapes = new Grapes(wine.getGrapeType());
@@ -131,11 +131,11 @@ public class MainController {
     @ResponseBody
     public String getAllGrapes() {
         Iterable<Grapes> grapes = grapesRepository.findAll();
-        String html = "";
+        StringBuilder html = new StringBuilder();
         for (Grapes someGrape : grapes) {
-            html += someGrape + "<br>";
+            html.append(someGrape).append("<br>");
         }
-        return html;
+        return html.toString();
     }
 
     /** The method based on a GET request. Output of all brands stored in the {@link BrandsRepository}.
@@ -144,11 +144,11 @@ public class MainController {
     @ResponseBody
     public String getAllBrands() {
         Iterable<Brands> brands = brandsRepository.findAll();
-        String html = "";
+        StringBuilder html = new StringBuilder();
         for (Brands someBrand : brands) {
-            html += someBrand + "<br>";
+            html.append(someBrand).append("<br>");
         }
-        return html;
+        return html.toString();
     }
 
     /** The method based on a GET request. Output of all countries stored in the {@link CountriesRepository}.
@@ -157,11 +157,11 @@ public class MainController {
     @ResponseBody
     public String getAllCountries() {
         Iterable<Countries> countries = countriesRepository.findAll();
-        String html = "";
+        StringBuilder html = new StringBuilder();
         for (Countries someCountry : countries) {
-            html += someCountry + "<br>";
+            html.append(someCountry).append("<br>");
         }
-        return html;
+        return html.toString();
     }
 
     /** A method based on a GET request. Output of all wines stored in the {@link WineRepository}.
@@ -170,11 +170,11 @@ public class MainController {
     @ResponseBody
     public String getAllWines() {
         Iterable<Wine> wines = wineRepository.findAll();
-        String html = "";
+        StringBuilder html = new StringBuilder();
         for (Wine someWine : wines) {
-            html += someWine + "<br>";
+            html.append(someWine).append("<br>");
         }
-        return html;
+        return html.toString();
     }
 
     /** The method based on a GET request. Output of a message created to be sent to Kafka, contains all parsed wine information.
@@ -183,23 +183,23 @@ public class MainController {
     @ResponseBody
     public String getAllProducts() {
         UpdateProducts.UpdateProductsMessage message = parserService.getMessage();
-        String html = "";
+        StringBuilder html = new StringBuilder();
         for (UpdateProducts.Product someProduct : message.getProductsList()) {
-            html += "<a>Name: </a>" + someProduct.getName() + "<br>";
-            html += "<a>Link: </a>" + someProduct.getLink() + "<br>";
-            html += "<a>Brand: </a>" + someProduct.getBrand() + "<br>";
-            html += "<a>Country: </a>" + someProduct.getCountry() + "<br>";
-            html += "<a>Region: </a>" + someProduct.getRegion(0) + "<br>";
-            html += "<a>Year: </a>" + someProduct.getYear() + "<br>";
-            html += "<a>Grapes: </a>" + someProduct.getGrapeSort(0) + "<br>";
-            html += "<a>Volume: </a>" + someProduct.getCapacity() + "<br>";
-            html += "<a>ABV: </a>" + someProduct.getStrength() + "<br>";
-            html += "<a>Sugar: </a>" + someProduct.getSugar() + "<br>";
-            html += "<a>Color: </a>" + someProduct.getColor() + "<br>";
-            html += "<a>New Price: </a>" + someProduct.getNewPrice() + "<br>";
-            html += "<a>Old Price: </a>" + someProduct.getOldPrice() + "<br><br>";
+            html.append("<a>Name: </a>").append(someProduct.getName()).append("<br>");
+            html.append("<a>Link: </a>").append(someProduct.getLink()).append("<br>");
+            html.append("<a>Brand: </a>").append(someProduct.getBrand()).append("<br>");
+            html.append("<a>Country: </a>").append(someProduct.getCountry()).append("<br>");
+            html.append("<a>Region: </a>").append(someProduct.getRegion(0)).append("<br>");
+            html.append("<a>Year: </a>").append(someProduct.getYear()).append("<br>");
+            html.append("<a>Grapes: </a>").append(someProduct.getGrapeSort(0)).append("<br>");
+            html.append("<a>Volume: </a>").append(someProduct.getCapacity()).append("<br>");
+            html.append("<a>ABV: </a>").append(someProduct.getStrength()).append("<br>");
+            html.append("<a>Sugar: </a>").append(someProduct.getSugar()).append("<br>");
+            html.append("<a>Color: </a>").append(someProduct.getColor()).append("<br>");
+            html.append("<a>New Price: </a>").append(someProduct.getNewPrice()).append("<br>");
+            html.append("<a>Old Price: </a>").append(someProduct.getOldPrice()).append("<br><br>");
         }
-        return html;
+        return html.toString();
     }
 
     /** Parser's homepage which contains links to some methods.

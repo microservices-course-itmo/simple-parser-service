@@ -3,7 +3,6 @@ package com.wine.to.up.simple.parser.service.domain.entity;
 import lombok.*;
 
 import javax.persistence.*;
-import java.io.File;
 import java.util.UUID;
 
 /** The 'Wine' entity that is matched to the 'wine' DB table  */
