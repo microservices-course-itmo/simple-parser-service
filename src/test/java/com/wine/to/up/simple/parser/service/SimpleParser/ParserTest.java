@@ -31,7 +31,7 @@ class ParserTest {
      */
     @Test
     void testParseNumberOfPagesIntegration() throws IOException {
-        Document testCatalogPage = ParserService.urlToDocument(URL + "/catalog/vino/");
+        Document testCatalogPage = Jsoup.connect(URL + "/catalog/vino/").get();
         int numberOfPages = Parser.parseNumberOfPages(testCatalogPage);
         assertTrue(numberOfPages >= 0);
     }
@@ -98,6 +98,7 @@ class ParserTest {
                 taste("Вино блестящего фиолетово-красного цвета с яркими ароматами темных спелых ягод, ванили, лакрицы и легкими перечными нотками. " +
                         "Среднетелое, насыщенное и хорошо структурированное во вкусе, с бархатистыми танинами и оттенками черной смородины, сливы и ванили в послевкусии.").
                 sparkling(false).
+                oldPrice((float) 1190.0).
                 build();
         assertEquals(testWine.toString(), Parser.parseWine(testWinePage).toString());
     }

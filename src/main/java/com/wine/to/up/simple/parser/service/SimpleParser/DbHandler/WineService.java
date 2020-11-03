@@ -38,7 +38,7 @@ public class WineService {
     public void saveAllWineParsedInfo(SimpleWine newWine) {
         Float price = newWine.getNewPrice();
         String link = newWine.getLink();
-        if (wineRepository.existsWineByLinkAndNewPrice(link, price)) {
+        if (Boolean.TRUE.equals(wineRepository.existsWineByLinkAndNewPrice(link, price))) {
             return;
         }
         String brand = newWine.getBrandID();
@@ -66,7 +66,7 @@ public class WineService {
             }
         }
 
-        if (!(brandEntity == null) && !(countryEntity == null)) {
+        if ((brandEntity != null) && (countryEntity != null)) {
             Wine wineEntity = saveWine(newWine, brandEntity, countryEntity);
             for (Grapes grapeEntity : grapesEntity) {
                 wineGrapesService.saveWineGrapes(grapeEntity, wineEntity);

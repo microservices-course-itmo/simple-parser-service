@@ -38,7 +38,7 @@ class ParserServiceTest {
      */
     @Test
     void testURLtoDocument() throws IOException {
-        Document doc = ParserService.urlToDocument(URL);
-        assertTrue(doc.title().contains("Интернет-витрина магазина SimpleWine: продажа хорошего алкоголя в Москве и Санкт-Петербурге, цены на сайте"));
+        Document doc = ParserService.urlToDocument("https://simplewine.ru/catalog/product/lindeman_s_bin_50_shiraz_2018_075/");
+        assertTrue(doc.title().contains("Вино Bin 50 Shiraz"));
     }
 }
