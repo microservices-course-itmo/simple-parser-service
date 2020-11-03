@@ -9,17 +9,16 @@ import java.util.Arrays;
 
 /**
  * Parses wine and counts number of pages with wines
- * 
  */
 
 @Slf4j
 @Component
 public class Parser {
     private Parser() {
+        throw new IllegalStateException("Utility class");
     }
 
     /**
-     * 
      * @param mainPage URL of simplewine main page
      * @return Number of pages with wines
      */
@@ -36,7 +35,6 @@ public class Parser {
     }
 
     /**
-     * 
      * @param wineDoc Jsoup Document of wine
      * @return
      */

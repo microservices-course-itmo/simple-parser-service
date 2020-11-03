@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 public class WineToDTO {
     private final ModelMapper modelMapper;
 
-    WineToDTO() {
+    private WineToDTO() {
         modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setSkipNullEnabled(true);
     }
@@ -24,7 +24,7 @@ public class WineToDTO {
      * @param wine instance of the SimpleWine class which contains parsed wine information.
      * @return instance of UpdateProducts.Product
      **/
-    public UpdateProducts.Product getProtoWine(SimpleWine wine) {
+    public static UpdateProducts.Product getProtoWine(SimpleWine wine) {
         UpdateProducts.Product.Color color = defineColor(wine.getColor());
         UpdateProducts.Product.Sugar sugar = defineSugar(wine.getSugar());
 
@@ -47,7 +47,7 @@ public class WineToDTO {
      * @param color type of color received during wine parsing.
      * @return value of UpdateProducts.Product.Color enum
      **/
-    private UpdateProducts.Product.Color defineColor(String color) {
+    private static UpdateProducts.Product.Color defineColor(String color) {
         UpdateProducts.Product.Color colorType;
         switch (color) {
             case "красное":
@@ -79,7 +79,7 @@ public class WineToDTO {
      * @param sugar type of sugar received during wine parsing.
      * @return value of UpdateProducts.Product.Sugar enum
      **/
-    private UpdateProducts.Product.Sugar defineSugar(String sugar) {
+    private static UpdateProducts.Product.Sugar defineSugar(String sugar) {
         UpdateProducts.Product.Sugar sugarType;
         switch (sugar) {
             case "сухое":
