@@ -1,4 +1,4 @@
-package com.wine.to.up.simple.parser.service.SimpleParser;
+package com.wine.to.up.simple.parser.service.simple_parser;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
