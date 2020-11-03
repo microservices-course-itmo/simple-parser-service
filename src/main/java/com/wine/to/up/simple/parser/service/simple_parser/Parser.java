@@ -15,7 +15,6 @@ import java.util.Arrays;
 @Component
 public class Parser {
     private Parser() {
-        throw new IllegalStateException("Utility class");
     }
 
     /**

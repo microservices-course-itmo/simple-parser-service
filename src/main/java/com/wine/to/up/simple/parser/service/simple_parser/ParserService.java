@@ -48,7 +48,6 @@ public class ParserService {
     private WineRepository wineRepository;
 
     /**
-     *
      * @param someURL URL to get jsoup Document
      * @return Jsoup Document class
      * @throws IOException IDK
@@ -74,7 +73,6 @@ public class ParserService {
 
         WineService dbHandler = new WineService(grapesRepository, brandsRepository, countriesRepository,
                 wineGrapesRepository, wineRepository);
-        WineToDTO wineToDTO = new WineToDTO();
         List<UpdateProducts.Product> products = new ArrayList<>();
 
         AtomicLong pageCounter = new AtomicLong(1);
@@ -92,7 +90,7 @@ public class ParserService {
                         if (wineURL == null) {
                             return;
                         }
-                        addWineToDB(wineURL, wineToDTO, products, dbHandler, wineCounter);
+                        addWineToProducts(wineURL, products, dbHandler, wineCounter);
                     }
                 } catch (InterruptedException e) {
                     log.error("Interrupt ", e);
@@ -120,23 +118,21 @@ public class ParserService {
         return messageToKafka;
     }
 
-    private void addWineToDB(String wineURL, WineToDTO wineToDTO, List<UpdateProducts.Product> products, WineService dbHandler, AtomicInteger wineCounter) {
+    private void addWineToProducts(String wineURL, List<UpdateProducts.Product> products, WineService dbHandler, AtomicInteger wineCounter) {
         try {
             SimpleWine wine = Parser.parseWine(urlToDocument(url + wineURL));
-            UpdateProducts.Product newProduct = wineToDTO.getProtoWine(wine);
+            UpdateProducts.Product newProduct = WineToDTO.getProtoWine(wine);
             if (!products.contains(newProduct)) {
                 products.add(newProduct);
             }
-
             saveWineToDB(wine, dbHandler);
-
             log.trace("Wine: {} added to database", wineCounter.getAndIncrement());
         } catch (IOException e) {
             log.error("Error while parsing page: ", e);
         }
     }
 
-    private void saveWineToDB(SimpleWine wine, WineService dbHandler){
+    private void saveWineToDB(SimpleWine wine, WineService dbHandler) {
         try {
             if ((wine.getBrandID() != null) && (wine.getCountryID() != null)
                     && !(wine.getBrandID().equals(""))) {

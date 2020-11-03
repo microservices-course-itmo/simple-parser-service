@@ -12,22 +12,20 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class WineToDTO {
-    private final ModelMapper modelMapper;
-
-    WineToDTO() {
-        modelMapper = new ModelMapper();
-        modelMapper.getConfiguration().setSkipNullEnabled(true);
+    private WineToDTO() {
     }
 
     /**
      * The function is designed to get parsed wine information which is wrapped into a common-api UpdateProducts.Product class for subsequent transfer to Kafka.
+     *
      * @param wine instance of the SimpleWine class which contains parsed wine information.
      * @return instance of UpdateProducts.Product
      **/
-    public UpdateProducts.Product getProtoWine(SimpleWine wine) {
+    public static UpdateProducts.Product getProtoWine(SimpleWine wine) {
         UpdateProducts.Product.Color color = defineColor(wine.getColor());
         UpdateProducts.Product.Sugar sugar = defineSugar(wine.getSugar());
-
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setSkipNullEnabled(true);
         UpdateProducts.Product.Builder product = modelMapper
                 .map(wine, UpdateProducts.Product.Builder.class)
                 .addAllGrapeSort(wine.getGrapeSort())
@@ -44,6 +42,7 @@ public class WineToDTO {
 
     /**
      * The method using to define the type of wine color relative to enum common-api.
+     *
      * @param color type of color received during wine parsing.
      * @return value of UpdateProducts.Product.Color enum
      **/
@@ -76,6 +75,7 @@ public class WineToDTO {
 
     /**
      * The method using to define the type of wine sugar relative to enum common-api.
+     *
      * @param sugar type of sugar received during wine parsing.
      * @return value of UpdateProducts.Product.Sugar enum
      **/
