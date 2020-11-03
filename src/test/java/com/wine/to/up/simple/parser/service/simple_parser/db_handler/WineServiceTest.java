@@ -5,9 +5,11 @@ import com.wine.to.up.simple.parser.service.repository.*;
 import com.wine.to.up.simple.parser.service.simple_parser.SimpleWine;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
+import org.modelmapper.MappingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 import static org.junit.Assert.*;
@@ -24,16 +26,18 @@ class WineServiceTest {
     @Autowired
     private WineRepository wineRepository;
     @Autowired
-    private WineService wineService;
+    private WineGrapesRepository wineGrapesRepository;
     @Autowired
-    private BrandsService brandsService;
+    private GrapesRepository grapesRepository;
+    @Autowired
+    private WineService wineService;
 
     /**
      * Testing {@link WineService#saveAllWineParsedInfo(SimpleWine)} method
      */
 
     @Test
-    void testSaveWine() {
+    void testSaveAllWineInfo() {
         SimpleWine testWine = SimpleWine.builder().
                 name("Бин 50 Шираз").
                 brandID("Lindeman's").
@@ -95,10 +99,10 @@ class WineServiceTest {
 
     /**
      * Testing {@link WineService#saveAllWineParsedInfo(SimpleWine)} method<br>
-     * Trying to parse wine without Brand<br>
+     * Trying to parse wine without Brand and country<br>
      */
     @Test
-    void testParseWineWithoutBrandAndCountry()  {
+    void testParseWineWithoutBrandAndCountry() {
         SimpleWine testWine = SimpleWine.builder().
                 name("Мое любимое").
                 brandID(null).
@@ -123,6 +127,213 @@ class WineServiceTest {
         wineService.saveAllWineParsedInfo(testWine);
         assertEquals(wineRepository.existsWineByLinkAndNewPrice(testWine.getLink(), testWine.getNewPrice()), Boolean.FALSE);
     }
+
+    /**
+     * Testing {@link WineService#saveAllWineParsedInfo(SimpleWine)} method<br>
+     * Trying to parse wine without Brand and country<br>
+     */
+    @Test
+    void testParseWineWithoutBrand() {
+        SimpleWine testWine = SimpleWine.builder().
+                name("Мое любимое").
+                brandID(null).
+                countryID("Раися").
+                newPrice((float) 20000.0).
+                year(2018).
+                capacity((float) 0.75).
+                strength((float) 13.0).
+                color("цветное").
+                grapeSort(Collections.singleton("шираз")).
+                sugar("соленое").
+                discount((float) 20.0).
+                region("Новый Южный").
+                link("https://myfavorite").
+                rating((float) 4.6).
+                image("https://static.simplewine.ru/upload/iblock/3ce/vino-bin-50-shiraz-lindeman-s-2018_1.png@x303").
+                gastronomy("Прекрасно в сочетании с жареным ягненком, свининой с овощами и сырами средней выдержки.").
+                taste("Вино блестящего фиолетово-красного цвета с яркими ароматами темных спелых ягод, ванили, лакрицы и легкими перечными нотками. " +
+                        "Среднетелое, насыщенное и хорошо структурированное во вкусе, с бархатистыми танинами и оттенками черной смородины, сливы и ванили в послевкусии.").
+                sparkling(false).
+                build();
+        wineService.saveAllWineParsedInfo(testWine);
+        assertEquals(wineRepository.existsWineByLinkAndNewPrice(testWine.getLink(), testWine.getNewPrice()), Boolean.FALSE);
+    }
+
+    /**
+     * Testing {@link WineService#saveAllWineParsedInfo(SimpleWine)} method<br>
+     * Trying to parse wine without Grapes<br>
+     */
+    @Test
+    void testParseWineWithoutGrapes() throws NullPointerException {
+        SimpleWine testWine = SimpleWine.builder().
+                name("Мое любимое").
+                brandID("Чайка").
+                countryID("Раися").
+                newPrice((float) 20000.0).
+                year(2018).
+                capacity((float) 0.75).
+                strength((float) 13.0).
+                color("цветное").
+                grapeSort(null).
+                sugar("соленое").
+                discount((float) 20.0).
+                region("Новый Южный").
+                link("https://myfavorite").
+                rating((float) 4.6).
+                image("https://static.simplewine.ru/upload/iblock/3ce/vino-bin-50-shiraz-lindeman-s-2018_1.png@x303").
+                gastronomy("Прекрасно в сочетании с жареным ягненком, свининой с овощами и сырами средней выдержки.").
+                taste("Вино блестящего фиолетово-красного цвета с яркими ароматами темных спелых ягод, ванили, лакрицы и легкими перечными нотками. " +
+                        "Среднетелое, насыщенное и хорошо структурированное во вкусе, с бархатистыми танинами и оттенками черной смородины, сливы и ванили в послевкусии.").
+                sparkling(false).
+                build();
+        assertThrows(NullPointerException.class, () -> wineService.saveAllWineParsedInfo(testWine));
+    }
+
+    @Test
+    void testCreateConstructor() {
+        assertThrows(NullPointerException.class, () -> new WineService(null, null, null, null, null));
+    }
+
+    @Test
+    void testSaveWineWithoutLink() {
+        SimpleWine testWine = SimpleWine.builder().
+                name("Мое любимое").
+                brandID("Чайка").
+                countryID("Раися").
+                newPrice((float) 20000.0).
+                year(2018).
+                capacity((float) 0.75).
+                strength((float) 13.0).
+                color("цветное").
+                grapeSort(null).
+                sugar("соленое").
+                discount((float) 20.0).
+                region("Новый Южный").
+                link(null).
+                rating((float) 4.6).
+                image("https://static.simplewine.ru/upload/iblock/3ce/vino-bin-50-shiraz-lindeman-s-2018_1.png@x303").
+                gastronomy("Прекрасно в сочетании с жареным ягненком, свининой с овощами и сырами средней выдержки.").
+                taste("Вино блестящего фиолетово-красного цвета с яркими ароматами темных спелых ягод, ванили, лакрицы и легкими перечными нотками. " +
+                        "Среднетелое, насыщенное и хорошо структурированное во вкусе, с бархатистыми танинами и оттенками черной смородины, сливы и ванили в послевкусии.").
+                sparkling(false).
+                build();
+        assertThrows(NullPointerException.class, () -> wineService.saveAllWineParsedInfo(testWine));
+    }
+
+    @Test
+    void testSaveWineWithoutPrice() throws NullPointerException{
+        SimpleWine testWine = SimpleWine.builder().
+                name("Мое любимое").
+                brandID("Чайка").
+                countryID("Раися").
+                newPrice(null).
+                year(2018).
+                capacity((float) 0.75).
+                strength((float) 13.0).
+                color("цветное").
+                grapeSort(null).
+                sugar("соленое").
+                discount((float) 20.0).
+                region("Новый Южный").
+                link("https://myfavorite").
+                rating((float) 4.6).
+                image("https://static.simplewine.ru/upload/iblock/3ce/vino-bin-50-shiraz-lindeman-s-2018_1.png@x303").
+                gastronomy("Прекрасно в сочетании с жареным ягненком, свининой с овощами и сырами средней выдержки.").
+                taste("Вино блестящего фиолетово-красного цвета с яркими ароматами темных спелых ягод, ванили, лакрицы и легкими перечными нотками. " +
+                        "Среднетелое, насыщенное и хорошо структурированное во вкусе, с бархатистыми танинами и оттенками черной смородины, сливы и ванили в послевкусии.").
+                sparkling(false).
+                build();
+        assertThrows(NullPointerException.class, () -> wineService.saveAllWineParsedInfo(testWine));
+    }
+
+    @Test
+    void testSaveNull() throws NullPointerException{
+        assertThrows(NullPointerException.class, () -> wineService.saveAllWineParsedInfo(null));
+    }
+
+    @Test
+    void testSameGrapesSaveWine() {
+        SimpleWine testWine = SimpleWine.builder().
+                name("Бин 50 Шираз").
+                brandID("Lindeman's").
+                countryID("Австралия").
+                newPrice((float) 952.0).
+                year(2018).
+                capacity((float) 0.75).
+                strength((float) 13.0).
+                color("красное").
+                grapeSort(Arrays.asList("шираз", "шираз")).
+                sugar("полусухое").
+                discount((float) 20.0).
+                region("Новый Южный Уэльс").
+                link("https://simplewine.ru/catalog/product/lindeman_s_bin_50_shiraz_2018_075/").
+                rating((float) 4.6).
+                image("https://static.simplewine.ru/upload/iblock/3ce/vino-bin-50-shiraz-lindeman-s-2018_1.png@x303").
+                gastronomy("Прекрасно в сочетании с жареным ягненком, свининой с овощами и сырами средней выдержки.").
+                taste("Вино блестящего фиолетово-красного цвета с яркими ароматами темных спелых ягод, ванили, лакрицы и легкими перечными нотками. " +
+                        "Среднетелое, насыщенное и хорошо структурированное во вкусе, с бархатистыми танинами и оттенками черной смородины, сливы и ванили в послевкусии.").
+                sparkling(false).
+                build();
+        wineService.saveAllWineParsedInfo(testWine);
+        assertNotEquals(testWine.getGrapeSort().toString(), wineRepository.findWineByLinkAndNewPrice(testWine.getLink(), testWine.getNewPrice()).getGrapeSort());
+    }
+
+
+    @Test
+    void testSaveWithoutCapacity(){
+        SimpleWine testWine = SimpleWine.builder().
+                name("Мое любимое2").
+                brandID("Чайка").
+                countryID("Раися").
+                newPrice((float) 3000.0).
+                year(2018).
+                strength((float) 13.0).
+                color("цветное").
+                grapeSort(Arrays.asList("шираз", "каберне")).
+                sugar("соленое").
+                discount((float) 20.0).
+                region("Новый Южный").
+                link("https://myfavorite2").
+                rating((float) 4.6).
+                image("https://static.simplewine.ru/upload/iblock/3ce/vino-bin-50-shiraz-lindeman-s-2018_1.png@x303").
+                gastronomy("Прекрасно в сочетании с жареным ягненком, свининой с овощами и сырами средней выдержки.").
+                taste("Вино блестящего фиолетово-красного цвета с яркими ароматами темных спелых ягод, ванили, лакрицы и легкими перечными нотками. " +
+                        "Среднетелое, насыщенное и хорошо структурированное во вкусе, с бархатистыми танинами и оттенками черной смородины, сливы и ванили в послевкусии.").
+                sparkling(false).
+                build();
+        assertThrows(MappingException.class, () -> wineService.saveAllWineParsedInfo(testWine));
+    }
+
+
+    @Test
+    void testSaveWineGrapes(){
+        SimpleWine testWine = SimpleWine.builder().
+                name("Мое любимое").
+                brandID("Чайка").
+                countryID("Раися").
+                newPrice((float) 30000.0).
+                year(2018).
+                capacity((float) 0.75).
+                strength((float) 13.0).
+                color("цветное").
+                grapeSort(Arrays.asList("шираз", "каберне")).
+                sugar("соленое").
+                discount((float) 20.0).
+                region("Новый Южный").
+                link("https://myfavorite").
+                rating((float) 4.6).
+                image("https://static.simplewine.ru/upload/iblock/3ce/vino-bin-50-shiraz-lindeman-s-2018_1.png@x303").
+                gastronomy("Прекрасно в сочетании с жареным ягненком, свининой с овощами и сырами средней выдержки.").
+                taste("Вино блестящего фиолетово-красного цвета с яркими ароматами темных спелых ягод, ванили, лакрицы и легкими перечными нотками. " +
+                        "Среднетелое, насыщенное и хорошо структурированное во вкусе, с бархатистыми танинами и оттенками черной смородины, сливы и ванили в послевкусии.").
+                sparkling(false).
+                build();
+        wineService.saveAllWineParsedInfo(testWine);
+
+        assertNotNull(wineGrapesRepository.existsWineGrapesByGrapeIdAndAndWineId(grapesRepository.findGrapeByGrapeName("шираз"), wineRepository.findWineByLinkAndNewPrice(testWine.getLink(), testWine.getNewPrice())));
+        assertNotNull(wineGrapesRepository.existsWineGrapesByGrapeIdAndAndWineId(grapesRepository.findGrapeByGrapeName("каберне"), wineRepository.findWineByLinkAndNewPrice(testWine.getLink(), testWine.getNewPrice())));
+    }
 }
+
 
 
