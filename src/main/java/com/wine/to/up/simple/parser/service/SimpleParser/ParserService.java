@@ -30,7 +30,7 @@ public class ParserService {
     private String wineUrl;
     private static final int PAGES_TO_PARSE = 106; // currently max 106, lower const value for testing purposes
     private static final int NUMBER_OF_THREADS = 15;
-    private static UpdateProducts.UpdateProductsMessage messageToKafka;
+    private UpdateProducts.UpdateProductsMessage messageToKafka;
     private final ExecutorService pagesExecutor = Executors.newSingleThreadExecutor();
     private final ExecutorService winesExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
 
@@ -48,7 +48,6 @@ public class ParserService {
     private WineRepository wineRepository;
 
     /**
-     *
      * @param someURL URL to get jsoup Document
      * @return Jsoup Document class
      * @throws IOException IDK
@@ -74,7 +73,6 @@ public class ParserService {
 
         WineService dbHandler = new WineService(grapesRepository, brandsRepository, countriesRepository,
                 wineGrapesRepository, wineRepository);
-        WineToDTO wineToDTO = new WineToDTO();
         List<UpdateProducts.Product> products = new ArrayList<>();
 
         AtomicLong pageCounter = new AtomicLong(1);
@@ -110,7 +108,7 @@ public class ParserService {
                         }
                         try {
                             SimpleWine wine = Parser.parseWine(urlToDocument(url + wineURL));
-                            UpdateProducts.Product newProduct = wineToDTO.getProtoWine(wine);
+                            UpdateProducts.Product newProduct = WineToDTO.getProtoWine(wine);
                             if (!products.contains(newProduct)) {
                                 products.add(newProduct);
                             }

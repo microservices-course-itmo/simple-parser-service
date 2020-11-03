@@ -12,13 +12,15 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class WineToDTO {
-
+    private WineToDTO(){
+        throw new IllegalStateException("Utility class");
+    }
     /**
      * The function is designed to get parsed wine information which is wrapped into a common-api UpdateProducts.Product class for subsequent transfer to Kafka.
      * @param wine instance of the SimpleWine class which contains parsed wine information.
      * @return instance of UpdateProducts.Product
      **/
-    public UpdateProducts.Product getProtoWine(SimpleWine wine) {
+    public static UpdateProducts.Product getProtoWine(SimpleWine wine) {
         UpdateProducts.Product.Color color = defineColor(wine.getColorType());
         UpdateProducts.Product.Sugar sugar = defineSugar(wine.getSugarType());
         UpdateProducts.Product.Builder product = UpdateProducts.Product.newBuilder()
@@ -55,7 +57,7 @@ public class WineToDTO {
      * @param color type of color received during wine parsing.
      * @return value of UpdateProducts.Product.Color enum
      **/
-    private UpdateProducts.Product.Color defineColor(@NonNull String color) {
+    private static UpdateProducts.Product.Color defineColor(@NonNull String color) {
         UpdateProducts.Product.Color colorType;
         switch (color) {
             case "красное":
@@ -87,7 +89,7 @@ public class WineToDTO {
      * @param sugar type of sugar received during wine parsing.
      * @return  value of UpdateProducts.Product.Sugar enum
      **/
-    private UpdateProducts.Product.Sugar defineSugar(@NonNull String sugar) {
+    private static UpdateProducts.Product.Sugar defineSugar(@NonNull String sugar) {
         UpdateProducts.Product.Sugar sugarType;
         switch (sugar) {
             case "сухое":
