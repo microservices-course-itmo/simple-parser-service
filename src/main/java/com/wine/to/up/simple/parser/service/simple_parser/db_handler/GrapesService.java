@@ -1,4 +1,4 @@
-package com.wine.to.up.simple.parser.service.SimpleParser.DbHandler;
+package com.wine.to.up.simple.parser.service.simple_parser.db_handler;
 
 import com.wine.to.up.simple.parser.service.domain.entity.Grapes;
 import com.wine.to.up.simple.parser.service.repository.GrapesRepository;

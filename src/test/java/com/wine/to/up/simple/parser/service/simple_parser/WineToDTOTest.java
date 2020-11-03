@@ -1,4 +1,4 @@
-package com.wine.to.up.simple.parser.service.SimpleParser;
+package com.wine.to.up.simple.parser.service.simple_parser;
 
 import com.wine.to.up.parser.common.api.schema.UpdateProducts;
 import org.junit.jupiter.params.ParameterizedTest;
