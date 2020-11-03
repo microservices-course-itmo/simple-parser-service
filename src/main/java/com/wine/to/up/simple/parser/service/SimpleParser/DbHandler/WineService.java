@@ -1,11 +1,13 @@
-package com.wine.to.up.simple.parser.service.simple_parser.db_handler;
+package com.wine.to.up.simple.parser.service.SimpleParser.DbHandler;
 
-import com.wine.to.up.simple.parser.service.simple_parser.SimpleWine;
+import com.wine.to.up.simple.parser.service.SimpleParser.SimpleWine;
 import com.wine.to.up.simple.parser.service.domain.entity.*;
 import com.wine.to.up.simple.parser.service.repository.*;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import java.util.UUID;
+import java.util.LinkedList;
+import java.util.List;
 
 /** The service is responsible for adding all info to DB.*/
 @Service
@@ -17,6 +19,7 @@ public class WineService {
     private final CountriesService countriesService;
     private final GrapesService grapesService;
     private final WineGrapesService wineGrapesService;
+    private final ModelMapper modelMapper;
 
 
     /**  The service instance creation. */
@@ -26,15 +29,16 @@ public class WineService {
         grapesService = new GrapesService(grapesRepository);
         wineGrapesService = new WineGrapesService(wineGrapesRepository);
         this.wineRepository = wineRepository;
+        modelMapper = new ModelMapper();
     }
 
     /** Adding all parsed info to the corresponding DB tables/repositories.)
      * @param newWine {@link SimpleWine} class instance containing all wine parsed info
-     * */
+     */
     public void saveAllWineParsedInfo(SimpleWine newWine) {
-        Float price = newWine.getPrice();
+        Float price = newWine.getNewPrice();
         String link = newWine.getLink();
-        if (Boolean.TRUE.equals(wineRepository.existsWineByLinkAndPrice(link, price))) {
+        if (wineRepository.existsWineByLinkAndNewPrice(link, price)) {
             return;
         }
         String brand = newWine.getBrandID();
@@ -53,46 +57,35 @@ public class WineService {
             log.error("DB error: problem with saveCountry: ", e);
         }
 
-        String grape = newWine.getGrapeType();
-        Grapes grapeEntity = null;
-        try {
-            grapeEntity = grapesService.saveGrape(grape);
-        } catch (Exception e) {
-            log.error("DB error: problem with saveGrape: ", e);
+        List<Grapes> grapesEntity = new LinkedList<>();
+        for (String grape : newWine.getGrapeSort()) {
+            try {
+                grapesEntity.add(grapesService.saveGrape(grape));
+            } catch (Exception e) {
+                log.error("DB error: problem with saveGrape: ", e);
+            }
         }
 
-        if ((brandEntity != null) && (countryEntity != null) && (grapeEntity != null)) {
+        if (!(brandEntity == null) && !(countryEntity == null)) {
             Wine wineEntity = saveWine(newWine, brandEntity, countryEntity);
-            wineGrapesService.saveWineGrapes(grapeEntity, wineEntity);
+            for (Grapes grapeEntity : grapesEntity) {
+                wineGrapesService.saveWineGrapes(grapeEntity, wineEntity);
+            }
         }
     }
 
-    /** Adding wine to DB ({@link WineRepository})
+    /**
+     * Adding wine to DB ({@link WineRepository})
+     *
      * @param newWine {@link SimpleWine} class instance containing all wine parsed info
      * @return instance of the {@link Wine} entity
-     * */
+     */
     private Wine saveWine(SimpleWine newWine, Brands brandEntity, Countries countryEntity) {
-        Wine wineEntity = Wine.builder()
-                .wineID(UUID.randomUUID())
-                .name(newWine.getName())
-                .price(newWine.getPrice())
-                .volume(newWine.getVolume())
-                .colorType(newWine.getColorType())
-                .sugarType(newWine.getSugarType())
-                .picture(newWine.getPicture())
-                .link(newWine.getLink())
-                .brandID(brandEntity)
-                .countryID(countryEntity)
-                .rating(newWine.getRating())
-                .grapeType(newWine.getGrapeType())
-                .abv(newWine.getAbv())
-                .year(newWine.getYear())
-                .discount(newWine.getDiscount())
-                .region(newWine.getRegion())
-                .gastronomy(newWine.getGastronomy())
-                .sparkling(newWine.isSparkling())
-                .taste(newWine.getTaste())
-                .build();
+        Wine wineEntity = modelMapper.map(newWine, Wine.class);
+        wineEntity.setCountryID(countryEntity);
+        wineEntity.setBrandID(brandEntity);
+        wineEntity.setGrapeSort(String.valueOf(newWine.getGrapeSort()));
+
         wineRepository.save(wineEntity);
         log.trace("New Wine was added to DB: " + wineEntity.toString());
         return wineEntity;

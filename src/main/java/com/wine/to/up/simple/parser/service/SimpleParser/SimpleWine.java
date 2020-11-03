@@ -1,4 +1,4 @@
-package com.wine.to.up.simple.parser.service.simple_parser;
+package com.wine.to.up.simple.parser.service.SimpleParser;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,18 +16,19 @@ import lombok.ToString;
 @Getter
 @Setter
 public class SimpleWine {
-    private String picture;
+    private String image;
     private String brandID;
     private String countryID;
-    private Float volume;
-    private Float abv; // alcohol by volume
-    private String colorType;
-    private String sugarType;
+    private Float capacity;
+    private Float strength; // alcohol by volume
+    private String color;
+    private String sugar;
     private Integer year;
     private Float discount;
-    private Float price;
+    private Float newPrice;
+    private Float oldPrice;
     private String name;
-    private String grapeType;
+    private Iterable<String> grapeSort;
     private String region;
     private String link;
     private float rating;
