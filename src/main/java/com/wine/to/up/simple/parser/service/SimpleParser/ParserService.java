@@ -1,4 +1,4 @@
-package com.wine.to.up.simple.parser.service.simple_parser;
+package com.wine.to.up.simple.parser.service.SimpleParser;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import com.wine.to.up.commonlib.messaging.KafkaMessageSender;
 import com.wine.to.up.parser.common.api.schema.UpdateProducts;
-import com.wine.to.up.simple.parser.service.simple_parser.db_handler.WineService;
+import com.wine.to.up.simple.parser.service.SimpleParser.DbHandler.WineService;
 import com.wine.to.up.simple.parser.service.repository.*;
 import org.jsoup.*;
 import org.jsoup.nodes.Document;
@@ -30,7 +30,7 @@ public class ParserService {
     private String wineUrl;
     private static final int PAGES_TO_PARSE = 106; // currently max 106, lower const value for testing purposes
     private static final int NUMBER_OF_THREADS = 15;
-    private UpdateProducts.UpdateProductsMessage messageToKafka;
+    private static UpdateProducts.UpdateProductsMessage messageToKafka;
     private final ExecutorService pagesExecutor = Executors.newSingleThreadExecutor();
     private final ExecutorService winesExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
 
@@ -79,7 +79,23 @@ public class ParserService {
 
         AtomicLong pageCounter = new AtomicLong(1);
         for (int i = 0; i < NUMBER_OF_THREADS; i++) {
-            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> addWineUrls(pageCounter, wineURLs), pagesExecutor);
+            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+                Document doc;
+                try {
+                    while (pageCounter.longValue() <= PAGES_TO_PARSE) {
+                        doc = Jsoup.connect(wineUrl + pageCounter.get()).get();
+                        Elements wines = doc.getElementsByClass("catalog-grid__item");
+                        for (Element wine : wines) {
+                            if (!wineURLs.contains(wine.getElementsByClass("product-snippet__name").attr("href")))
+                                wineURLs.add(wine.getElementsByClass("product-snippet__name").attr("href"));
+                        }
+                        log.debug("Parsed {} wines from url {}", wines.size(),
+                                wineUrl + pageCounter.getAndIncrement());
+                    }
+                } catch (IOException e) {
+                    log.error("Error while parsing page: ", e);
+                }
+            }, pagesExecutor);
             futures.add(future);
         }
 
@@ -92,7 +108,27 @@ public class ParserService {
                         if (wineURL == null) {
                             return;
                         }
-                        addWineToDB(wineURL, wineToDTO, products, dbHandler, wineCounter);
+                        try {
+                            SimpleWine wine = Parser.parseWine(urlToDocument(url + wineURL));
+                            UpdateProducts.Product newProduct = wineToDTO.getProtoWine(wine);
+                            if (!products.contains(newProduct)) {
+                                products.add(newProduct);
+                            }
+
+                            try {
+                                if ((wine.getBrandID() != null) && (wine.getCountryID() != null)
+                                        && !(wine.getBrandID().equals(""))) {
+                                    Thread.sleep((long) (Math.random() * 1500));
+                                    dbHandler.saveAllWineParsedInfo(wine);
+                                }
+                            } catch (Exception e) {
+                                log.error("DB error ", e);
+                            }
+
+                            log.trace("Wine: {} added to database", wineCounter.getAndIncrement());
+                        } catch (IOException e) {
+                            log.error("Error while parsing page: ", e);
+                        }
                     }
                 } catch (InterruptedException e) {
                     log.error("Interrupt ", e);
@@ -103,69 +139,6 @@ public class ParserService {
         }
         futures.forEach(CompletableFuture::join);
         log.info("End of adding information to the database.");
-        generateMessageToKafka(products);
-        log.info("TIME : {} min {} seconds", TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - start),
-                TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()
-                        - TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - start) * 60000 - start));
-        log.info("End of parsing, {} wines collected and sent to Kafka", products.size());
-
-    }
-
-    /**
-     * Getting of all products
-     *
-     * @return Message to Kafka
-     */
-    public UpdateProducts.UpdateProductsMessage getMessage() {
-        return messageToKafka;
-    }
-
-    private void addWineToDB(String wineURL, WineToDTO wineToDTO, List<UpdateProducts.Product> products, WineService dbHandler, AtomicInteger wineCounter) {
-        try {
-            SimpleWine wine = Parser.parseWine(urlToDocument(url + wineURL));
-            UpdateProducts.Product newProduct = wineToDTO.getProtoWine(wine);
-            if (!products.contains(newProduct)) {
-                products.add(newProduct);
-            }
-
-            saveWineToDB(wine, dbHandler);
-
-            log.trace("Wine: {} added to database", wineCounter.getAndIncrement());
-        } catch (IOException e) {
-            log.error("Error while parsing page: ", e);
-        }
-    }
-
-    private void saveWineToDB(SimpleWine wine, WineService dbHandler){
-        try {
-            if ((wine.getBrandID() != null) && (wine.getCountryID() != null)
-                    && !(wine.getBrandID().equals(""))) {
-                Thread.sleep((long) (Math.random() * 1500));
-                dbHandler.saveAllWineParsedInfo(wine);
-            }
-        } catch (Exception e) {
-            log.error("DB error ", e);
-        }
-    }
-    
-    private void addWineUrls(AtomicLong pageCounter, ArrayBlockingQueue<String> wineURLs) {
-        try {
-            while (pageCounter.longValue() <= PAGES_TO_PARSE) {
-                Document doc = Jsoup.connect(wineUrl + pageCounter.get()).get();
-                Elements wines = doc.getElementsByClass("catalog-grid__item");
-                for (Element wine : wines) {
-                    if (!wineURLs.contains(wine.getElementsByClass("product-snippet__name").attr("href")))
-                        wineURLs.add(wine.getElementsByClass("product-snippet__name").attr("href"));
-                }
-                log.debug("Parsed {} wines from url {}", wines.size(),
-                        wineUrl + pageCounter.getAndIncrement());
-            }
-        } catch (IOException e) {
-            log.error("Error while parsing page: ", e);
-        }
-    }
-
-    private void generateMessageToKafka(List<UpdateProducts.Product> products) {
         if (products.isEmpty()) {
             log.error("\t Z E R O\tP A R S I N G");
         } else {
@@ -185,7 +158,22 @@ public class ParserService {
                 message = UpdateProducts.UpdateProductsMessage.newBuilder().addAllProducts(products).build();
                 kafkaSendMessageService.sendMessage(message);
             }
+
+            log.info("TIME : {} min {} seconds", TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - start),
+                    TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()
+                            - TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - start) * 60000 - start));
+            log.info("End of parsing, {} wines collected and sent to Kafka", products.size());
+
             messageToKafka = UpdateProducts.UpdateProductsMessage.newBuilder().addAllProducts(products).build();
         }
+    }
+
+    /**
+     * Getting of all products
+     *
+     * @return Message to Kafka
+     */
+    public UpdateProducts.UpdateProductsMessage getMessage() {
+        return messageToKafka;
     }
 }

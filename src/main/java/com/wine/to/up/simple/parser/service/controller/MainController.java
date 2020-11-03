@@ -1,7 +1,7 @@
 package com.wine.to.up.simple.parser.service.controller;
 
 import com.wine.to.up.parser.common.api.schema.UpdateProducts;
-import com.wine.to.up.simple.parser.service.simple_parser.ParserService;
+import com.wine.to.up.simple.parser.service.SimpleParser.ParserService;
 import com.wine.to.up.simple.parser.service.domain.entity.*;
 import com.wine.to.up.simple.parser.service.repository.*;
 import lombok.RequiredArgsConstructor;

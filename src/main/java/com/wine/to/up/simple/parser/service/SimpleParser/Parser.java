@@ -1,4 +1,4 @@
-package com.wine.to.up.simple.parser.service.simple_parser;
+package com.wine.to.up.simple.parser.service.SimpleParser;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
