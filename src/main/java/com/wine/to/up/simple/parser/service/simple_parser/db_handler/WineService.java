@@ -1,6 +1,6 @@
-package com.wine.to.up.simple.parser.service.SimpleParser.DbHandler;
+package com.wine.to.up.simple.parser.service.simple_parser.db_handler;
 
-import com.wine.to.up.simple.parser.service.SimpleParser.SimpleWine;
+import com.wine.to.up.simple.parser.service.simple_parser.SimpleWine;
 import com.wine.to.up.simple.parser.service.domain.entity.*;
 import com.wine.to.up.simple.parser.service.repository.*;
 import lombok.extern.slf4j.Slf4j;

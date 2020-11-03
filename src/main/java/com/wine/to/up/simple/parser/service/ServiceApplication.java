@@ -1,6 +1,6 @@
 package com.wine.to.up.simple.parser.service;
 
-import com.wine.to.up.simple.parser.service.SimpleParser.ParserService;
+import com.wine.to.up.simple.parser.service.simple_parser.ParserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
