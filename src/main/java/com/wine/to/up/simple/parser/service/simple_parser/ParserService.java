@@ -52,7 +52,6 @@ public class ParserService {
      * @return Jsoup Document class
      * @throws IOException IDK
      */
-
     public static Document urlToDocument(String someURL) throws IOException {
         Document wineDoc = Jsoup.connect(someURL).get();
         while (!(wineDoc.getElementsByClass("product-page").first().children().first().className().equals("product"))) {
@@ -106,7 +105,6 @@ public class ParserService {
                 TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()
                         - TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - start) * 60000 - start));
         log.info("End of parsing, {} wines collected and sent to Kafka", products.size());
-
     }
 
     /**
