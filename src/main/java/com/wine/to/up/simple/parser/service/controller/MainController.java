@@ -113,10 +113,11 @@ public class MainController {
         }
 
         Grapes grapes;
-        if (Boolean.TRUE.equals(grapesRepository.existsGrapesByGrapeName(wine.getGrapeType()))) {
-            grapes = grapesRepository.findGrapeByGrapeName(wine.getGrapeType());
+        String grapeSort = wine.getGrapeSort();
+        if (Boolean.TRUE.equals(grapesRepository.existsGrapesByGrapeName(grapeSort))) {
+            grapes = grapesRepository.findGrapeByGrapeName(grapeSort);
         } else {
-            grapes = new Grapes(wine.getGrapeType());
+            grapes = new Grapes(grapeSort);
             grapesRepository.save(grapes);
         }
         wineRepository.save(newWine);
@@ -191,7 +192,7 @@ public class MainController {
             html.append("<a>Country: </a>").append(someProduct.getCountry()).append("<br>");
             html.append("<a>Region: </a>").append(someProduct.getRegion(0)).append("<br>");
             html.append("<a>Year: </a>").append(someProduct.getYear()).append("<br>");
-            html.append("<a>Grapes: </a>").append(someProduct.getGrapeSort(0)).append("<br>");
+            html.append("<a>Grapes: </a>").append(someProduct.getGrapeSortList()).append("<br>");
             html.append("<a>Volume: </a>").append(someProduct.getCapacity()).append("<br>");
             html.append("<a>ABV: </a>").append(someProduct.getStrength()).append("<br>");
             html.append("<a>Sugar: </a>").append(someProduct.getSugar()).append("<br>");

@@ -5,6 +5,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
+import java.util.Arrays;
 
 /**
  * Parses wine and counts number of pages with wines
@@ -143,10 +144,10 @@ public class Parser {
         }
 
         log.debug("Wine parsing takes : {}", System.currentTimeMillis() - wineParseStart);
-        return SimpleWine.builder().name(wineName).brandID(brandID).countryID(countryID).price(bottlePrice)
-                .year(bottleYear).volume(bottleVolume).abv(bottleABV).colorType(colorType).grapeType(grapeType)
-                .sugarType(sugarType).discount(bottleDiscount).region(region).link(wineDoc.baseUri())
-                .picture(bottleImage).rating(wineRating).sparkling(sparkling).taste(wineTaste)
-                .gastronomy(wineGastronomy).build();
+        return SimpleWine.builder().name(wineName).brandID(brandID).countryID(countryID).newPrice(bottlePrice)
+                .year(bottleYear).capacity(bottleVolume).strength(bottleABV).color(colorType).grapeSort(Arrays.asList(grapeType.split(", ")))
+                .sugar(sugarType).discount(bottleDiscount).region(region).link(wineDoc.baseUri())
+                .image(bottleImage).rating(wineRating).sparkling(sparkling).taste(wineTaste)
+                .gastronomy(wineGastronomy).oldPrice(100 * bottlePrice / (100 - bottleDiscount)).build();
     }
 }

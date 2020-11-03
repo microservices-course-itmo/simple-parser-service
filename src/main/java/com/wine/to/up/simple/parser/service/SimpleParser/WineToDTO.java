@@ -1,8 +1,8 @@
 package com.wine.to.up.simple.parser.service.SimpleParser;
 
 import com.wine.to.up.parser.common.api.schema.UpdateProducts;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 /**
@@ -12,43 +12,33 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class WineToDTO {
-    private WineToDTO(){
-        throw new IllegalStateException("Utility class");
+    private final ModelMapper modelMapper;
+
+    private WineToDTO() {
+        modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setSkipNullEnabled(true);
     }
+
     /**
      * The function is designed to get parsed wine information which is wrapped into a common-api UpdateProducts.Product class for subsequent transfer to Kafka.
      * @param wine instance of the SimpleWine class which contains parsed wine information.
      * @return instance of UpdateProducts.Product
      **/
     public static UpdateProducts.Product getProtoWine(SimpleWine wine) {
-        UpdateProducts.Product.Color color = defineColor(wine.getColorType());
-        UpdateProducts.Product.Sugar sugar = defineSugar(wine.getSugarType());
-        UpdateProducts.Product.Builder product = UpdateProducts.Product.newBuilder()
-                .addGrapeSort(wine.getGrapeType())
-                .setBrand(wine.getBrandID())
-                .setCapacity(wine.getVolume())
-                .setCountry(wine.getCountryID())
-                .setNewPrice(wine.getPrice())
-                .setYear(wine.getYear())
-                .setOldPrice(100 * wine.getPrice() / (100 - wine.getDiscount()))
-                .setStrength(wine.getAbv())
-                .setName(wine.getName())
-                .addRegion(wine.getRegion())
-                .setRegion(0, wine.getRegion())
-                .setLink(wine.getLink())
-                .setRating(wine.getRating())
-                .setSparkling(wine.isSparkling())
-                .setGastronomy(wine.getGastronomy())
-                .setTaste(wine.getTaste())
-                .setImage(wine.getPicture());
-        if (sugar != null) {
-            product.setSugar(sugar);
-        }
+        UpdateProducts.Product.Color color = defineColor(wine.getColor());
+        UpdateProducts.Product.Sugar sugar = defineSugar(wine.getSugar());
+
+        UpdateProducts.Product.Builder product = modelMapper
+                .map(wine, UpdateProducts.Product.Builder.class)
+                .addAllGrapeSort(wine.getGrapeSort())
+                .addRegion(wine.getRegion());
+
         if (color != null) {
             product.setColor(color);
         }
-        if (wine.getGrapeType() != null)
-            product.setGrapeSort(0, wine.getGrapeType());
+        if (sugar != null) {
+            product.setSugar(sugar);
+        }
         return product.build();
     }
 
@@ -57,7 +47,7 @@ public class WineToDTO {
      * @param color type of color received during wine parsing.
      * @return value of UpdateProducts.Product.Color enum
      **/
-    private static UpdateProducts.Product.Color defineColor(@NonNull String color) {
+    private static UpdateProducts.Product.Color defineColor(String color) {
         UpdateProducts.Product.Color colorType;
         switch (color) {
             case "красное":
@@ -87,9 +77,9 @@ public class WineToDTO {
     /**
      * The method using to define the type of wine sugar relative to enum common-api.
      * @param sugar type of sugar received during wine parsing.
-     * @return  value of UpdateProducts.Product.Sugar enum
+     * @return value of UpdateProducts.Product.Sugar enum
      **/
-    private static UpdateProducts.Product.Sugar defineSugar(@NonNull String sugar) {
+    private static UpdateProducts.Product.Sugar defineSugar(String sugar) {
         UpdateProducts.Product.Sugar sugarType;
         switch (sugar) {
             case "сухое":

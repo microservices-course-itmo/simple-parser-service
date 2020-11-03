@@ -28,7 +28,7 @@ public class ParserService {
     private String url;
     @Value("${parser.wineurl}")
     private String wineUrl;
-    private static final int PAGES_TO_PARSE = 106; // currently max 106, lower const value for testing purposes
+    private static final int PAGES_TO_PARSE = 10; // currently max 106, lower const value for testing purposes
     private static final int NUMBER_OF_THREADS = 15;
     private UpdateProducts.UpdateProductsMessage messageToKafka;
     private final ExecutorService pagesExecutor = Executors.newSingleThreadExecutor();
@@ -56,7 +56,7 @@ public class ParserService {
     public static Document urlToDocument(String someURL) throws IOException {
         Document wineDoc = Jsoup.connect(someURL).get();
         while (!(wineDoc.getElementsByClass("product-page").first().children().first().className().equals("product"))) {
-            log.error("Doing re-request...");
+            log.debug("Doing re-request...");
             wineDoc = Jsoup.connect(someURL).get();
         }
         return wineDoc;
