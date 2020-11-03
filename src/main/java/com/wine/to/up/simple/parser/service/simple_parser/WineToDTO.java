@@ -1,4 +1,4 @@
-package com.wine.to.up.simple.parser.service.SimpleParser;
+package com.wine.to.up.simple.parser.service.simple_parser;
 
 import com.wine.to.up.parser.common.api.schema.UpdateProducts;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 public class WineToDTO {
     private final ModelMapper modelMapper;
 
-    private WineToDTO() {
+    WineToDTO() {
         modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setSkipNullEnabled(true);
     }
@@ -24,7 +24,7 @@ public class WineToDTO {
      * @param wine instance of the SimpleWine class which contains parsed wine information.
      * @return instance of UpdateProducts.Product
      **/
-    public static UpdateProducts.Product getProtoWine(SimpleWine wine) {
+    public UpdateProducts.Product getProtoWine(SimpleWine wine) {
         UpdateProducts.Product.Color color = defineColor(wine.getColor());
         UpdateProducts.Product.Sugar sugar = defineSugar(wine.getSugar());
 
