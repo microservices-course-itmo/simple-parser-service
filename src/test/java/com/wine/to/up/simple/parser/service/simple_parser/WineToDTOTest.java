@@ -1,6 +1,6 @@
 package com.wine.to.up.simple.parser.service.simple_parser;
 
-import com.wine.to.up.parser.common.api.schema.UpdateProducts;
+import com.wine.to.up.parser.common.api.schema.ParserApi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -43,15 +43,15 @@ class WineToDTOTest {
             "белое,сухое,WHITE,DRY",
             "розовое,сладкое,ROSE,SWEET",
             "оранжевое,полусладкое,ORANGE,MEDIUM",
-            "фиолетовое,горькое, RED, DRY"})
-    void testGetProtoWine(String colorType, String sugarType, UpdateProducts.Product.Color color, UpdateProducts.Product.Sugar sugar) {
+            "фиолетовое,горькое, UNRECOGNIZED, UNRECOGNIZED"})
+    void testGetProtoWine(String colorType, String sugarType, ParserApi.Wine.Color color, ParserApi.Wine.Sugar sugar) {
         wine.setColor(colorType);
         wine.setSugar(sugarType);
 
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setSkipNullEnabled(true);
-        UpdateProducts.Product.Builder expectedProduct = modelMapper
-                .map(wine, UpdateProducts.Product.Builder.class)
+        ParserApi.Wine.Builder expectedProduct = modelMapper
+                .map(wine, ParserApi.Wine.Builder.class)
                 .addAllGrapeSort(wine.getGrapeSort())
                 .addRegion(wine.getRegion())
                 .setColor(color)
@@ -63,9 +63,9 @@ class WineToDTOTest {
     void testGetProtoWineEmptyString() {
         wine.setColor("");
         wine.setSugar("");
-        UpdateProducts.Product product = WineToDTO.getProtoWine(wine);
+        ParserApi.Wine product = WineToDTO.getProtoWine(wine);
 
-        assertEquals(0, product.getColor().getNumber());
-        assertEquals(0, product.getSugar().getNumber());
+        assertEquals(ParserApi.Wine.Color.UNRECOGNIZED, product.getColor());
+        assertEquals(ParserApi.Wine.Sugar.UNRECOGNIZED, product.getSugar());
     }
 }

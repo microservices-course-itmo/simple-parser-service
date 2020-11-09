@@ -4,7 +4,7 @@
 package com.wine.to.up.simple.parser.service.messaging;
 
 import com.wine.to.up.commonlib.messaging.KafkaMessageHandler;
-import com.wine.to.up.parser.common.api.schema.UpdateProducts;
+import com.wine.to.up.parser.common.api.schema.ParserApi;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -13,14 +13,14 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Component
 @Slf4j
-public class TestTopicKafkaMessageHandler implements KafkaMessageHandler<UpdateProducts.UpdateProductsMessage> {
+public class TestTopicKafkaMessageHandler implements KafkaMessageHandler<ParserApi.WineParsedEvent> {
     /** Counter of messages */
     private final AtomicInteger counter = new AtomicInteger(0);
     /**
      * Function for getting {@link TestTopicKafkaMessageHandler#counter}
      */
     @Override
-    public void handle(UpdateProducts.UpdateProductsMessage message) {
+    public void handle(ParserApi.WineParsedEvent message) {
         counter.incrementAndGet();
         log.debug("Message received message of type {}, number of messages: {}", message.getClass().getSimpleName(),
                 counter.get());

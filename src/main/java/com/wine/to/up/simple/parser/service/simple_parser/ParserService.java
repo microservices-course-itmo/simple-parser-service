@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.wine.to.up.commonlib.messaging.KafkaMessageSender;
-import com.wine.to.up.parser.common.api.schema.UpdateProducts;
+import com.wine.to.up.parser.common.api.schema.ParserApi;
 import com.wine.to.up.simple.parser.service.simple_parser.db_handler.WineService;
 import com.wine.to.up.simple.parser.service.repository.*;
 import org.jsoup.*;
@@ -28,14 +28,14 @@ public class ParserService {
     private String url;
     @Value("${parser.wineurl}")
     private String wineUrl;
-    private static final int PAGES_TO_PARSE = 106; // currently max 106, lower const value for testing purposes
+    private static final int PAGES_TO_PARSE = 2; // currently max 106, lower const value for testing purposes
     private static final int NUMBER_OF_THREADS = 15;
-    private UpdateProducts.UpdateProductsMessage messageToKafka;
+    private ParserApi.WineParsedEvent messageToKafka;
     private final ExecutorService pagesExecutor = Executors.newSingleThreadExecutor();
     private final ExecutorService winesExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
 
     @Autowired
-    KafkaMessageSender<UpdateProducts.UpdateProductsMessage> kafkaSendMessageService;
+    KafkaMessageSender<ParserApi.WineParsedEvent> kafkaSendMessageService;
     @Autowired
     private GrapesRepository grapesRepository;
     @Autowired
@@ -72,7 +72,7 @@ public class ParserService {
 
         WineService dbHandler = new WineService(grapesRepository, brandsRepository, countriesRepository,
                 wineGrapesRepository, wineRepository);
-        List<UpdateProducts.Product> products = new ArrayList<>();
+        List<ParserApi.Wine> products = new ArrayList<>();
 
         AtomicLong pageCounter = new AtomicLong(1);
         for (int i = 0; i < NUMBER_OF_THREADS; i++) {
@@ -112,14 +112,14 @@ public class ParserService {
      *
      * @return Message to Kafka
      */
-    public UpdateProducts.UpdateProductsMessage getMessage() {
+    public ParserApi.WineParsedEvent getMessage() {
         return messageToKafka;
     }
 
-    private void addWineToProducts(String wineURL, List<UpdateProducts.Product> products, WineService dbHandler, AtomicInteger wineCounter) {
+    private void addWineToProducts(String wineURL, List<ParserApi.Wine> products, WineService dbHandler, AtomicInteger wineCounter) {
         try {
             SimpleWine wine = Parser.parseWine(urlToDocument(url + wineURL));
-            UpdateProducts.Product newProduct = WineToDTO.getProtoWine(wine);
+            ParserApi.Wine newProduct = WineToDTO.getProtoWine(wine);
             if (!products.contains(newProduct)) {
                 products.add(newProduct);
             }
@@ -159,27 +159,27 @@ public class ParserService {
         }
     }
 
-    private void generateMessageToKafka(List<UpdateProducts.Product> products) {
+    private void generateMessageToKafka(List<ParserApi.Wine> products) {
         if (products.isEmpty()) {
             log.error("\t Z E R O\tP A R S I N G");
         } else {
-            UpdateProducts.UpdateProductsMessage message;
+            ParserApi.WineParsedEvent message;
             if (products.size() >= 1000) {
                 int messageSize = (int) Math.round(products.size() / 4.0);
                 for (int i = 0; i < 4; i++) {
                     if (i == 3)
-                        message = UpdateProducts.UpdateProductsMessage.newBuilder()
-                                .addAllProducts(products.subList(i * messageSize, products.size() - 1)).build();
+                        message = ParserApi.WineParsedEvent.newBuilder()
+                                .addAllWines(products.subList(i * messageSize, products.size() - 1)).build();
                     else
-                        message = UpdateProducts.UpdateProductsMessage.newBuilder()
-                                .addAllProducts(products.subList(i * messageSize, (i + 1) * messageSize - 1)).build();
+                        message = ParserApi.WineParsedEvent.newBuilder()
+                                .addAllWines(products.subList(i * messageSize, (i + 1) * messageSize - 1)).build();
                     kafkaSendMessageService.sendMessage(message);
                 }
             } else {
-                message = UpdateProducts.UpdateProductsMessage.newBuilder().addAllProducts(products).build();
+                message = ParserApi.WineParsedEvent.newBuilder().addAllWines(products).build();
                 kafkaSendMessageService.sendMessage(message);
             }
-            messageToKafka = UpdateProducts.UpdateProductsMessage.newBuilder().addAllProducts(products).build();
+            messageToKafka = ParserApi.WineParsedEvent.newBuilder().addAllWines(products).build();
         }
     }
 }
