@@ -1,6 +1,6 @@
 package com.wine.to.up.simple.parser.service.controller;
 
-import com.wine.to.up.parser.common.api.schema.UpdateProducts;
+import com.wine.to.up.parser.common.api.schema.ParserApi;
 import com.wine.to.up.simple.parser.service.simple_parser.ParserService;
 import com.wine.to.up.simple.parser.service.domain.entity.*;
 import com.wine.to.up.simple.parser.service.repository.*;
@@ -183,9 +183,9 @@ public class MainController {
     @GetMapping(path = "/all-products")
     @ResponseBody
     public String getAllProducts() {
-        UpdateProducts.UpdateProductsMessage message = parserService.getMessage();
+        ParserApi.WineParsedEvent message = parserService.getMessage();
         StringBuilder html = new StringBuilder();
-        for (UpdateProducts.Product someProduct : message.getProductsList()) {
+        for (ParserApi.Wine someProduct : message.getWinesList()) {
             html.append("<a>Name: </a>").append(someProduct.getName()).append("<br>");
             html.append("<a>Link: </a>").append(someProduct.getLink()).append("<br>");
             html.append("<a>Brand: </a>").append(someProduct.getBrand()).append("<br>");

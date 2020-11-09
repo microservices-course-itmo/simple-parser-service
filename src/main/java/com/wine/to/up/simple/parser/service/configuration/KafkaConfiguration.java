@@ -5,7 +5,7 @@ import com.wine.to.up.commonlib.messaging.KafkaMessageHandler;
 import com.wine.to.up.commonlib.messaging.KafkaMessageSender;
 import com.wine.to.up.demo.service.api.message.KafkaMessageSentEventOuterClass.KafkaMessageSentEvent;
 import com.wine.to.up.parser.common.api.ParserCommonApiProperties;
-import com.wine.to.up.parser.common.api.schema.UpdateProducts;
+import com.wine.to.up.parser.common.api.schema.ParserApi;
 import com.wine.to.up.simple.parser.service.components.SimpleParserMetricsCollector;
 import com.wine.to.up.simple.parser.service.messaging.TestTopicKafkaMessageHandler;
 import com.wine.to.up.simple.parser.service.messaging.serialization.EventDeserializer;
@@ -90,7 +90,7 @@ public class KafkaConfiguration {
      */
 
     @Bean
-    BaseKafkaHandler<UpdateProducts.UpdateProductsMessage> productTopicMessagesHandler(
+    BaseKafkaHandler<ParserApi.WineParsedEvent> productTopicMessagesHandler(
             Properties consumerProperties, ParserCommonApiProperties apiProperties,
             TestTopicKafkaMessageHandler handler) {
         // set appropriate deserializer for value
@@ -129,7 +129,7 @@ public class KafkaConfiguration {
     }
 
     @Bean
-    KafkaMessageSender<UpdateProducts.UpdateProductsMessage> productTopicKafkaMessageSender(
+    KafkaMessageSender<ParserApi.WineParsedEvent> productTopicKafkaMessageSender(
             Properties producerProperties, ParserCommonApiProperties apiProperties,
             SimpleParserMetricsCollector metricsCollector) {
         // set appropriate serializer for value
