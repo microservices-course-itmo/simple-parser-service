@@ -1,11 +1,16 @@
 package com.wine.to.up.simple.parser.service.controller;
 
 import com.wine.to.up.parser.common.api.schema.ParserApi;
+import com.wine.to.up.simple.parser.service.dto.BrandsDTO;
+import com.wine.to.up.simple.parser.service.dto.CountriesDTO;
+import com.wine.to.up.simple.parser.service.dto.GrapesDTO;
+import com.wine.to.up.simple.parser.service.dto.WineDTO;
 import com.wine.to.up.simple.parser.service.simple_parser.ParserService;
 import com.wine.to.up.simple.parser.service.domain.entity.*;
 import com.wine.to.up.simple.parser.service.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -76,7 +81,7 @@ public class MainController {
      */
     @PostMapping(path = "/grape")
     @ResponseBody
-    public Grapes addGrape(@ModelAttribute("grape") Grapes grape) {
+    public Grapes addGrape(@ModelAttribute("grape") GrapesDTO grape) {
         Grapes newGrape = new Grapes(grape.getGrapeName());
         grapesRepository.save(newGrape);
         return newGrape;
@@ -91,7 +96,7 @@ public class MainController {
      */
     @PostMapping(path = "/brand")
     @ResponseBody
-    public Brands addBrand(@ModelAttribute("brand") Brands brand) {
+    public Brands addBrand(@ModelAttribute("brand") BrandsDTO brand) {
         Brands newBrand = new Brands(brand.getBrandName());
         brandsRepository.save(newBrand);
         return newBrand;
@@ -106,7 +111,7 @@ public class MainController {
      */
     @PostMapping(path = "/country")
     @ResponseBody
-    public Countries addCountry(@ModelAttribute("country") Countries country) {
+    public Countries addCountry(@ModelAttribute("country") CountriesDTO country) {
         Countries newCountry = new Countries(country.getCountryName());
         countriesRepository.save(newCountry);
         return newCountry;
@@ -121,8 +126,9 @@ public class MainController {
      */
     @PostMapping(path = "/wine")
     @ResponseBody
-    public Wine addWine(@ModelAttribute("wine") Wine wine) {
-        Wine newWine = wine;
+    public Wine addWine(@ModelAttribute("wine") WineDTO wine) {
+        ModelMapper modelMapper = new ModelMapper();
+        Wine newWine = modelMapper.map(wine, Wine.class);
         if (Boolean.TRUE.equals(brandsRepository.existsBrandsByBrandName(wine.getBrandID().getBrandName()))) {
             newWine.setBrandID(brandsRepository.findBrandByBrandName(wine.getBrandID().getBrandName()));
         } else {
@@ -146,7 +152,7 @@ public class MainController {
         wineRepository.save(newWine);
         wineGrapesRepository.save(new WineGrapes(newWine, grapes));
 
-        return wine;
+        return newWine;
     }
 
     /**
