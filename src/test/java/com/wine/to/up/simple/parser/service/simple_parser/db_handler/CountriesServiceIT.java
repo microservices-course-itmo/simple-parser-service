@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
  * Class for testing {@link CountriesService.java}
  */
 @SpringBootTest
-public class CountriesServiceTest {
+public class CountriesServiceIT{
     @Autowired
     private CountriesRepository countriesRepository;
     @Autowired

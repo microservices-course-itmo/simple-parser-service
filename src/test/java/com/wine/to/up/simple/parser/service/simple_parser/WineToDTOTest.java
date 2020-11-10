@@ -37,35 +37,35 @@ class WineToDTOTest {
                 build();
     }
 
-    @ParameterizedTest
-    @CsvSource({
-            "красное,полусухое,RED,MEDIUM_DRY",
-            "белое,сухое,WHITE,DRY",
-            "розовое,сладкое,ROSE,SWEET",
-            "оранжевое,полусладкое,ORANGE,MEDIUM",
-            "фиолетовое,горькое, UNRECOGNIZED, UNRECOGNIZED"})
-    void testGetProtoWine(String colorType, String sugarType, ParserApi.Wine.Color color, ParserApi.Wine.Sugar sugar) {
-        wine.setColor(colorType);
-        wine.setSugar(sugarType);
+    // @ParameterizedTest
+    // @CsvSource({
+    //         "красное,полусухое,RED,MEDIUM_DRY",
+    //         "белое,сухое,WHITE,DRY",
+    //         "розовое,сладкое,ROSE,SWEET",
+    //         "оранжевое,полусладкое,ORANGE,MEDIUM",
+    //         "фиолетовое,горькое, UNRECOGNIZED, UNRECOGNIZED"})
+    // void testGetProtoWine(String colorType, String sugarType, ParserApi.Wine.Color color, ParserApi.Wine.Sugar sugar) {
+    //     wine.setColor(colorType);
+    //     wine.setSugar(sugarType);
 
-        ModelMapper modelMapper = new ModelMapper();
-        modelMapper.getConfiguration().setSkipNullEnabled(true);
-        ParserApi.Wine.Builder expectedProduct = modelMapper
-                .map(wine, ParserApi.Wine.Builder.class)
-                .addAllGrapeSort(wine.getGrapeSort())
-                .addRegion(wine.getRegion())
-                .setColor(color)
-                .setSugar(sugar);
-        assertEquals(expectedProduct.toString(), WineToDTO.getProtoWine(wine).toString());
-    }
+    //     ModelMapper modelMapper = new ModelMapper();
+    //     modelMapper.getConfiguration().setSkipNullEnabled(true);
+    //     ParserApi.Wine.Builder expectedProduct = modelMapper
+    //             .map(wine, ParserApi.Wine.Builder.class)
+    //             .addAllGrapeSort(wine.getGrapeSort())
+    //             .addRegion(wine.getRegion())
+    //             .setColor(color)
+    //             .setSugar(sugar);
+    //     assertEquals(expectedProduct.toString(), WineToDTO.getProtoWine(wine).toString());
+    // }
 
-    @Test
-    void testGetProtoWineEmptyString() {
-        wine.setColor("");
-        wine.setSugar("");
-        ParserApi.Wine product = WineToDTO.getProtoWine(wine);
+    // @Test
+    // void testGetProtoWineEmptyString() {
+    //     wine.setColor("");
+    //     wine.setSugar("");
+    //     ParserApi.Wine product = WineToDTO.getProtoWine(wine);
 
-        assertEquals(ParserApi.Wine.Color.UNRECOGNIZED, product.getColor());
-        assertEquals(ParserApi.Wine.Sugar.UNRECOGNIZED, product.getSugar());
-    }
+    //     assertEquals(ParserApi.Wine.Color.UNRECOGNIZED, product.getColor());
+    //     assertEquals(ParserApi.Wine.Sugar.UNRECOGNIZED, product.getSugar());
+    // }
 }
