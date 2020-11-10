@@ -10,7 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import static org.junit.Assert.*;
 
 /**
- * Class for testing {@link CountriesService.java}
+ * Class for testing {@link CountriesService}
  */
 @SpringBootTest
 class CountriesServiceIT {
