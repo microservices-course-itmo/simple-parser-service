@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class WineToDTO {
 
-    private static WineMapper wineMapper;
+    private WineMapper wineMapper;
 
     @Autowired
     private WineToDTO(WineMapper modelMapper) {
@@ -27,7 +27,7 @@ public class WineToDTO {
      * @param wine instance of the SimpleWine class which contains parsed wine information.
      * @return instance of ParserApi.WineParsedEvent
      **/
-    public static ParserApi.Wine getProtoWine(SimpleWine wine) {
+    public ParserApi.Wine getProtoWine(SimpleWine wine) {
         ParserApi.Wine.Builder product = wineMapper.toKafka(wine);
         return product.build();
     }
