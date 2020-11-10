@@ -4,6 +4,7 @@ import com.wine.to.up.parser.common.api.schema.ParserApi;
 import com.wine.to.up.simple.parser.service.domain.entity.Wine;
 import com.wine.to.up.simple.parser.service.simple_parser.SimpleWine;
 import org.modelmapper.*;
+import org.modelmapper.spi.MappingContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -45,7 +46,7 @@ public class ModelMapperConfiguration {
         Converter<ParserApi.Wine.Color, String> colorToString = ctx -> ctx.getSource() == null ? null : colorMap.getOrDefault(ctx.getSource(), "");
         Converter<ParserApi.Wine.Sugar, String> sugarToString = ctx -> ctx.getSource() == null ? null : sugarMap.getOrDefault(ctx.getSource(), "");
 
-        PropertyMap<SimpleWine, Wine> propertyMapDB = new PropertyMap<> (){
+        PropertyMap<SimpleWine, Wine> propertyMapDB = new PropertyMap<>() {
             protected void configure() {
                 skip().setWineID(null);
                 using(sugarToString).map(source.getSugar()).setSugar(null);
