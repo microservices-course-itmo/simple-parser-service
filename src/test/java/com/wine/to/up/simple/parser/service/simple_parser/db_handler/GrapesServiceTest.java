@@ -8,7 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import static org.junit.Assert.*;
 
 @SpringBootTest
-class GrapesServiceIT {
+class GrapesServiceTest {
     @Autowired
     GrapesRepository grapesRepository;
     @Autowired

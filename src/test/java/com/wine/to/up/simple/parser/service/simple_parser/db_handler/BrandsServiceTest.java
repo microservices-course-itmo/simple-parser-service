@@ -12,7 +12,7 @@ import static org.junit.Assert.*;
  * Class for testing {@link WineService}
  */
 @SpringBootTest
-public class BrandsServiceIT {
+public class BrandsServiceTest {
 
     @Autowired
     private BrandsRepository brandsRepository;

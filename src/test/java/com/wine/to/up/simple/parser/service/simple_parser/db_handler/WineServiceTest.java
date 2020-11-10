@@ -18,7 +18,7 @@ import static org.junit.Assert.*;
  * Class for testing {@link WineService}
  */
 @SpringBootTest
-class WineServiceIT {
+class WineServiceTest {
     /**
      * The repository that stores all info about wine.
      */
