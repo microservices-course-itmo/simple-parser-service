@@ -1,5 +1,6 @@
 package com.wine.to.up.simple.parser.service.simple_parser;
 
+import com.wine.to.up.parser.common.api.schema.ParserApi;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -21,20 +22,6 @@ class ParserTest {
      * SimpleWine base URL
      */
     private static final String URL = "https://simplewine.ru";
-
-    /**
-     * Testing {@link Parser#parseNumberOfPages(Document)} method<br>
-     * Trying to get number of pages from SimpleWine catalog page by URL<br>
-     * Using {@link ParserService#urlToDocument(String)} to get Document from URL
-     *
-     * @throws IOException Wrong input for {@link ParserService#urlToDocument(String)}
-     */
-    @Test
-    void testParseNumberOfPagesIntegration() throws IOException {
-        Document testCatalogPage = Jsoup.connect(URL + "/catalog/vino/").get();
-        int numberOfPages = Parser.parseNumberOfPages(testCatalogPage);
-        assertTrue(numberOfPages >= 0);
-    }
 
     /**
      * Testing {@link Parser#parseNumberOfPages(Document)} method<br>
@@ -80,15 +67,15 @@ class ParserTest {
         Document testWinePage = Jsoup.parse(testWinePageFile, "UTF-8");
         SimpleWine testWine = SimpleWine.builder().
                 name("Бин 50 Шираз").
-                brandID("Lindeman's").
-                countryID("Австралия").
+                brand("Lindeman's").
+                country("Австралия").
                 newPrice((float) 952.0).
                 year(2018).
                 capacity((float) 0.75).
                 strength((float) 13.0).
-                color("красное").
+                color(ParserApi.Wine.Color.RED).
                 grapeSort(Collections.singleton("шираз")).
-                sugar("полусухое").
+                sugar(ParserApi.Wine.Sugar.MEDIUM_DRY).
                 discount((float) 20.0).
                 region("Новый Южный Уэльс").
                 link(testWinePage.baseUri()).

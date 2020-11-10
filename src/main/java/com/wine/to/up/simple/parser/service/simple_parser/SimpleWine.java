@@ -1,5 +1,8 @@
 package com.wine.to.up.simple.parser.service.simple_parser;
 
+import com.wine.to.up.parser.common.api.schema.ParserApi;
+import com.wine.to.up.simple.parser.service.domain.entity.Brands;
+import com.wine.to.up.simple.parser.service.domain.entity.Countries;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,12 +20,14 @@ import lombok.ToString;
 @Setter
 public class SimpleWine {
     private String image;
-    private String brandID;
-    private String countryID;
+    private String brand;
+    private Brands brandID;
+    private String country;
+    private Countries countryID;
     private Float capacity;
     private Float strength; // alcohol by volume
-    private String color;
-    private String sugar;
+    private ParserApi.Wine.Color color;
+    private ParserApi.Wine.Sugar sugar;
     private Integer year;
     private Float discount;
     private Float newPrice;
