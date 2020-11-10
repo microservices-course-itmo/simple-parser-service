@@ -14,6 +14,10 @@ public class SimpleParserMetricsCollector extends CommonMetricsCollector {
     private static final String SERVICE_NAME = "simple_parser_service_test";
 
     public SimpleParserMetricsCollector() {
-        super(SERVICE_NAME);
+        this(SERVICE_NAME);
+    }
+
+    public SimpleParserMetricsCollector(String serviceName) {
+        super(serviceName);
     }
 }

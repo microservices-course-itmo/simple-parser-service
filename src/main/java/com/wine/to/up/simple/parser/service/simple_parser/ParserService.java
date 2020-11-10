@@ -11,6 +11,7 @@ import com.wine.to.up.commonlib.messaging.KafkaMessageSender;
 import com.wine.to.up.parser.common.api.schema.ParserApi;
 import com.wine.to.up.simple.parser.service.simple_parser.db_handler.WineService;
 import com.wine.to.up.simple.parser.service.repository.*;
+import com.wine.to.up.simple.parser.service.simple_parser.mappers.WineMapper;
 import org.jsoup.*;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -28,7 +29,7 @@ public class ParserService {
     private String url;
     @Value("${parser.wineurl}")
     private String wineUrl;
-    private static final int PAGES_TO_PARSE = 2; // currently max 106, lower const value for testing purposes
+    private static final int PAGES_TO_PARSE = 3; // currently max 106, lower const value for testing purposes
     private static final int NUMBER_OF_THREADS = 15;
     private ParserApi.WineParsedEvent messageToKafka;
     private final ExecutorService pagesExecutor = Executors.newSingleThreadExecutor();
@@ -46,6 +47,8 @@ public class ParserService {
     private WineGrapesRepository wineGrapesRepository;
     @Autowired
     private WineRepository wineRepository;
+    @Autowired
+    private WineMapper modelMapper;
 
     /**
      * @param someURL URL to get jsoup Document
@@ -55,7 +58,7 @@ public class ParserService {
     public static Document urlToDocument(String someURL) throws IOException {
         Document wineDoc = Jsoup.connect(someURL).get();
         while (!(wineDoc.getElementsByClass("product-page").first().children().first().className().equals("product"))) {
-            log.error("Doing re-request...");
+            log.debug("Doing re-request...");
             wineDoc = Jsoup.connect(someURL).get();
         }
         return wineDoc;
@@ -71,7 +74,7 @@ public class ParserService {
         ArrayBlockingQueue<String> wineURLs = new ArrayBlockingQueue<>(100_000);
 
         WineService dbHandler = new WineService(grapesRepository, brandsRepository, countriesRepository,
-                wineGrapesRepository, wineRepository);
+                wineGrapesRepository, wineRepository, modelMapper);
         List<ParserApi.Wine> products = new ArrayList<>();
 
         AtomicLong pageCounter = new AtomicLong(1);
@@ -119,11 +122,12 @@ public class ParserService {
     private void addWineToProducts(String wineURL, List<ParserApi.Wine> products, WineService dbHandler, AtomicInteger wineCounter) {
         try {
             SimpleWine wine = Parser.parseWine(urlToDocument(url + wineURL));
+            saveWineToDB(wine, dbHandler);
+
             ParserApi.Wine newProduct = WineToDTO.getProtoWine(wine);
             if (!products.contains(newProduct)) {
                 products.add(newProduct);
             }
-            saveWineToDB(wine, dbHandler);
             log.trace("Wine: {} added to database", wineCounter.getAndIncrement());
         } catch (IOException e) {
             log.error("Error while parsing page: ", e);
@@ -132,8 +136,8 @@ public class ParserService {
 
     private void saveWineToDB(SimpleWine wine, WineService dbHandler) {
         try {
-            if ((wine.getBrandID() != null) && (wine.getCountryID() != null)
-                    && !(wine.getBrandID().equals(""))) {
+            if ((wine.getBrand() != null) && (wine.getCountry() != null)
+                    && !(wine.getBrand().equals(""))) {
                 Thread.sleep((long) (Math.random() * 1500));
                 dbHandler.saveAllWineParsedInfo(wine);
             }
