@@ -66,10 +66,10 @@ class WineServiceIT {
     @Test
     void testDoubleSaveWine() {
         SimpleWine testWine = SimpleWine.builder().
-                name("Бин 50 Шираз").
+                name("Бин 60 Шираз").
                 brand("Lindeman's").
                 country("Австралия").
-                newPrice((float) 952.0).
+                newPrice((float) 902.0).
                 year(2018).
                 capacity((float) 0.75).
                 strength((float) 13.0).
@@ -78,7 +78,7 @@ class WineServiceIT {
                 sugar(ParserApi.Wine.Sugar.MEDIUM_DRY).
                 discount((float) 20.0).
                 region("Новый Южный Уэльс").
-                link("https://simplewine.ru/catalog/product/lindeman_s_bin_50_shiraz_2018_075/").
+                link("https://simplewine/catalog/product/lindeman_s_bin_50_shiraz_2018_075/").
                 rating((float) 4.6).
                 image("https://static.simplewine.ru/upload/iblock/3ce/vino-bin-50-shiraz-lindeman-s-2018_1.png@x303").
                 gastronomy("Прекрасно в сочетании с жареным ягненком, свининой с овощами и сырами средней выдержки.").
