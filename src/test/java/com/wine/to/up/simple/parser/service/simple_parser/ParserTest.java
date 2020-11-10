@@ -25,20 +25,6 @@ class ParserTest {
 
     /**
      * Testing {@link Parser#parseNumberOfPages(Document)} method<br>
-     * Trying to get number of pages from SimpleWine catalog page by URL<br>
-     * Using {@link ParserService#urlToDocument(String)} to get Document from URL
-     *
-     * @throws IOException Wrong input for {@link ParserService#urlToDocument(String)}
-     */
-    @Test
-    void testParseNumberOfPagesIntegration() throws IOException {
-        Document testCatalogPage = Jsoup.connect(URL + "/catalog/vino/").get();
-        int numberOfPages = Parser.parseNumberOfPages(testCatalogPage);
-        assertTrue(numberOfPages >= 0);
-    }
-
-    /**
-     * Testing {@link Parser#parseNumberOfPages(Document)} method<br>
      * Trying to get number of pages from downloaded SimpleWine HTML catalog page with 1, 3, 5 and 107 pages
      *
      * @throws IOException Wrong input for {@link Jsoup#parse(File, String)}

@@ -21,11 +21,18 @@ public class WineMapper {
     public ParserApi.Wine.Builder toKafka(SimpleWine wine) {
 
         //The final type, which is written in protobuf3, cannot be manually configured in beans. The converter doesn't help.
-        return modelMapper.map(wine, ParserApi.Wine.Builder.class)
+        ParserApi.Wine.Builder newWine = modelMapper.map(wine, ParserApi.Wine.Builder.class)
                 .addRegion(wine.getRegion())
-                .setColor(wine.getColor())
-                .setSugar(wine.getSugar())
                 .addAllGrapeSort(wine.getGrapeSort());
+
+        //We wait when UNRECOGNIZED gets a numeric value.
+        if (wine.getSugar() != null && wine.getSugar() != ParserApi.Wine.Sugar.UNRECOGNIZED) {
+            newWine.setSugar(wine.getSugar());
+        }
+        if (wine.getColor() != null && wine.getColor() != ParserApi.Wine.Color.UNRECOGNIZED) {
+            newWine.setColor(wine.getColor());
+        }
+        return newWine;
     }
 
     public Wine toDB(SimpleWine wine) {

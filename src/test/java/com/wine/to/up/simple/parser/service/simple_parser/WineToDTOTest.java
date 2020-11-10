@@ -1,18 +1,29 @@
 package com.wine.to.up.simple.parser.service.simple_parser;
 
 import com.wine.to.up.parser.common.api.schema.ParserApi;
+import com.wine.to.up.simple.parser.service.simple_parser.mappers.WineMapper;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Collections;
+import java.util.Map;
 
+import static com.wine.to.up.parser.common.api.schema.ParserApi.Wine.Color.*;
+import static com.wine.to.up.parser.common.api.schema.ParserApi.Wine.Color.ORANGE;
+import static com.wine.to.up.parser.common.api.schema.ParserApi.Wine.Sugar.*;
+import static com.wine.to.up.parser.common.api.schema.ParserApi.Wine.Sugar.SWEET;
 import static org.junit.Assert.*;
 
+@SpringBootTest
 class WineToDTOTest {
     private SimpleWine wine;
+    @Autowired
+    private WineMapper wineMapper;
 
     @BeforeEach
     void initWine() {
@@ -41,33 +52,20 @@ class WineToDTOTest {
 
     @ParameterizedTest
     @CsvSource({
-            "красное,полусухое,RED,MEDIUM_DRY",
-            "белое,сухое,WHITE,DRY",
-            "розовое,сладкое,ROSE,SWEET",
-            "оранжевое,полусладкое,ORANGE,MEDIUM",
-            "фиолетовое,горькое, UNRECOGNIZED, UNRECOGNIZED"})
-    void testGetProtoWine(ParserApi.Wine.Color color, ParserApi.Wine.Sugar sugar) {
-        wine.setColor(color);
-        wine.setSugar(sugar);
+            "красное,полусухое",
+            "белое,сухое",
+            "розовое,сладкое",
+            "оранжевое,полусладкое",
+            "фиолетовое,горькое"})
+    void testGetProtoWine(String colorType, String sugarType) {
+        Map<String, ParserApi.Wine.Sugar> sugarMap = Map.of( "сухое", DRY, "полусухое", MEDIUM_DRY, "полусладкое", MEDIUM, "сладкое", SWEET);
+        Map<String, ParserApi.Wine.Color> colorMap = Map.of( "красное", RED, "розовое", ROSE, "белое", WHITE, "оранжевое", ORANGE);
 
-        ModelMapper modelMapper = new ModelMapper();
-        modelMapper.getConfiguration().setSkipNullEnabled(true);
-        ParserApi.Wine.Builder expectedProduct = modelMapper
-                .map(wine, ParserApi.Wine.Builder.class)
-                .addAllGrapeSort(wine.getGrapeSort())
-                .addRegion(wine.getRegion())
-                .setColor(color)
-                .setSugar(sugar);
-        assertEquals(expectedProduct.toString(), WineToDTO.getProtoWine(wine).toString());
-    }
+        wine.setColor(colorMap.getOrDefault(colorType, null));
+        wine.setSugar(sugarMap.getOrDefault(sugarType, null));
 
-    @Test
-    void testGetProtoWineEmptyString() {
-        wine.setColor(ParserApi.Wine.Color.UNRECOGNIZED);
-        wine.setSugar(ParserApi.Wine.Sugar.UNRECOGNIZED);
-        ParserApi.Wine product = WineToDTO.getProtoWine(wine);
-
-        assertEquals(ParserApi.Wine.Color.UNRECOGNIZED, product.getColor());
-        assertEquals(ParserApi.Wine.Sugar.UNRECOGNIZED, product.getSugar());
+        ParserApi.Wine expectedProduct = wineMapper.toKafka(wine).build();
+        ParserApi.Wine result = WineToDTO.getProtoWine(wine);
+        assertEquals(expectedProduct.toString(), result.toString());
     }
 }

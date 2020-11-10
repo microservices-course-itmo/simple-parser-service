@@ -154,8 +154,8 @@ public class Parser {
         Map<String, ParserApi.Wine.Color> colorMap = Map.of( "красное", RED, "розовое", ROSE, "белое", WHITE, "оранжевое", ORANGE);
 
         return SimpleWine.builder().name(wineName).brand(brandID).country(countryID).newPrice(bottlePrice)
-                .year(bottleYear).capacity(bottleVolume).strength(bottleABV).color(colorMap.getOrDefault(colorType, RED)).grapeSort(Arrays.asList(grapeType.split(", ")))
-                .sugar(sugarMap.getOrDefault(sugarType, DRY)).discount(bottleDiscount).region(region).link(wineDoc.baseUri())
+                .year(bottleYear).capacity(bottleVolume).strength(bottleABV).color(colorMap.getOrDefault(colorType, null)).grapeSort(Arrays.asList(grapeType.split(", ")))
+                .sugar(sugarMap.getOrDefault(sugarType, null)).discount(bottleDiscount).region(region).link(wineDoc.baseUri())
                 .image(bottleImage).rating(wineRating).sparkling(sparkling).taste(wineTaste)
                 .gastronomy(wineGastronomy).oldPrice(100 * bottlePrice / (100 - bottleDiscount)).build();
     }

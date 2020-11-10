@@ -40,8 +40,8 @@ public class ModelMapperConfiguration {
 
         modelMapper.createTypeMap(SimpleWine.class, ParserApi.Wine.Builder.class);
 
-        Map<ParserApi.Wine.Color, String> colorMap = Map.of(RED, "красное", ROSE, "розовое", WHITE, "белое", ORANGE, "оранжевое");
-        Map<ParserApi.Wine.Sugar, String> sugarMap = Map.of(DRY, "сухое", MEDIUM_DRY, "полусухое", MEDIUM, "полусладкое", SWEET, "сладкое");
+        Map<ParserApi.Wine.Color, String> colorMap = Map.of(RED, "красное", ROSE, "розовое", WHITE, "белое", ORANGE, "оранжевое", ParserApi.Wine.Color.UNRECOGNIZED, "");
+        Map<ParserApi.Wine.Sugar, String> sugarMap = Map.of(DRY, "сухое", MEDIUM_DRY, "полусухое", MEDIUM, "полусладкое", SWEET, "сладкое", ParserApi.Wine.Sugar.UNRECOGNIZED, "");
         Converter<ParserApi.Wine.Color, String> colorToString = ctx -> ctx.getSource() == null ? null : colorMap.getOrDefault(ctx.getSource(), "");
         Converter<ParserApi.Wine.Sugar, String> sugarToString = ctx -> ctx.getSource() == null ? null : sugarMap.getOrDefault(ctx.getSource(), "");
 

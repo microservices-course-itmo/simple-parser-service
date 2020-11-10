@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.modelmapper.MappingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,7 +19,7 @@ import static org.junit.Assert.*;
  * Class for testing {@link WineService}
  */
 @SpringBootTest
-class WineServiceTest {
+class WineServiceIT {
     /**
      * The repository that stores all info about wine.
      */
@@ -300,7 +301,7 @@ class WineServiceTest {
                         "Среднетелое, насыщенное и хорошо структурированное во вкусе, с бархатистыми танинами и оттенками черной смородины, сливы и ванили в послевкусии.").
                 sparkling(false).
                 build();
-        assertThrows(MappingException.class, () -> wineService.saveAllWineParsedInfo(testWine));
+        assertThrows(DataIntegrityViolationException.class, () -> wineService.saveAllWineParsedInfo(testWine));
     }
 
 

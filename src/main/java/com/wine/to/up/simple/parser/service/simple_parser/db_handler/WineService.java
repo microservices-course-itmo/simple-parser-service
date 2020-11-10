@@ -92,9 +92,9 @@ public class WineService {
      */
     private Wine saveWine(SimpleWine newWine) {
         Wine wineEntity = wineMapper.toDB(newWine);
-
         wineRepository.save(wineEntity);
         log.trace("New Wine was added to DB: " + wineEntity.toString());
+
         return wineEntity;
     }
 }
