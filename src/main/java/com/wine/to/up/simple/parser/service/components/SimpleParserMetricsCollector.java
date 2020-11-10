@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class SimpleParserMetricsCollector extends CommonMetricsCollector {
-    private static final String SERVICE_NAME = "simple_parser_service";
+    private static final String SERVICE_NAME = "simple_parser_service_test";
 
     public SimpleParserMetricsCollector() {
         this(SERVICE_NAME);
