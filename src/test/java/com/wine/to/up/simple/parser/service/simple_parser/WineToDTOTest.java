@@ -1,8 +1,8 @@
 package com.wine.to.up.simple.parser.service.simple_parser;
 
 import com.wine.to.up.parser.common.api.schema.ParserApi;
+import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.modelmapper.ModelMapper;
@@ -18,13 +18,15 @@ class WineToDTOTest {
     void initWine() {
         wine = SimpleWine.builder().
                 name("Бин 50 Шираз").
-                brandID("Lindeman's").
-                countryID("Австралия").
+                brand("Lindeman's").
+                country("Австралия").
                 newPrice((float) 952.0).
                 year(2018).
                 capacity((float) 0.75).
                 strength((float) 13.0).
+                color(ParserApi.Wine.Color.RED).
                 grapeSort(Collections.singleton("шираз")).
+                sugar(ParserApi.Wine.Sugar.MEDIUM_DRY).
                 discount((float) 20.0).
                 region("Новый Южный Уэльс").
                 link("https://simplewine.ru/catalog/product/lindeman_s_bin_50_shiraz_2018_075/").
@@ -44,9 +46,9 @@ class WineToDTOTest {
             "розовое,сладкое,ROSE,SWEET",
             "оранжевое,полусладкое,ORANGE,MEDIUM",
             "фиолетовое,горькое, UNRECOGNIZED, UNRECOGNIZED"})
-    void testGetProtoWine(String colorType, String sugarType, ParserApi.Wine.Color color, ParserApi.Wine.Sugar sugar) {
-        wine.setColor(colorType);
-        wine.setSugar(sugarType);
+    void testGetProtoWine(ParserApi.Wine.Color color, ParserApi.Wine.Sugar sugar) {
+        wine.setColor(color);
+        wine.setSugar(sugar);
 
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setSkipNullEnabled(true);
@@ -61,8 +63,8 @@ class WineToDTOTest {
 
     @Test
     void testGetProtoWineEmptyString() {
-        wine.setColor("");
-        wine.setSugar("");
+        wine.setColor(ParserApi.Wine.Color.UNRECOGNIZED);
+        wine.setSugar(ParserApi.Wine.Sugar.UNRECOGNIZED);
         ParserApi.Wine product = WineToDTO.getProtoWine(wine);
 
         assertEquals(ParserApi.Wine.Color.UNRECOGNIZED, product.getColor());

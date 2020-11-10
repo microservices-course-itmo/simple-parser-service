@@ -1,5 +1,6 @@
 package com.wine.to.up.simple.parser.service.simple_parser;
 
+import com.wine.to.up.parser.common.api.schema.ParserApi;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -80,15 +81,15 @@ class ParserTest {
         Document testWinePage = Jsoup.parse(testWinePageFile, "UTF-8");
         SimpleWine testWine = SimpleWine.builder().
                 name("Бин 50 Шираз").
-                brandID("Lindeman's").
-                countryID("Австралия").
+                brand("Lindeman's").
+                country("Австралия").
                 newPrice((float) 952.0).
                 year(2018).
                 capacity((float) 0.75).
                 strength((float) 13.0).
-                color("красное").
+                color(ParserApi.Wine.Color.RED).
                 grapeSort(Collections.singleton("шираз")).
-                sugar("полусухое").
+                sugar(ParserApi.Wine.Sugar.MEDIUM_DRY).
                 discount((float) 20.0).
                 region("Новый Южный Уэльс").
                 link(testWinePage.baseUri()).

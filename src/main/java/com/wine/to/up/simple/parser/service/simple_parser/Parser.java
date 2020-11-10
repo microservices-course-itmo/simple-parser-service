@@ -1,11 +1,18 @@
 package com.wine.to.up.simple.parser.service.simple_parser;
 
+import com.wine.to.up.parser.common.api.schema.ParserApi;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 import java.util.Arrays;
+import java.util.Map;
+
+import static com.wine.to.up.parser.common.api.schema.ParserApi.Wine.Color.*;
+import static com.wine.to.up.parser.common.api.schema.ParserApi.Wine.Color.ORANGE;
+import static com.wine.to.up.parser.common.api.schema.ParserApi.Wine.Sugar.*;
+import static com.wine.to.up.parser.common.api.schema.ParserApi.Wine.Sugar.SWEET;
 
 /**
  * Parses wine and counts number of pages with wines
@@ -143,9 +150,12 @@ public class Parser {
         }
 
         log.debug("Wine parsing takes : {}", System.currentTimeMillis() - wineParseStart);
-        return SimpleWine.builder().name(wineName).brandID(brandID).countryID(countryID).newPrice(bottlePrice)
-                .year(bottleYear).capacity(bottleVolume).strength(bottleABV).color(colorType).grapeSort(Arrays.asList(grapeType.split(", ")))
-                .sugar(sugarType).discount(bottleDiscount).region(region).link(wineDoc.baseUri())
+        Map<String, ParserApi.Wine.Sugar> sugarMap = Map.of( "сухое", DRY, "полусухое", MEDIUM_DRY, "полусладкое", MEDIUM, "сладкое", SWEET);
+        Map<String, ParserApi.Wine.Color> colorMap = Map.of( "красное", RED, "розовое", ROSE, "белое", WHITE, "оранжевое", ORANGE);
+
+        return SimpleWine.builder().name(wineName).brand(brandID).country(countryID).newPrice(bottlePrice)
+                .year(bottleYear).capacity(bottleVolume).strength(bottleABV).color(colorMap.getOrDefault(colorType, RED)).grapeSort(Arrays.asList(grapeType.split(", ")))
+                .sugar(sugarMap.getOrDefault(sugarType, DRY)).discount(bottleDiscount).region(region).link(wineDoc.baseUri())
                 .image(bottleImage).rating(wineRating).sparkling(sparkling).taste(wineTaste)
                 .gastronomy(wineGastronomy).oldPrice(100 * bottlePrice / (100 - bottleDiscount)).build();
     }

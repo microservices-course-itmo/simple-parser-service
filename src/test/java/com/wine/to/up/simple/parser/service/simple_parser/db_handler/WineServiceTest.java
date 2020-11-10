@@ -1,9 +1,9 @@
 package com.wine.to.up.simple.parser.service.simple_parser.db_handler;
 
+import com.wine.to.up.parser.common.api.schema.ParserApi;
 import com.wine.to.up.simple.parser.service.domain.entity.Wine;
 import com.wine.to.up.simple.parser.service.repository.*;
 import com.wine.to.up.simple.parser.service.simple_parser.SimpleWine;
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.MappingException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,6 @@ class WineServiceTest {
     /**
      * The repository that stores all info about wine.
      */
-
     @Autowired
     private WineRepository wineRepository;
     @Autowired
@@ -40,15 +39,15 @@ class WineServiceTest {
     void testSaveAllWineInfo() {
         SimpleWine testWine = SimpleWine.builder().
                 name("Бин 50 Шираз").
-                brandID("Lindeman's").
-                countryID("Австралия").
+                brand("Lindeman's").
+                country("Австралия").
                 newPrice((float) 952.0).
                 year(2018).
                 capacity((float) 0.75).
                 strength((float) 13.0).
-                color("красное").
+                color(ParserApi.Wine.Color.RED).
                 grapeSort(Collections.singleton("шираз")).
-                sugar("полусухое").
+                sugar(ParserApi.Wine.Sugar.MEDIUM_DRY).
                 discount((float) 20.0).
                 region("Новый Южный Уэльс").
                 link("https://simplewine.ru/catalog/product/lindeman_s_bin_50_shiraz_2018_075/").
@@ -60,22 +59,22 @@ class WineServiceTest {
                 sparkling(false).
                 build();
         wineService.saveAllWineParsedInfo(testWine);
-        Assert.assertNotNull(wineRepository.findWineByLinkAndNewPrice(testWine.getLink(), testWine.getNewPrice()));
+        assertNotNull(wineRepository.findWineByLinkAndNewPrice(testWine.getLink(), testWine.getNewPrice()));
     }
 
     @Test
     void testDoubleSaveWine() {
         SimpleWine testWine = SimpleWine.builder().
                 name("Бин 50 Шираз").
-                brandID("Lindeman's").
-                countryID("Австралия").
+                brand("Lindeman's").
+                country("Австралия").
                 newPrice((float) 952.0).
                 year(2018).
                 capacity((float) 0.75).
                 strength((float) 13.0).
-                color("красное").
+                color(ParserApi.Wine.Color.RED).
                 grapeSort(Collections.singleton("шираз")).
-                sugar("полусухое").
+                sugar(ParserApi.Wine.Sugar.MEDIUM_DRY).
                 discount((float) 20.0).
                 region("Новый Южный Уэльс").
                 link("https://simplewine.ru/catalog/product/lindeman_s_bin_50_shiraz_2018_075/").
@@ -94,7 +93,7 @@ class WineServiceTest {
                 counter++;
             }
         }
-        assertTrue(counter == 1);
+        assertEquals(1, counter);
     }
 
     /**
@@ -105,15 +104,15 @@ class WineServiceTest {
     void testParseWineWithoutBrandAndCountry() {
         SimpleWine testWine = SimpleWine.builder().
                 name("Мое любимое").
-                brandID(null).
-                countryID(null).
+                brand(null).
+                country(null).
                 newPrice((float) 20000.0).
                 year(2018).
                 capacity((float) 0.75).
                 strength((float) 13.0).
-                color("цветное").
+                color(ParserApi.Wine.Color.UNRECOGNIZED).
                 grapeSort(Collections.singleton("шираз")).
-                sugar("соленое").
+                sugar(ParserApi.Wine.Sugar.UNRECOGNIZED).
                 discount((float) 20.0).
                 region("Новый Южный").
                 link("https://myfavorite").
@@ -125,7 +124,7 @@ class WineServiceTest {
                 sparkling(false).
                 build();
         wineService.saveAllWineParsedInfo(testWine);
-        assertEquals(wineRepository.existsWineByLinkAndNewPrice(testWine.getLink(), testWine.getNewPrice()), Boolean.FALSE);
+        assertFalse(wineRepository.existsWineByLinkAndNewPrice(testWine.getLink(), testWine.getNewPrice()));
     }
 
     /**
@@ -136,15 +135,15 @@ class WineServiceTest {
     void testParseWineWithoutBrand() {
         SimpleWine testWine = SimpleWine.builder().
                 name("Мое любимое").
-                brandID(null).
-                countryID("Раися").
+                brand(null).
+                country("Раися").
                 newPrice((float) 20000.0).
                 year(2018).
                 capacity((float) 0.75).
                 strength((float) 13.0).
-                color("цветное").
+                color(ParserApi.Wine.Color.UNRECOGNIZED).
                 grapeSort(Collections.singleton("шираз")).
-                sugar("соленое").
+                sugar(ParserApi.Wine.Sugar.UNRECOGNIZED).
                 discount((float) 20.0).
                 region("Новый Южный").
                 link("https://myfavorite").
@@ -156,7 +155,7 @@ class WineServiceTest {
                 sparkling(false).
                 build();
         wineService.saveAllWineParsedInfo(testWine);
-        assertEquals(wineRepository.existsWineByLinkAndNewPrice(testWine.getLink(), testWine.getNewPrice()), Boolean.FALSE);
+        assertFalse(wineRepository.existsWineByLinkAndNewPrice(testWine.getLink(), testWine.getNewPrice()));
     }
 
     /**
@@ -167,15 +166,15 @@ class WineServiceTest {
     void testParseWineWithoutGrapes() throws NullPointerException {
         SimpleWine testWine = SimpleWine.builder().
                 name("Мое любимое").
-                brandID("Чайка").
-                countryID("Раися").
+                brand("Чайка").
+                country("Раися").
                 newPrice((float) 20000.0).
                 year(2018).
                 capacity((float) 0.75).
                 strength((float) 13.0).
-                color("цветное").
+                color(ParserApi.Wine.Color.UNRECOGNIZED).
                 grapeSort(null).
-                sugar("соленое").
+                sugar(ParserApi.Wine.Sugar.UNRECOGNIZED).
                 discount((float) 20.0).
                 region("Новый Южный").
                 link("https://myfavorite").
@@ -191,22 +190,22 @@ class WineServiceTest {
 
     @Test
     void testCreateConstructor() {
-        assertThrows(NullPointerException.class, () -> new WineService(null, null, null, null, null));
+        assertThrows(NullPointerException.class, () -> new WineService(null, null, null, null, null, null));
     }
 
     @Test
     void testSaveWineWithoutLink() {
         SimpleWine testWine = SimpleWine.builder().
                 name("Мое любимое").
-                brandID("Чайка").
-                countryID("Раися").
+                brand("Чайка").
+                country("Раися").
                 newPrice((float) 20000.0).
                 year(2018).
                 capacity((float) 0.75).
                 strength((float) 13.0).
-                color("цветное").
+                color(ParserApi.Wine.Color.UNRECOGNIZED).
                 grapeSort(null).
-                sugar("соленое").
+                sugar(ParserApi.Wine.Sugar.UNRECOGNIZED).
                 discount((float) 20.0).
                 region("Новый Южный").
                 link(null).
@@ -221,18 +220,18 @@ class WineServiceTest {
     }
 
     @Test
-    void testSaveWineWithoutPrice() throws NullPointerException{
+    void testSaveWineWithoutPrice() throws NullPointerException {
         SimpleWine testWine = SimpleWine.builder().
                 name("Мое любимое").
-                brandID("Чайка").
-                countryID("Раися").
+                brand("Чайка").
+                country("Раися").
                 newPrice(null).
                 year(2018).
                 capacity((float) 0.75).
                 strength((float) 13.0).
-                color("цветное").
+                color(ParserApi.Wine.Color.UNRECOGNIZED).
                 grapeSort(null).
-                sugar("соленое").
+                sugar(ParserApi.Wine.Sugar.UNRECOGNIZED).
                 discount((float) 20.0).
                 region("Новый Южный").
                 link("https://myfavorite").
@@ -247,7 +246,7 @@ class WineServiceTest {
     }
 
     @Test
-    void testSaveNull() throws NullPointerException{
+    void testSaveNull() throws NullPointerException {
         assertThrows(NullPointerException.class, () -> wineService.saveAllWineParsedInfo(null));
     }
 
@@ -255,15 +254,15 @@ class WineServiceTest {
     void testSameGrapesSaveWine() {
         SimpleWine testWine = SimpleWine.builder().
                 name("Бин 50 Шираз").
-                brandID("Lindeman's").
-                countryID("Австралия").
+                brand("Lindeman's").
+                country("Австралия").
                 newPrice((float) 952.0).
                 year(2018).
                 capacity((float) 0.75).
                 strength((float) 13.0).
-                color("красное").
+                color(ParserApi.Wine.Color.RED).
                 grapeSort(Arrays.asList("шираз", "шираз")).
-                sugar("полусухое").
+                sugar(ParserApi.Wine.Sugar.MEDIUM_DRY).
                 discount((float) 20.0).
                 region("Новый Южный Уэльс").
                 link("https://simplewine.ru/catalog/product/lindeman_s_bin_50_shiraz_2018_075/").
@@ -280,17 +279,17 @@ class WineServiceTest {
 
 
     @Test
-    void testSaveWithoutCapacity(){
+    void testSaveWithoutCapacity() {
         SimpleWine testWine = SimpleWine.builder().
                 name("Мое любимое2").
-                brandID("Чайка").
-                countryID("Раися").
+                brand("Чайка").
+                country("Раися").
                 newPrice((float) 3000.0).
                 year(2018).
                 strength((float) 13.0).
-                color("цветное").
+                color(ParserApi.Wine.Color.UNRECOGNIZED).
                 grapeSort(Arrays.asList("шираз", "каберне")).
-                sugar("соленое").
+                sugar(ParserApi.Wine.Sugar.UNRECOGNIZED).
                 discount((float) 20.0).
                 region("Новый Южный").
                 link("https://myfavorite2").
@@ -306,18 +305,18 @@ class WineServiceTest {
 
 
     @Test
-    void testSaveWineGrapes(){
+    void testSaveWineGrapes() {
         SimpleWine testWine = SimpleWine.builder().
                 name("Мое любимое").
-                brandID("Чайка").
-                countryID("Раися").
+                brand("Чайка").
+                country("Раися").
                 newPrice((float) 30000.0).
                 year(2018).
                 capacity((float) 0.75).
                 strength((float) 13.0).
-                color("цветное").
+                color(ParserApi.Wine.Color.UNRECOGNIZED).
                 grapeSort(Arrays.asList("шираз", "каберне")).
-                sugar("соленое").
+                sugar(ParserApi.Wine.Sugar.UNRECOGNIZED).
                 discount((float) 20.0).
                 region("Новый Южный").
                 link("https://myfavorite").
