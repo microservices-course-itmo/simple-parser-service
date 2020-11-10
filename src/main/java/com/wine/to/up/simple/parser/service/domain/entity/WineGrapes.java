@@ -17,7 +17,7 @@ public class WineGrapes {
     /** Unique identifier */
     @Id
     @Column(name = "id")
-    private UUID ID = UUID.randomUUID();
+    private UUID uuID = UUID.randomUUID();
 
     /** Foreign key that refers to the {@link Wine} entity */
     @ManyToOne

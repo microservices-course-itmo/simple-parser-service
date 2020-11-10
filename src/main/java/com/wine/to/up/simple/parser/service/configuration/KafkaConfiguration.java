@@ -25,6 +25,8 @@ import org.springframework.context.annotation.Scope;
 
 import java.util.Properties;
 
+import static org.apache.kafka.common.requests.FetchMetadata.log;
+
 @Configuration
 public class KafkaConfiguration {
     /**
@@ -135,7 +137,7 @@ public class KafkaConfiguration {
         // set appropriate serializer for value
         producerProperties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
                 EventSerializer.class.getName());
-
+        log.debug("Kafka message sender successfully processed Wines");
         return new KafkaMessageSender<>(new KafkaProducer<>(producerProperties),
                 apiProperties.getWineParsedEventsTopicName(), metricsCollector);
     }
