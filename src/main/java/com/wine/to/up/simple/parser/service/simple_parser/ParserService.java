@@ -29,7 +29,7 @@ public class ParserService {
     private String url;
     @Value("${parser.wineurl}")
     private String wineUrl;
-    private static final int PAGES_TO_PARSE = 3; // currently max 106, lower const value for testing purposes
+    private static final int PAGES_TO_PARSE = 100; // currently max 106, lower const value for testing purposes
     private static final int NUMBER_OF_THREADS = 15;
     private ParserApi.WineParsedEvent messageToKafka;
     private final ExecutorService pagesExecutor = Executors.newSingleThreadExecutor();
@@ -49,6 +49,8 @@ public class ParserService {
     private WineRepository wineRepository;
     @Autowired
     private WineMapper modelMapper;
+    @Autowired
+    private WineToDTO wineToDTO;
 
     /**
      * @param someURL URL to get jsoup Document
@@ -124,7 +126,7 @@ public class ParserService {
             SimpleWine wine = Parser.parseWine(urlToDocument(url + wineURL));
             saveWineToDB(wine, dbHandler);
 
-            ParserApi.Wine newProduct = WineToDTO.getProtoWine(wine);
+            ParserApi.Wine newProduct = wineToDTO.getProtoWine(wine);
             if (!products.contains(newProduct)) {
                 products.add(newProduct);
             }

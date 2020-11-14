@@ -121,7 +121,7 @@ public class KafkaConfiguration {
      */
     @Bean
     KafkaMessageSender<KafkaMessageSentEvent> testTopicKafkaMessageSender(Properties producerProperties,
-                                                      ParserCommonApiProperties apiProperties, SimpleParserMetricsCollector metricsCollector) {
+                                                                          ParserCommonApiProperties apiProperties, SimpleParserMetricsCollector metricsCollector) {
         // set appropriate serializer for value
         producerProperties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
                 EventSerializer.class.getName());

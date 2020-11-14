@@ -40,6 +40,8 @@ class WineToDTOTest {
     private SimpleWine wine;
     @Autowired
     private WineMapper wineMapper;
+    @Autowired
+    private WineToDTO wineToDTO;
 
     @BeforeEach
     void initWine() {
@@ -66,22 +68,22 @@ class WineToDTOTest {
                 build();
     }
 
-    // @ParameterizedTest
-    // @CsvSource({
-    //         "красное,полусухое",
-    //         "белое,сухое",
-    //         "розовое,сладкое",
-    //         "оранжевое,полусладкое",
-    //         "фиолетовое,горькое"})
-    // void testGetProtoWine(String colorType, String sugarType) {
-    //     Map<String, ParserApi.Wine.Sugar> sugarMap = Map.of("сухое", DRY, "полусухое", MEDIUM_DRY, "полусладкое", MEDIUM, "сладкое", SWEET);
-    //     Map<String, ParserApi.Wine.Color> colorMap = Map.of("красное", RED, "розовое", ROSE, "белое", WHITE, "оранжевое", ORANGE);
+    @ParameterizedTest
+    @CsvSource({
+            "красное,полусухое",
+            "белое,сухое",
+            "розовое,сладкое",
+            "оранжевое,полусладкое",
+            "фиолетовое,горькое"})
+    void testGetProtoWine(String colorType, String sugarType) {
+        Map<String, ParserApi.Wine.Sugar> sugarMap = Map.of("сухое", DRY, "полусухое", MEDIUM_DRY, "полусладкое", MEDIUM, "сладкое", SWEET);
+        Map<String, ParserApi.Wine.Color> colorMap = Map.of("красное", RED, "розовое", ROSE, "белое", WHITE, "оранжевое", ORANGE);
 
-    //     wine.setColor(colorMap.getOrDefault(colorType, null));
-    //     wine.setSugar(sugarMap.getOrDefault(sugarType, null));
+        wine.setColor(colorMap.getOrDefault(colorType, null));
+        wine.setSugar(sugarMap.getOrDefault(sugarType, null));
 
-    //     ParserApi.Wine expectedProduct = wineMapper.toKafka(wine).build();
-    //     ParserApi.Wine result = WineToDTO.getProtoWine(wine);
-    //     assertEquals(expectedProduct.toString(), result.toString());
-    // }
+        ParserApi.Wine expectedProduct = wineMapper.toKafka(wine).build();
+        ParserApi.Wine result = wineToDTO.getProtoWine(wine);
+        assertEquals(expectedProduct.toString(), result.toString());
+    }
 }
