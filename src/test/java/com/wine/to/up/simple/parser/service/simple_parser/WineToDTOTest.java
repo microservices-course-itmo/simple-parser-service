@@ -79,8 +79,8 @@ class WineToDTOTest {
         Map<String, ParserApi.Wine.Sugar> sugarMap = Map.of("сухое", DRY, "полусухое", MEDIUM_DRY, "полусладкое", MEDIUM, "сладкое", SWEET);
         Map<String, ParserApi.Wine.Color> colorMap = Map.of("красное", RED, "розовое", ROSE, "белое", WHITE, "оранжевое", ORANGE);
 
-        wine.setColor(colorMap.getOrDefault(colorType, null));
-        wine.setSugar(sugarMap.getOrDefault(sugarType, null));
+        wine.setColor(colorMap.getOrDefault(colorType, RED));
+        wine.setSugar(sugarMap.getOrDefault(sugarType, DRY));
 
         ParserApi.Wine expectedProduct = wineMapper.toKafka(wine).build();
         ParserApi.Wine result = wineToDTO.getProtoWine(wine);

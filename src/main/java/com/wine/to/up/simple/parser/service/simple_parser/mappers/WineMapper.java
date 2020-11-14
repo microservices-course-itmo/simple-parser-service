@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class WineMapper {
 
-    private ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
     @Autowired
     public WineMapper(ModelMapper modelMapper) {
