@@ -60,20 +60,8 @@ public class BrandsServiceTest {
     }
 
     @Test
-    public void testDoubleSave() {
-        ArrayList<Brands> brands = new ArrayList<>();
-        brands.add(brand);
-        when(brandsRepository.findAll()).thenReturn(brands);
-
-        brandsService.saveBrand("vvvino");
-        brandsService.saveBrand("vvvino");
-
-        int counter = 0;
-        for (Brands i : brandsRepository.findAll()) {
-            if (i.getBrandName().equals("vvvino")) {
-                counter++;
-            }
-        }
-        assertEquals(1, counter);
+    public void testSaveBrandService() {
+        when(brandsService.saveBrand("vvvino")).thenReturn(brand);
+        assertEquals("vvvino", brandsService.saveBrand("vvvino").getBrandName());
     }
 }

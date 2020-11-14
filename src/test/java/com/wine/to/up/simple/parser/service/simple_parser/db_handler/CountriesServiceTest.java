@@ -61,20 +61,8 @@ public class CountriesServiceTest {
     }
 
     @Test
-    public void testDoubleSave() {
-        ArrayList<Countries> countries = new ArrayList<>();
-        countries.add(country);
-        when(countriesRepository.findAll()).thenReturn(countries);
-
-        countriesService.saveCountry("Раися");
-        countriesService.saveCountry("Раися");
-
-        int counter = 0;
-        for (Countries i : countriesRepository.findAll()) {
-            if (i.getCountryName().equals("Раися")) {
-                counter++;
-            }
-        }
-        assertEquals(1, counter);
+    public void testSaveCountryService() {
+        when(countriesService.saveCountry("Раися")).thenReturn(country);
+        assertEquals("Раися", countriesService.saveCountry("Раися").getCountryName());
     }
 }
