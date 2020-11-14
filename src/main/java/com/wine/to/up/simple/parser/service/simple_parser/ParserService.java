@@ -29,7 +29,6 @@ public class ParserService {
     private String url;
     @Value("${parser.wineurl}")
     private String wineUrl;
-    private static final int PAGES_TO_PARSE = 100; // currently max 106, lower const value for testing purposes
     private static final int NUMBER_OF_THREADS = 15;
     private ParserApi.WineParsedEvent messageToKafka;
     private final ExecutorService pagesExecutor = Executors.newSingleThreadExecutor();
@@ -66,10 +65,7 @@ public class ParserService {
         return wineDoc;
     }
 
-    /**
-     * Multithreading simplewine parser
-     */
-    public void startParser() {
+    private void parser(int pagesToParse) {
         long start = System.currentTimeMillis();
 
         List<CompletableFuture<?>> futures = new ArrayList<>();
@@ -81,7 +77,7 @@ public class ParserService {
 
         AtomicLong pageCounter = new AtomicLong(1);
         for (int i = 0; i < NUMBER_OF_THREADS; i++) {
-            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> addWineUrls(pageCounter, wineURLs), pagesExecutor);
+            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> addWineUrls(pageCounter, wineURLs, pagesToParse), pagesExecutor);
             futures.add(future);
         }
 
@@ -110,6 +106,29 @@ public class ParserService {
                 TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()
                         - TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - start) * 60000 - start));
         log.info("End of parsing, {} wines collected and sent to Kafka", products.size());
+
+    }
+
+    /**
+     * Multithreading simplewine parser with a specified number of pages
+     */
+    public void startParser(int pagesToParse) {
+        if (pagesToParse > 0) {
+            parser(pagesToParse);
+        } else {
+            log.error("Set invalid number of pages: {}", pagesToParse);
+        }
+    }
+
+    /**
+     * Multithreading simplewine parser with maximum number of pages
+     */
+    public void startParser() {
+        try {
+            parser(Parser.parseNumberOfPages(urlToDocument(url)));
+        } catch (IOException e) {
+            log.error("Error while getting number of pages: ", e);
+        }
     }
 
     /**
@@ -148,9 +167,9 @@ public class ParserService {
         }
     }
 
-    private void addWineUrls(AtomicLong pageCounter, ArrayBlockingQueue<String> wineURLs) {
+    private void addWineUrls(AtomicLong pageCounter, ArrayBlockingQueue<String> wineURLs, int pagesToParse) {
         try {
-            while (pageCounter.longValue() <= PAGES_TO_PARSE) {
+            while (pageCounter.longValue() <= pagesToParse) {
                 Document doc = Jsoup.connect(wineUrl + pageCounter.get()).get();
                 Elements wines = doc.getElementsByClass("catalog-grid__item");
                 for (Element wine : wines) {

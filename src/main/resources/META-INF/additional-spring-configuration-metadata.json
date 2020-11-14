@@ -9,6 +9,11 @@
       "name": "parser.wineurl",
       "type": "java.lang.String",
       "description": "SimpleWine wine page URL."
+    },
+    {
+      "name": "parser.sparkling_wineurl",
+      "type": "java.lang.String",
+      "description": "SimpleWine sparkling wine page URL."
     }
   ]
 }
