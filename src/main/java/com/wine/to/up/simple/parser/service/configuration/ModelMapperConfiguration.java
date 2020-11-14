@@ -4,7 +4,6 @@ import com.wine.to.up.parser.common.api.schema.ParserApi;
 import com.wine.to.up.simple.parser.service.domain.entity.Wine;
 import com.wine.to.up.simple.parser.service.simple_parser.SimpleWine;
 import org.modelmapper.*;
-import org.modelmapper.spi.MappingContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
