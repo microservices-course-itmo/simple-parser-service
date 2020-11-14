@@ -2,16 +2,12 @@ package com.wine.to.up.simple.parser.service.simple_parser;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.Assert.*;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
 
 /**
  * Class for integration testing of {@link Parser}

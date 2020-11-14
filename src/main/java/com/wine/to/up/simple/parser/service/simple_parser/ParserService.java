@@ -29,7 +29,8 @@ public class ParserService {
     private String url;
     @Value("${parser.wineurl}")
     private String wineUrl;
-    private static final int PAGES_TO_PARSE = 100; // currently max 106, lower const value for testing purposes
+    //private static final int PAGES_TO_PARSE = 100; // currently max 106, lower const value for testing purposes
+    private int pagesToParse;
     private static final int NUMBER_OF_THREADS = 15;
     private ParserApi.WineParsedEvent messageToKafka;
     private final ExecutorService pagesExecutor = Executors.newSingleThreadExecutor();
@@ -55,13 +56,20 @@ public class ParserService {
     /**
      * @param someURL URL to get jsoup Document
      * @return Jsoup Document class
-     * @throws IOException IDK
      */
-    public static Document urlToDocument(String someURL) throws IOException {
-        Document wineDoc = Jsoup.connect(someURL).get();
-        while (!(wineDoc.getElementsByClass("product-page").first().children().first().className().equals("product"))) {
-            log.debug("Doing re-request...");
+    public static Document urlToDocument(String someURL) {
+        Document wineDoc = null;
+        try {
             wineDoc = Jsoup.connect(someURL).get();
+            while (!(wineDoc.getElementsByClass("product-page").first().children().first().className().equals("product"))) {
+                log.debug("Doing re-request...");
+                wineDoc = Jsoup.connect(someURL).get();
+            }
+
+        } catch (IOException e) {
+            log.error("Incorrect URL address: " + someURL);
+        } catch (NullPointerException e) {
+            log.error("No such element on page");
         }
         return wineDoc;
     }
@@ -69,7 +77,13 @@ public class ParserService {
     /**
      * Multithreading simplewine parser
      */
-    public void startParser() {
+    public void startParser(int pages) {
+        int maxPages = Parser.parseNumberOfPages(urlToDocument(url + "/catalog/vino/"));
+        if (pages > maxPages || pages < 1) {
+            pagesToParse = maxPages;
+        } else {
+            pagesToParse = pages;
+        }
         long start = System.currentTimeMillis();
 
         List<CompletableFuture<?>> futures = new ArrayList<>();
@@ -122,18 +136,13 @@ public class ParserService {
     }
 
     private void addWineToProducts(String wineURL, List<ParserApi.Wine> products, WineService dbHandler, AtomicInteger wineCounter) {
-        try {
-            SimpleWine wine = Parser.parseWine(urlToDocument(url + wineURL));
-            saveWineToDB(wine, dbHandler);
-
-            ParserApi.Wine newProduct = wineToDTO.getProtoWine(wine);
-            if (!products.contains(newProduct)) {
-                products.add(newProduct);
-            }
-            log.trace("Wine: {} added to database", wineCounter.getAndIncrement());
-        } catch (IOException e) {
-            log.error("Error while parsing page: ", e);
+        SimpleWine wine = Parser.parseWine(urlToDocument(url + wineURL));
+        saveWineToDB(wine, dbHandler);
+        ParserApi.Wine newProduct = wineToDTO.getProtoWine(wine);
+        if (!products.contains(newProduct)) {
+            products.add(newProduct);
         }
+        log.trace("Wine: {} added to database", wineCounter.getAndIncrement());
     }
 
     private void saveWineToDB(SimpleWine wine, WineService dbHandler) {
@@ -150,7 +159,7 @@ public class ParserService {
 
     private void addWineUrls(AtomicLong pageCounter, ArrayBlockingQueue<String> wineURLs) {
         try {
-            while (pageCounter.longValue() <= PAGES_TO_PARSE) {
+            while (pageCounter.longValue() <= pagesToParse) {
                 Document doc = Jsoup.connect(wineUrl + pageCounter.get()).get();
                 Elements wines = doc.getElementsByClass("catalog-grid__item");
                 for (Element wine : wines) {
