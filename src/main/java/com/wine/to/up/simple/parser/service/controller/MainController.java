@@ -67,8 +67,8 @@ public class MainController {
      * @return message about successful execution.
      */
     @GetMapping(path = "/run-parser")
-    public String runParser() {
-        parserService.startParser(0);
+    public String runParser(@RequestParam int pagesToParse) {
+        parserService.startParser(pagesToParse);
         return "Parser started by request";
     }
 

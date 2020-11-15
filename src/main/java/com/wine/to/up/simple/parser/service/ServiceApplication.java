@@ -29,7 +29,7 @@ public class ServiceApplication {
         // run once in 12 hours
     void scheduledRunParser() {
         log.info("SCHEDULED PARSER START");
-        parserService.startParser(0);
+        parserService.startParser(3); //to run on all pages, remove the parameter
     }
 
 }

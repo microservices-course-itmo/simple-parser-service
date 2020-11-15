@@ -6,13 +6,11 @@ import org.hibernate.metamodel.internal.MetamodelImpl;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -26,6 +24,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+
 import java.util.Collections;
 import java.util.Map;
 
@@ -34,7 +33,6 @@ import static com.wine.to.up.parser.common.api.schema.ParserApi.Wine.Color.ORANG
 import static com.wine.to.up.parser.common.api.schema.ParserApi.Wine.Sugar.*;
 import static com.wine.to.up.parser.common.api.schema.ParserApi.Wine.Sugar.SWEET;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
 class WineToDTOTest {
