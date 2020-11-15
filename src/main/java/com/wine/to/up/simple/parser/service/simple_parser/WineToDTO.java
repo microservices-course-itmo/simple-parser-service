@@ -17,7 +17,7 @@ public class WineToDTO {
     private WineMapper wineMapper;
 
     @Autowired
-    private WineToDTO(WineMapper modelMapper) {
+    public WineToDTO(WineMapper modelMapper) {
         wineMapper = modelMapper;
     }
 

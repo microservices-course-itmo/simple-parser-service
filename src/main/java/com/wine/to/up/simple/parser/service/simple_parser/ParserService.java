@@ -54,13 +54,20 @@ public class ParserService {
     /**
      * @param someURL URL to get jsoup Document
      * @return Jsoup Document class
-     * @throws IOException IDK
      */
-    public static Document urlToDocument(String someURL) throws IOException {
-        Document wineDoc = Jsoup.connect(someURL).get();
-        while (!(wineDoc.getElementsByClass("product-page").first().children().first().className().equals("product"))) {
-            log.debug("Doing re-request...");
+    public static Document urlToDocument(String someURL) {
+        Document wineDoc = null;
+        try {
             wineDoc = Jsoup.connect(someURL).get();
+            while (!(wineDoc.getElementsByClass("product-page").first().children().first().className().equals("product"))) {
+                log.debug("Doing re-request...");
+                wineDoc = Jsoup.connect(someURL).get();
+            }
+
+        } catch (IOException e) {
+            log.error("Incorrect URL address: " + someURL);
+        } catch (NullPointerException e) {
+            log.error("No such element on page");
         }
         return wineDoc;
     }
@@ -113,7 +120,7 @@ public class ParserService {
      * Multithreading simplewine parser with a specified number of pages
      */
     public void startParser(int pagesToParse) {
-        if (pagesToParse > 0) {
+        if (pagesToParse <= Parser.parseNumberOfPages(urlToDocument(url + "/catalog/vino/") && pagesToParse > 0) {
             parser(pagesToParse);
         } else {
             log.error("Set invalid number of pages: {}", pagesToParse);
@@ -141,18 +148,13 @@ public class ParserService {
     }
 
     private void addWineToProducts(String wineURL, List<ParserApi.Wine> products, WineService dbHandler, AtomicInteger wineCounter) {
-        try {
-            SimpleWine wine = Parser.parseWine(urlToDocument(url + wineURL));
-            saveWineToDB(wine, dbHandler);
-
-            ParserApi.Wine newProduct = wineToDTO.getProtoWine(wine);
-            if (!products.contains(newProduct)) {
-                products.add(newProduct);
-            }
-            log.trace("Wine: {} added to database", wineCounter.getAndIncrement());
-        } catch (IOException e) {
-            log.error("Error while parsing page: ", e);
+        SimpleWine wine = Parser.parseWine(urlToDocument(url + wineURL));
+        saveWineToDB(wine, dbHandler);
+        ParserApi.Wine newProduct = wineToDTO.getProtoWine(wine);
+        if (!products.contains(newProduct)) {
+            products.add(newProduct);
         }
+        log.trace("Wine: {} added to database", wineCounter.getAndIncrement());
     }
 
     private void saveWineToDB(SimpleWine wine, WineService dbHandler) {
