@@ -120,7 +120,7 @@ public class ParserService {
      * Multithreading simplewine parser with a specified number of pages
      */
     public void startParser(int pagesToParse) {
-        if (pagesToParse <= Parser.parseNumberOfPages(urlToDocument(url + "/catalog/vino/") && pagesToParse > 0) {
+        if (pagesToParse <= Parser.parseNumberOfPages(urlToDocument(url + "/catalog/vino/")) && (pagesToParse > 0)) {
             parser(pagesToParse);
         } else {
             log.error("Set invalid number of pages: {}", pagesToParse);
@@ -131,11 +131,7 @@ public class ParserService {
      * Multithreading simplewine parser with maximum number of pages
      */
     public void startParser() {
-        try {
-            parser(Parser.parseNumberOfPages(urlToDocument(url)));
-        } catch (IOException e) {
-            log.error("Error while getting number of pages: ", e);
-        }
+        parser(Parser.parseNumberOfPages(urlToDocument(url)));
     }
 
     /**
