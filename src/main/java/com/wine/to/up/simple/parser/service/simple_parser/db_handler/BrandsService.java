@@ -6,28 +6,37 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-/** The service is responsible for adding a brand to DB.*/
+/**
+ * The service is responsible for adding a {@link Brands} entity to DB.
+ */
 @Service
 @Slf4j
 public class BrandsService {
-    /** The repository that stores brands info (name, id)*/
+    /**
+     * The repository that stores brands info (name, id)
+     */
     private final BrandsRepository brandsRepository;
 
-    /**  The service instance creation.
-     * @param brandsRepository not an empty Brands Repository*/
+    /**
+     * The service instance creation.
+     *
+     * @param brandsRepository not an empty {@link BrandsRepository}
+     */
     public BrandsService(@NonNull BrandsRepository brandsRepository) {
         this.brandsRepository = brandsRepository;
     }
 
-    /** Adding to DB with an existence check before
+    /**
+     * Adding to DB with an existence check before
+     *
      * @param brand brand name
-     * @return instance of the Brands entity
+     * @return instance of the {@link Brands}
      * @see BrandsRepository
-     * */
+     */
     protected Brands saveBrand(@NonNull String brand) {
         if (Boolean.FALSE.equals(brandsRepository.existsBrandsByBrandName(brand))) {
             brandsRepository.save(new Brands(brand));
-            log.trace("New Brand was added to DB: " + brand);
+            log.trace("New Brand was added to DB: {}", brand);
         }
         return brandsRepository.findBrandByBrandName(brand);
     }

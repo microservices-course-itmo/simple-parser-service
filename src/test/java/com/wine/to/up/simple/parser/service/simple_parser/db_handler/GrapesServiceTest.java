@@ -1,6 +1,5 @@
 package com.wine.to.up.simple.parser.service.simple_parser.db_handler;
 
-
 import com.wine.to.up.simple.parser.service.domain.entity.Grapes;
 import com.wine.to.up.simple.parser.service.repository.GrapesRepository;
 import org.junit.Before;
@@ -41,20 +40,20 @@ public class GrapesServiceTest {
     }
 
     @Test
-    public void findBrandByNameTest() {
+    public void findGrapeByNameTest() {
         when(grapesRepository.findGrapeByGrapeName(grape.getGrapeName())).thenReturn(grape);
         Grapes newGrape = grapesRepository.findGrapeByGrapeName("бонано");
         assertEquals(grape, newGrape);
     }
 
     @Test
-    public void existBrandByNameTest() {
+    public void existGrapeByNameTest() {
         when(grapesRepository.existsGrapesByGrapeName(grape.getGrapeName())).thenReturn(true);
         assertEquals(true, grapesRepository.existsGrapesByGrapeName("бонано"));
     }
 
     @Test
-    public void findAllBrandsTest() {
+    public void findAllGrapesTest() {
         ArrayList<Grapes> grapes = new ArrayList<>();
         grapes.add(grape);
         when(grapesRepository.findAll()).thenReturn(grapes);
@@ -62,7 +61,7 @@ public class GrapesServiceTest {
     }
 
     @Test
-    public void testSaveBrandService() {
+    public void testSaveGrapeService() {
         when(grapesService.saveGrape("бонано")).thenReturn(grape);
         assertEquals("бонано", grapesService.saveGrape("бонано").getGrapeName());
     }

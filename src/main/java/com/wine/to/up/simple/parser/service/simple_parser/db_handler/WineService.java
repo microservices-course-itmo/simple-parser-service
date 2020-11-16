@@ -11,7 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * The service is responsible for adding all info to DB.
+ * The service is responsible for adding a {@link Wine} entity to DB.
  */
 @Service
 @Slf4j
@@ -26,6 +26,7 @@ public class WineService {
     private final WineGrapesService wineGrapesService;
 
     final WineMapper wineMapper;
+
     /**
      * The service instance creation.
      */
@@ -93,7 +94,7 @@ public class WineService {
     private Wine saveWine(SimpleWine newWine) {
         Wine wineEntity = wineMapper.toDB(newWine);
         wineRepository.save(wineEntity);
-        log.trace("New Wine was added to DB: " + wineEntity.toString());
+        log.trace("New Wine was added to DB: {}", wineEntity.toString());
 
         return wineEntity;
     }
