@@ -2,37 +2,19 @@ package com.wine.to.up.simple.parser.service.simple_parser;
 
 import com.wine.to.up.parser.common.api.schema.ParserApi;
 import com.wine.to.up.simple.parser.service.simple_parser.mappers.WineMapper;
-import org.hibernate.metamodel.internal.MetamodelImpl;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.runner.RunWith;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.PlatformTransactionManager;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 
 import java.util.Collections;
 import java.util.Map;
 
 import static com.wine.to.up.parser.common.api.schema.ParserApi.Wine.Color.*;
-import static com.wine.to.up.parser.common.api.schema.ParserApi.Wine.Color.ORANGE;
 import static com.wine.to.up.parser.common.api.schema.ParserApi.Wine.Sugar.*;
-import static com.wine.to.up.parser.common.api.schema.ParserApi.Wine.Sugar.SWEET;
 import static org.junit.Assert.*;
 import static org.modelmapper.convention.MatchingStrategies.STRICT;
 
@@ -41,14 +23,14 @@ class WineToDTOTest {
     private SimpleWine wine;
     private WineMapper wineMapper;
     private WineToDTO wineToDTO;
-    private ModelMapper modelMapper;
-
+    private final Map<String, ParserApi.Wine.Sugar> sugarMap = Map.of("сухое", DRY, "полусухое", MEDIUM_DRY, "полусладкое", MEDIUM, "сладкое", SWEET);
+    private final Map<String, ParserApi.Wine.Color> colorMap = Map.of("красное", RED, "розовое", ROSE, "белое", WHITE, "оранжевое", ORANGE);
 
 
 
     @BeforeEach
-    void init(){
-        modelMapper = new ModelMapper();
+    void init() {
+        ModelMapper modelMapper = new ModelMapper();
         modelMapper
                 .getConfiguration()
                 .setSkipNullEnabled(true)
@@ -95,9 +77,6 @@ class WineToDTOTest {
             "оранжевое,полусладкое",
             "фиолетовое,горькое"})
     void testGetProtoWine(String colorType, String sugarType) {
-        Map<String, ParserApi.Wine.Sugar> sugarMap = Map.of("сухое", DRY, "полусухое", MEDIUM_DRY, "полусладкое", MEDIUM, "сладкое", SWEET);
-        Map<String, ParserApi.Wine.Color> colorMap = Map.of("красное", RED, "розовое", ROSE, "белое", WHITE, "оранжевое", ORANGE);
-
         wine.setColor(colorMap.getOrDefault(colorType, RED));
         wine.setSugar(sugarMap.getOrDefault(sugarType, DRY));
 
