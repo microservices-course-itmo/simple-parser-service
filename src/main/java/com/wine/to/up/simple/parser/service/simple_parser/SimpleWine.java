@@ -34,7 +34,8 @@ public class SimpleWine {
     private Float oldPrice;
     private String name;
     private Iterable<String> grapeSort;
-    private String region;
+    @Builder.Default
+    private String region = "";
     private String link;
     private float rating;
     private boolean sparkling;
