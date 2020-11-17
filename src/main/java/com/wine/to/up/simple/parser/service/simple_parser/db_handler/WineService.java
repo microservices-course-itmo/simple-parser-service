@@ -24,8 +24,7 @@ public class WineService {
     private final CountriesService countriesService;
     private final GrapesService grapesService;
     private final WineGrapesService wineGrapesService;
-
-    final WineMapper wineMapper;
+    private final WineMapper wineMapper;
 
     /**
      * The service instance creation.

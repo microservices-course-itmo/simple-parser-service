@@ -1,6 +1,8 @@
 package com.wine.to.up.simple.parser.service.simple_parser;
 
 import com.wine.to.up.parser.common.api.schema.ParserApi;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -20,9 +22,8 @@ import static com.wine.to.up.parser.common.api.schema.ParserApi.Wine.Sugar.SWEET
 
 @Slf4j
 @Component
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Parser {
-    private Parser() {
-    }
 
     /**
      * @param mainPage URL of simplewine main page
@@ -42,15 +43,14 @@ public class Parser {
 
     /**
      * @param wineDoc Jsoup Document of wine
-     * @return
      */
     public static SimpleWine parseWine(Document wineDoc) {
 
         Map<String, ParserApi.Wine.Sugar> sugarMap = Map.of( "сухое", DRY, "полусухое", MEDIUM_DRY, "полусладкое", MEDIUM, "сладкое", SWEET);
         Map<String, ParserApi.Wine.Color> colorMap = Map.of( "красное", RED, "розовое", ROSE, "белое", WHITE, "оранжевое", ORANGE);
-        
+
         long wineParseStart = System.currentTimeMillis();
-        
+
         float bottlePrice = 0;
         float bottleDiscount = 0;
 
@@ -157,7 +157,7 @@ public class Parser {
         //         .sugar(sugarMap.getOrDefault(sugarType, DRY)).discount(bottleDiscount).region(region).link(wineDoc.baseUri())
         //         .image(bottleImage).rating(wineRating).sparkling(sparkling).taste(wineTaste)
         //         .gastronomy(wineGastronomy).oldPrice(100 * bottlePrice / (100 - bottleDiscount)).build();
-    
+
         return sw.link(wineDoc.baseUri()).discount(bottleDiscount).oldPrice(100 * bottlePrice / (100 - bottleDiscount)).build();
     }
 }

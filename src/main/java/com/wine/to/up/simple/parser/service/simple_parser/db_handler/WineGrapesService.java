@@ -4,6 +4,8 @@ import com.wine.to.up.simple.parser.service.domain.entity.Grapes;
 import com.wine.to.up.simple.parser.service.domain.entity.Wine;
 import com.wine.to.up.simple.parser.service.domain.entity.WineGrapes;
 import com.wine.to.up.simple.parser.service.repository.WineGrapesRepository;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -12,26 +14,19 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class WineGrapesService {
     /**
      * The repository that stores the connections between wine and its grapes.
      */
     private final WineGrapesRepository wineGrapesRepository;
 
-
-    /**
-     * The service instance creation.
-     */
-    public WineGrapesService(WineGrapesRepository wineGrapesRepository) {
-        this.wineGrapesRepository = wineGrapesRepository;
-    }
-
     /**
      * Adding to DB with an existence check before
      *
      * @see WineGrapesRepository
      */
-    protected WineGrapes saveWineGrapes(Grapes grapeEntity, Wine wineEntity) {
+    protected WineGrapes saveWineGrapes(@NonNull Grapes grapeEntity, @NonNull Wine wineEntity) {
         if (Boolean.FALSE.equals(wineGrapesRepository.existsWineGrapesByGrapeIdAndAndWineId(grapeEntity, wineEntity))) {
             wineGrapesRepository.save(new WineGrapes(wineEntity, grapeEntity));
             log.trace("New Connection between Wine and Grape was added to DB");
