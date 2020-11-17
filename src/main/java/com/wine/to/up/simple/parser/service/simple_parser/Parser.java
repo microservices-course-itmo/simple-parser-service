@@ -64,12 +64,12 @@ public class Parser {
 
         var sw = SimpleWine.builder();
 
-        if (!wineDoc.select(".product__header-russian-name").isEmpty()) {
+        if (wineDoc.is(":has(.product__header-russian-name)")) {
             sw.name(wineDoc.getElementsByClass("product__header-russian-name").get(0).text());
-        } else if (!wineDoc.getElementsByClass("product-card-new__header-info").isEmpty()) {
+        } else if (wineDoc.is(":has(.product-card-new__header-info)")) {
             sw.name(wineDoc.getElementsByClass("product-card-new__header-info").get(0).text());
         } else {
-            log.error("fffffffffffffffffffffff");
+            log.error("The layout has been changed!");
         }
 
 
