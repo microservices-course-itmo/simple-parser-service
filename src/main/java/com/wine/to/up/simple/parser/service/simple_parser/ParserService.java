@@ -147,13 +147,16 @@ public class ParserService {
      * @param wineCounter
      */
     private void addWineToProducts(String wineURL, List<ParserApi.Wine> products, WineService dbHandler, AtomicInteger wineCounter) {
-        SimpleWine wine = Parser.parseWine(urlToDocument(url + wineURL));
-        saveWineToDB(wine, dbHandler);
-        ParserApi.Wine newProduct = wineMapper.toKafka(wine).build();
-        if (!products.contains(newProduct)) {
-            products.add(newProduct);
+        if (urlToDocument(url + wineURL) != null) {
+            SimpleWine wine = Parser.parseWine(urlToDocument(url + wineURL));
+            saveWineToDB(wine, dbHandler);
+            ParserApi.Wine newProduct = wineMapper.toKafka(wine).build();
+            if (!products.contains(newProduct)) {
+                products.add(newProduct);
+            }
+            log.trace("Wine: {} added to database", wineCounter.getAndIncrement());
         }
-        log.trace("Wine: {} added to database", wineCounter.getAndIncrement());
+
     }
 
     /**
