@@ -34,7 +34,8 @@ public class SimpleWine {
     private Float discount;
     private Float newPrice;
     private Float oldPrice;
-    private String name;
+    @Builder.Default
+    private String name = "No info";
     private Iterable<String> grapeSort;
     @Builder.Default
     private String region = "";
