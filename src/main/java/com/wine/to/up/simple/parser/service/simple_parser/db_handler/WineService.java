@@ -67,16 +67,19 @@ public class WineService {
             log.error("DB error: problem with saveCountry: ", e);
         }
 
-        List<Grapes> grapesEntity = new LinkedList<>();
-        for (String grape : newWine.getGrapeSort()) {
-            try {
-                grapesEntity.add(grapesService.saveGrape(grape));
-            } catch (Exception e) {
-                log.error("DB error: problem with saveGrape: ", e);
+        List<Grapes> grapesEntity = null;
+        if (newWine.getGrapeSort() != null) {
+            grapesEntity = new LinkedList<>();
+            for (String grape : newWine.getGrapeSort()) {
+                try {
+                    grapesEntity.add(grapesService.saveGrape(grape));
+                } catch (Exception e) {
+                    log.error("DB error: problem with saveGrape: ", e);
+                }
             }
         }
 
-        if ((brandEntity != null) && (countryEntity != null)) {
+        if ((brandEntity != null) && (countryEntity != null) && (grapesEntity != null)) {
             Wine wineEntity = saveWine(newWine);
             for (Grapes grapeEntity : grapesEntity) {
                 wineGrapesService.saveWineGrapes(grapeEntity, wineEntity);
