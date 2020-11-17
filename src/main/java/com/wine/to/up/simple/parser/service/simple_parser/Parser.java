@@ -51,8 +51,10 @@ public class Parser {
      */
     public static SimpleWine parseWine(Document wineDoc) {
 
-        Map<String, ParserApi.Wine.Sugar> sugarMap = Map.of( "сухое", DRY, "полусухое", MEDIUM_DRY, "полусладкое", MEDIUM, "сладкое", SWEET);
-        Map<String, ParserApi.Wine.Color> colorMap = Map.of( "красное", RED, "розовое", ROSE, "белое", WHITE, "оранжевое", ORANGE);
+        Map<String, ParserApi.Wine.Sugar> sugarMap = Map.of("сухое", DRY, "полусухое", MEDIUM_DRY, "полусладкое",
+                MEDIUM, "сладкое", SWEET);
+        Map<String, ParserApi.Wine.Color> colorMap = Map.of("красное", RED, "розовое", ROSE, "белое", WHITE,
+                "оранжевое", ORANGE);
 
         long wineParseStart = System.currentTimeMillis();
 
@@ -61,7 +63,14 @@ public class Parser {
 
         var sw = SimpleWine.builder();
 
+        if (!wineDoc.getElementsByClass("product__header-russian-name").isEmpty()) {
         sw.name(wineDoc.getElementsByClass("product__header-russian-name").get(0).text());
+        }
+
+        if (!wineDoc.getElementsByClass("product-card-new__header-info").isEmpty()) {
+            sw.name(wineDoc.getElementsByClass("product-card-new__header-info").get(0).text());
+        }
+
         sw.rating(Float.parseFloat(wineDoc.getElementsByClass("ui-rating-stars__value").get(0).text()));
         if (wineDoc.select("img").hasClass("product-slider__slide-img")) {
             sw.image(wineDoc.getElementsByClass("product-slider__slide-img").first().attr("src"));
@@ -156,13 +165,17 @@ public class Parser {
 
         log.debug("Wine parsing takes : {}", System.currentTimeMillis() - wineParseStart);
 
+        // return
+        // SimpleWine.builder().name(wineName).brand(brandID).country(countryID).newPrice(bottlePrice)
+        // .year(bottleYear).capacity(bottleVolume).strength(bottleABV).color(colorMap.getOrDefault(colorType,
+        // RED)).grapeSort(Arrays.asList(grapeType.split(", ")))
+        // .sugar(sugarMap.getOrDefault(sugarType,
+        // DRY)).discount(bottleDiscount).region(region).link(wineDoc.baseUri())
+        // .image(bottleImage).rating(wineRating).sparkling(sparkling).taste(wineTaste)
+        // .gastronomy(wineGastronomy).oldPrice(100 * bottlePrice / (100 -
+        // bottleDiscount)).build();
 
-        // return SimpleWine.builder().name(wineName).brand(brandID).country(countryID).newPrice(bottlePrice)
-        //         .year(bottleYear).capacity(bottleVolume).strength(bottleABV).color(colorMap.getOrDefault(colorType, RED)).grapeSort(Arrays.asList(grapeType.split(", ")))
-        //         .sugar(sugarMap.getOrDefault(sugarType, DRY)).discount(bottleDiscount).region(region).link(wineDoc.baseUri())
-        //         .image(bottleImage).rating(wineRating).sparkling(sparkling).taste(wineTaste)
-        //         .gastronomy(wineGastronomy).oldPrice(100 * bottlePrice / (100 - bottleDiscount)).build();
-
-        return sw.link(wineDoc.baseUri()).discount(bottleDiscount).oldPrice(100 * bottlePrice / (100 - bottleDiscount)).build();
+        return sw.link(wineDoc.baseUri()).discount(bottleDiscount).oldPrice(100 * bottlePrice / (100 - bottleDiscount))
+                .build();
     }
 }
