@@ -1,7 +1,6 @@
 package com.wine.to.up.simple.parser.service.configuration;
 
 import com.wine.to.up.commonlib.messaging.KafkaMessageSender;
-import com.wine.to.up.demo.service.api.message.KafkaMessageSentEventOuterClass.KafkaMessageSentEvent;
 import com.wine.to.up.parser.common.api.ParserCommonApiProperties;
 import com.wine.to.up.parser.common.api.schema.ParserApi;
 import com.wine.to.up.simple.parser.service.components.SimpleParserMetricsCollector;
@@ -82,16 +81,6 @@ public class KafkaConfiguration {
      * @param metricsCollector   class encapsulating the logic of the metrics
      *                           collecting and publishing
      */
-    @Bean
-    KafkaMessageSender<KafkaMessageSentEvent> testTopicKafkaMessageSender(Properties producerProperties,
-                                                                          ParserCommonApiProperties apiProperties, SimpleParserMetricsCollector metricsCollector) {
-        // set appropriate serializer for value
-        producerProperties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
-                EventSerializer.class.getName());
-
-        return new KafkaMessageSender<>(new KafkaProducer<>(producerProperties),
-                apiProperties.getWineParsedEventsTopicName(), metricsCollector);
-    }
 
     @Bean
     KafkaMessageSender<ParserApi.WineParsedEvent> productTopicKafkaMessageSender(

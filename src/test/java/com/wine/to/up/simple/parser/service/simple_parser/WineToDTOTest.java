@@ -23,9 +23,9 @@ class WineToDTOTest {
     private SimpleWine wine;
     private WineMapper wineMapper;
     private WineToDTO wineToDTO;
+  
     private final Map<String, ParserApi.Wine.Sugar> sugarMap = Map.of("сухое", DRY, "полусухое", MEDIUM_DRY, "полусладкое", MEDIUM, "сладкое", SWEET);
     private final Map<String, ParserApi.Wine.Color> colorMap = Map.of("красное", RED, "розовое", ROSE, "белое", WHITE, "оранжевое", ORANGE);
-
 
 
     @BeforeEach
