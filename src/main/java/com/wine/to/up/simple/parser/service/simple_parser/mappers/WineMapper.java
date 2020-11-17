@@ -15,7 +15,10 @@ public class WineMapper {
         this.modelMapper = modelMapper;
     }
 
-
+    /**
+     * @param wine
+     * @return New wine
+     */
     public ParserApi.Wine.Builder toKafka(SimpleWine wine) {
 
         //The final type, which is written in protobuf3, cannot be manually configured in beans. The converter doesn't help.

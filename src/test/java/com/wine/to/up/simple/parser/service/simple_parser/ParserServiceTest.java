@@ -23,9 +23,6 @@ import java.lang.reflect.Field;
  */
 @RunWith(MockitoJUnitRunner.class)
 class ParserServiceTest {
-    /**
-     * Testing {@link ParserService#urlToDocument(String)} method
-     */
 
     @Mock
     private ParserService parserService;
@@ -47,6 +44,10 @@ class ParserServiceTest {
         ReflectionTestUtils.setField(parserService, "wineMapper", modelMapper1);
     }
 
+    /**
+     * Testing {@link ParserService#urlToDocument(String)} method
+     * Trying to create Jsoup Document from URL
+     */
     @Test
     void testURLtoDocument() {
         Document doc = ParserService.urlToDocument("https://simplewine.ru/catalog/product/lindeman_s_bin_50_shiraz_2018_075/");

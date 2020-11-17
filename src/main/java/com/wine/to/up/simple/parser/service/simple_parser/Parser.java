@@ -26,6 +26,8 @@ import static com.wine.to.up.parser.common.api.schema.ParserApi.Wine.Sugar.SWEET
 public class Parser {
 
     /**
+     * Parsing number of pages from catalog URL
+     *
      * @param mainPage URL of simplewine main page
      * @return Number of pages with wines
      */
@@ -42,7 +44,10 @@ public class Parser {
     }
 
     /**
+     * Parsing wine info
+     *
      * @param wineDoc Jsoup Document of wine
+     * @return wine {@link SimpleWine}
      */
     public static SimpleWine parseWine(Document wineDoc) {
 
