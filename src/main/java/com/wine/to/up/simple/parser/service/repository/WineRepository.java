@@ -1,21 +1,43 @@
 package com.wine.to.up.simple.parser.service.repository;
 
 import com.wine.to.up.simple.parser.service.domain.entity.Wine;
-import org.apache.kafka.common.protocol.types.Field;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
+/**
+ * The repository that stores all info about wine (Wine Entities).
+ */
 @Repository
 public interface WineRepository extends CrudRepository<Wine, UUID> {
-    Wine findWineByName(String name);
-    Wine findWineByNameAndPriceAndVolumeAndColorTypeAndSugarType(String name, Float price, Float volume, String ColorType, String SugarType);
 
-    @Query("SELECT w.wineID FROM Wine w WHERE w.name=?1")
-    UUID getIdByName(String name);
+    /**
+     * Finding a wine by name, price, volume, colo, sugar. Full compliance.
+     *
+     * @return found instance of the Wine entity.
+     */
+    Wine findWineByNameAndNewPriceAndCapacityAndColorAndSugar(String name, Float price, Float volume, String colorType, String sugarType);
 
-    Boolean existsWineByNameAndPrice(String name, float price);
-    Boolean existsWineByNameAndPriceAndVolumeAndColorTypeAndSugarType(String name, Float price, Float volume, String ColorType, String SugarType);
+    /**
+     * Finding a wine by link and price. One wine has one link.
+     *
+     * @param link  link to the wine page
+     * @param price wine price
+     * @return found instance of the Wine entity.
+     */
+    Wine findWineByLinkAndNewPrice(String link, float price);
+
+    /**
+     * Existence check by link and price. One wine has one link.
+     *
+     * @param link  link to the wine page
+     * @param price wine price
+     */
+    Boolean existsWineByLinkAndNewPrice(String link, float price);
+
+    /**
+     * Existence check by name, price, volume, colo, sugar. Full compliance.
+     */
+    Boolean existsWineByNameAndNewPriceAndCapacityAndColorAndSugarAndYear(String name, Float price, Float volume, String colorType, String sugarType, int year);
 }
