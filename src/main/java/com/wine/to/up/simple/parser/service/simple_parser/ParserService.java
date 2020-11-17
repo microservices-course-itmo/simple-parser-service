@@ -43,6 +43,8 @@ public class ParserService {
     }
 
     /**
+     * Creating Jsoup Document from URL
+     *
      * @param someURL URL to get jsoup Document
      * @return Jsoup Document class
      */
@@ -63,6 +65,11 @@ public class ParserService {
         return wineDoc;
     }
 
+    /**
+     * Parsing wines, collecting and sending to Kafka
+     *
+     * @param pagesToParse
+     */
     private void parser(int pagesToParse) {
         long start = System.currentTimeMillis();
 
@@ -131,6 +138,14 @@ public class ParserService {
         return messageToKafka;
     }
 
+    /**
+     * Adding wine to the Product list
+     *
+     * @param wineURL
+     * @param products
+     * @param dbHandler
+     * @param wineCounter
+     */
     private void addWineToProducts(String wineURL, List<ParserApi.Wine> products, WineService dbHandler, AtomicInteger wineCounter) {
         SimpleWine wine = Parser.parseWine(urlToDocument(url + wineURL));
         saveWineToDB(wine, dbHandler);
@@ -141,6 +156,12 @@ public class ParserService {
         log.trace("Wine: {} added to database", wineCounter.getAndIncrement());
     }
 
+    /**
+     * Saving all parsed wines info to database
+     *
+     * @param wine
+     * @param dbHandler
+     */
     private void saveWineToDB(SimpleWine wine, WineService dbHandler) {
         try {
             if ((wine.getBrand() != null) && (wine.getCountry() != null)
@@ -153,6 +174,13 @@ public class ParserService {
         }
     }
 
+    /**
+     * Collecting all wine URLs
+     *
+     * @param pageCounter
+     * @param wineURLs
+     * @param pagesToParse
+     */
     private void addWineUrls(AtomicLong pageCounter, ArrayBlockingQueue<String> wineURLs, int pagesToParse) {
         try {
             while (pageCounter.longValue() <= pagesToParse) {
@@ -170,6 +198,9 @@ public class ParserService {
         }
     }
 
+    /**
+     * @param products
+     */
     private void generateMessageToKafka(List<ParserApi.Wine> products) {
         if (products.isEmpty()) {
             log.error("\t Z E R O\tP A R S I N G");
