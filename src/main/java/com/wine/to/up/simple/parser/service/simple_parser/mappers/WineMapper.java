@@ -23,8 +23,11 @@ public class WineMapper {
 
         //The final type, which is written in protobuf3, cannot be manually configured in beans. The converter doesn't help.
         ParserApi.Wine.Builder newWine = modelMapper.map(wine, ParserApi.Wine.Builder.class)
-                .addRegion(wine.getRegion())
-                .addAllGrapeSort(wine.getGrapeSort());
+                .addRegion(wine.getRegion());
+
+        if (wine.getGrapeSort() != null) {
+            newWine.addAllGrapeSort(wine.getGrapeSort());
+        }
 
         //We wait when UNRECOGNIZED gets a numeric value.
         if (wine.getSugar() != null && wine.getSugar() != ParserApi.Wine.Sugar.UNRECOGNIZED) {
