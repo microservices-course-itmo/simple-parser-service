@@ -1,5 +1,8 @@
 package com.wine.to.up.simple.parser.service.simple_parser;
 
+import com.wine.to.up.commonlib.messaging.KafkaMessageSender;
+import com.wine.to.up.parser.common.api.schema.ParserApi;
+import com.wine.to.up.simple.parser.service.simple_parser.db_handler.WineService;
 import com.wine.to.up.simple.parser.service.simple_parser.mappers.WineMapper;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Assertions;
@@ -15,7 +18,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 import static org.junit.Assert.*;
 import static org.modelmapper.convention.MatchingStrategies.STRICT;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 
 /**
@@ -25,13 +27,14 @@ import java.lang.reflect.Field;
 class ParserServiceTest {
 
     @Mock
+    private KafkaMessageSender<ParserApi.WineParsedEvent> kafkaSendMessageService;
+    @Mock
+    private WineService wineService;
     private ParserService parserService;
 
     @BeforeEach
     public void init() {
         MockitoAnnotations.initMocks(this);
-        ReflectionTestUtils.setField(parserService, "url", "https://simplewine.ru");
-        ReflectionTestUtils.setField(parserService, "wineUrl", "https://simplewine.ru/catalog/vino/page");
         ModelMapper modelMapper = new ModelMapper();
         modelMapper
                 .getConfiguration()
@@ -40,8 +43,10 @@ class ParserServiceTest {
                 .setFieldAccessLevel(org.modelmapper.config.Configuration.AccessLevel.PRIVATE)
                 .setMatchingStrategy(STRICT)
                 .setAmbiguityIgnored(true);
-        WineMapper modelMapper1 = new WineMapper(modelMapper);
-        ReflectionTestUtils.setField(parserService, "wineMapper", modelMapper1);
+        WineMapper wineMapper = new WineMapper(modelMapper);
+        parserService = new ParserService(kafkaSendMessageService, wineService, wineMapper);
+        ReflectionTestUtils.setField(parserService, "url", "https://simplewine.ru");
+        ReflectionTestUtils.setField(parserService, "wineUrl", "https://simplewine.ru/catalog/vino/page");
     }
 
     /**
@@ -55,6 +60,17 @@ class ParserServiceTest {
     }
 
     @Test
+    void testURLtoDocumentWrongUrl() {
+        assertThrows(IllegalArgumentException.class, () -> ParserService.urlToDocument("Mem"));
+    }
+
+    @Test
+    void testURLtoDocumentWrongSite() {
+        Document doc = ParserService.urlToDocument("https://www.google.ru/");
+        assertNotNull(doc);
+    }
+
+    @Test
     void testGetMessage() throws NoSuchFieldException, IllegalAccessException {
         Field f = ParserService.class.getDeclaredField("messageToKafka");
         f.setAccessible(true);
@@ -65,4 +81,16 @@ class ParserServiceTest {
     void testStartParser() {
         Assertions.assertDoesNotThrow(() -> parserService.startParser(1));
     }
+
+    @Test
+    void testStartParserNegative() {
+        Assertions.assertDoesNotThrow(() -> parserService.startParser(-1));
+    }
+
+    @Test
+    void testStartParserLimitExceeded() {
+        Assertions.assertDoesNotThrow(() -> parserService.startParser(100500));
+    }
+
+
 }
