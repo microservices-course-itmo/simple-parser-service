@@ -68,7 +68,7 @@ public class ParserService {
     /**
      * Parsing wines, collecting and sending to Kafka
      *
-     * @param pagesToParse
+     * @param pagesToParse number pages to parse
      */
     private void parser(int pagesToParse) {
         long start = System.currentTimeMillis();
@@ -205,7 +205,7 @@ public class ParserService {
         if (products.isEmpty()) {
             log.error("\t Z E R O\tP A R S I N G");
         } else {
-            ParserApi.WineParsedEvent message;
+            ParserApi.WineParsedEvent message = null;
             if (products.size() >= 1000) {
                 int messageSize = (int) Math.round(products.size() / 4.0);
                 for (int i = 0; i < 4; i++) {
@@ -215,12 +215,11 @@ public class ParserService {
                     else
                         message = ParserApi.WineParsedEvent.newBuilder()
                                 .addAllWines(products.subList(i * messageSize, (i + 1) * messageSize - 1)).build();
-                    kafkaSendMessageService.sendMessage(message);
                 }
             } else {
                 message = ParserApi.WineParsedEvent.newBuilder().addAllWines(products).build();
-                kafkaSendMessageService.sendMessage(message);
             }
+            kafkaSendMessageService.sendMessage(message);
             messageToKafka = ParserApi.WineParsedEvent.newBuilder().addAllWines(products).build();
         }
     }

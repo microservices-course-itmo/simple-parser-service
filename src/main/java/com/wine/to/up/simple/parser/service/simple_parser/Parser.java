@@ -8,6 +8,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
+
 import java.util.Arrays;
 import java.util.Map;
 
@@ -63,13 +64,14 @@ public class Parser {
 
         var sw = SimpleWine.builder();
 
-        if (!wineDoc.getElementsByClass("product__header-russian-name").isEmpty()) {
-        sw.name(wineDoc.getElementsByClass("product__header-russian-name").get(0).text());
+        if (!wineDoc.select(".product__header-russian-name").isEmpty()) {
+            sw.name(wineDoc.getElementsByClass("product__header-russian-name").get(0).text());
+        } else if (!wineDoc.getElementsByClass("product-card-new__header-info").isEmpty()) {
+            sw.name(wineDoc.getElementsByClass("product-card-new__header-info").get(0).text());
+        } else {
+            log.error("fffffffffffffffffffffff");
         }
 
-        if (!wineDoc.getElementsByClass("product-card-new__header-info").isEmpty()) {
-            sw.name(wineDoc.getElementsByClass("product-card-new__header-info").get(0).text());
-        }
 
         sw.rating(Float.parseFloat(wineDoc.getElementsByClass("ui-rating-stars__value").get(0).text()));
         if (wineDoc.select("img").hasClass("product-slider__slide-img")) {
@@ -78,17 +80,21 @@ public class Parser {
 
         log.debug("Fetch wine position page takes : {}", System.currentTimeMillis() - wineParseStart);
         Elements prices = wineDoc.getElementsByClass("product__buy-price");
-        if (prices.get(0).childrenSize() > 1) {
-            bottlePrice = Float.parseFloat(prices.get(0).child(1).text().replaceAll(" |₽", ""));
-            bottleDiscount = Float.parseFloat(prices.get(0).child(2).text().replaceAll("-|%", ""));
-            sw.newPrice(bottlePrice);
-            sw.discount(bottleDiscount);
+        if (!prices.get(0).child(0).text().equals("")) {
+            if (prices.get(0).childrenSize() > 1) {
+                bottlePrice = Float.parseFloat(prices.get(0).child(1).text().replaceAll(" |₽", ""));
+                bottleDiscount = Float.parseFloat(prices.get(0).child(2).text().replaceAll("-|%", ""));
+            } else {
+                bottlePrice = Float.parseFloat(prices.get(0).child(0).text().replaceAll(" |₽", ""));
+                bottleDiscount = 0;
+            }
         } else {
-            bottlePrice = Float.parseFloat(prices.get(0).child(0).text().replaceAll(" |₽", ""));
+            bottlePrice = 0;
             bottleDiscount = 0;
-            sw.newPrice(bottlePrice);
-            sw.discount(bottleDiscount);
         }
+        sw.newPrice(bottlePrice);
+        sw.discount(bottleDiscount);
+
 
         Elements productFacts = wineDoc.getElementsByClass("product__facts-info-text");
         for (Element productFact : productFacts) {
