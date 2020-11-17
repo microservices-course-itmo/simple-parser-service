@@ -2,6 +2,7 @@ package com.wine.to.up.simple.parser.service.simple_parser;
 
 import com.wine.to.up.parser.common.api.schema.ParserApi;
 import com.wine.to.up.simple.parser.service.simple_parser.mappers.WineMapper;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -13,9 +14,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import static com.wine.to.up.parser.common.api.schema.ParserApi.Wine.Color.*;
-import static com.wine.to.up.parser.common.api.schema.ParserApi.Wine.Color.ORANGE;
 import static com.wine.to.up.parser.common.api.schema.ParserApi.Wine.Sugar.*;
-import static com.wine.to.up.parser.common.api.schema.ParserApi.Wine.Sugar.SWEET;
 import static org.junit.Assert.*;
 import static org.modelmapper.convention.MatchingStrategies.STRICT;
 
@@ -24,6 +23,9 @@ class WineToDTOTest {
     private SimpleWine wine;
     private WineMapper wineMapper;
     private WineToDTO wineToDTO;
+  
+    private final Map<String, ParserApi.Wine.Sugar> sugarMap = Map.of("сухое", DRY, "полусухое", MEDIUM_DRY, "полусладкое", MEDIUM, "сладкое", SWEET);
+    private final Map<String, ParserApi.Wine.Color> colorMap = Map.of("красное", RED, "розовое", ROSE, "белое", WHITE, "оранжевое", ORANGE);
 
 
     @BeforeEach
@@ -75,9 +77,6 @@ class WineToDTOTest {
             "оранжевое,полусладкое",
             "фиолетовое,горькое"})
     void testGetProtoWine(String colorType, String sugarType) {
-        Map<String, ParserApi.Wine.Sugar> sugarMap = Map.of("сухое", DRY, "полусухое", MEDIUM_DRY, "полусладкое", MEDIUM, "сладкое", SWEET);
-        Map<String, ParserApi.Wine.Color> colorMap = Map.of("красное", RED, "розовое", ROSE, "белое", WHITE, "оранжевое", ORANGE);
-
         wine.setColor(colorMap.getOrDefault(colorType, RED));
         wine.setSugar(sugarMap.getOrDefault(sugarType, DRY));
 
