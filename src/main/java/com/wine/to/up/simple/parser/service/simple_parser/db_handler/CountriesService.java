@@ -3,6 +3,7 @@ package com.wine.to.up.simple.parser.service.simple_parser.db_handler;
 import com.wine.to.up.simple.parser.service.domain.entity.Countries;
 import com.wine.to.up.simple.parser.service.repository.CountriesRepository;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -11,18 +12,12 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class CountriesService {
     /**
      * The repository that stores countries info (name, id)
      */
     private final CountriesRepository countriesRepository;
-
-    /**
-     * The service instance creation.
-     */
-    public CountriesService(@NonNull CountriesRepository countriesRepository) {
-        this.countriesRepository = countriesRepository;
-    }
 
     /**
      * Adding to DB with an existence check before

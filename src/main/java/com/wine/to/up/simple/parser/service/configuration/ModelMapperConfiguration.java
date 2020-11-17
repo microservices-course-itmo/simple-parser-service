@@ -42,14 +42,14 @@ public class ModelMapperConfiguration {
 
         Map<ParserApi.Wine.Color, String> colorMap = Map.of(RED, "красное", ROSE, "розовое", WHITE, "белое", ORANGE, "оранжевое", ParserApi.Wine.Color.UNRECOGNIZED, "");
         Map<ParserApi.Wine.Sugar, String> sugarMap = Map.of(DRY, "сухое", MEDIUM_DRY, "полусухое", MEDIUM, "полусладкое", SWEET, "сладкое", ParserApi.Wine.Sugar.UNRECOGNIZED, "");
-        Converter<ParserApi.Wine.Color, String> colorToString = ctx -> ctx.getSource() == null ? null : colorMap.getOrDefault(ctx.getSource(), "");
-        Converter<ParserApi.Wine.Sugar, String> sugarToString = ctx -> ctx.getSource() == null ? null : sugarMap.getOrDefault(ctx.getSource(), "");
+        Converter<ParserApi.Wine.Color, String> colorToString = ctx -> ctx.getSource() == null ? "нет информации" : colorMap.getOrDefault(ctx.getSource(), "иное");
+        Converter<ParserApi.Wine.Sugar, String> sugarToString = ctx -> ctx.getSource() == null ? "нет информации" : sugarMap.getOrDefault(ctx.getSource(), "иное");
 
         PropertyMap<SimpleWine, Wine> propertyMapDB = new PropertyMap<>() {
             protected void configure() {
                 skip().setWineID(null);
-                using(sugarToString).map(source.getSugar()).setSugar(null);
-                using(colorToString).map(source.getColor()).setColor(null);
+                using(sugarToString).map(source.getSugar()).setSugar("");
+                using(colorToString).map(source.getColor()).setColor("");
                 map().setBrandID(source.getBrandID());
                 map().setCountryID(source.getCountryID());
                 map().setGrapeSort(String.valueOf(source.getGrapeSort()));

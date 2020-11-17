@@ -3,6 +3,7 @@ package com.wine.to.up.simple.parser.service.simple_parser.db_handler;
 import com.wine.to.up.simple.parser.service.domain.entity.Grapes;
 import com.wine.to.up.simple.parser.service.repository.GrapesRepository;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -11,18 +12,12 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class GrapesService {
     /**
      * The repository that stores grape sorts info (name, id)
      */
     private final GrapesRepository grapesRepository;
-
-    /**
-     * The service instance creation.
-     */
-    public GrapesService(@NonNull GrapesRepository grapesRepository) {
-        this.grapesRepository = grapesRepository;
-    }
 
     /**
      * Adding to DB with an existence check before
@@ -31,7 +26,7 @@ public class GrapesService {
      * @return instance of the {@link Grapes} entity
      * @see GrapesRepository
      */
-    protected Grapes saveGrape(String grape) {
+    protected Grapes saveGrape(@NonNull String grape) {
         if (Boolean.FALSE.equals(grapesRepository.existsGrapesByGrapeName(grape))) {
             grapesRepository.save(new Grapes(grape));
             log.trace("New Brand was added to DB: {}", grape);

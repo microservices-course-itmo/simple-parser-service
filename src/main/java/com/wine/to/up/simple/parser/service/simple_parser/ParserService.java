@@ -10,7 +10,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import com.wine.to.up.commonlib.messaging.KafkaMessageSender;
 import com.wine.to.up.parser.common.api.schema.ParserApi;
 import com.wine.to.up.simple.parser.service.simple_parser.db_handler.WineService;
-import com.wine.to.up.simple.parser.service.repository.*;
 import com.wine.to.up.simple.parser.service.simple_parser.mappers.WineMapper;
 import org.jsoup.*;
 import org.jsoup.nodes.Document;
@@ -18,7 +17,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -34,22 +32,15 @@ public class ParserService {
     private final ExecutorService pagesExecutor = Executors.newSingleThreadExecutor();
     private final ExecutorService winesExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
 
-    @Autowired
-    KafkaMessageSender<ParserApi.WineParsedEvent> kafkaSendMessageService;
-    @Autowired
-    private GrapesRepository grapesRepository;
-    @Autowired
-    private BrandsRepository brandsRepository;
-    @Autowired
-    private CountriesRepository countriesRepository;
-    @Autowired
-    private WineGrapesRepository wineGrapesRepository;
-    @Autowired
-    private WineRepository wineRepository;
-    @Autowired
-    private WineMapper modelMapper;
-    @Autowired
-    private WineToDTO wineToDTO;
+    private final KafkaMessageSender<ParserApi.WineParsedEvent> kafkaSendMessageService;
+    private final WineService wineService;
+    private final WineMapper wineMapper;
+
+    public ParserService(KafkaMessageSender<ParserApi.WineParsedEvent> kafkaSendMessageService, WineService wineService, WineMapper wineMapper) {
+        this.kafkaSendMessageService = kafkaSendMessageService;
+        this.wineService = wineService;
+        this.wineMapper = wineMapper;
+    }
 
     /**
      * @param someURL URL to get jsoup Document
@@ -77,9 +68,6 @@ public class ParserService {
 
         List<CompletableFuture<?>> futures = new ArrayList<>();
         ArrayBlockingQueue<String> wineURLs = new ArrayBlockingQueue<>(100_000);
-
-        WineService dbHandler = new WineService(grapesRepository, brandsRepository, countriesRepository,
-                wineGrapesRepository, wineRepository, modelMapper);
         List<ParserApi.Wine> products = new ArrayList<>();
 
         AtomicLong pageCounter = new AtomicLong(1);
@@ -97,7 +85,7 @@ public class ParserService {
                         if (wineURL == null) {
                             return;
                         }
-                        addWineToProducts(wineURL, products, dbHandler, wineCounter);
+                        addWineToProducts(wineURL, products, wineService, wineCounter);
                     }
                 } catch (InterruptedException e) {
                     log.error("Interrupt ", e);
@@ -131,7 +119,7 @@ public class ParserService {
      * Multithreading simplewine parser with maximum number of pages
      */
     public void startParser() {
-        parser(Parser.parseNumberOfPages(urlToDocument(url)));
+        parser(Parser.parseNumberOfPages(urlToDocument(url + "/catalog/vino/")));
     }
 
     /**
@@ -146,7 +134,7 @@ public class ParserService {
     private void addWineToProducts(String wineURL, List<ParserApi.Wine> products, WineService dbHandler, AtomicInteger wineCounter) {
         SimpleWine wine = Parser.parseWine(urlToDocument(url + wineURL));
         saveWineToDB(wine, dbHandler);
-        ParserApi.Wine newProduct = wineToDTO.getProtoWine(wine);
+        ParserApi.Wine newProduct = wineMapper.toKafka(wine).build();
         if (!products.contains(newProduct)) {
             products.add(newProduct);
         }

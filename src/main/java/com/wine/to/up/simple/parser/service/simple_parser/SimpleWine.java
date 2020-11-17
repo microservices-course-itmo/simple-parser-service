@@ -24,8 +24,10 @@ public class SimpleWine {
     private Brands brandID;
     private String country;
     private Countries countryID;
-    private Float capacity;
-    private Float strength; // alcohol by volume
+    @Builder.Default
+    private Float capacity = 0.0f;
+    @Builder.Default
+    private Float strength = 0.0f; // alcohol by volume
     private ParserApi.Wine.Color color;
     private ParserApi.Wine.Sugar sugar;
     private Integer year;

@@ -3,6 +3,7 @@ package com.wine.to.up.simple.parser.service.simple_parser.db_handler;
 import com.wine.to.up.simple.parser.service.domain.entity.Brands;
 import com.wine.to.up.simple.parser.service.repository.BrandsRepository;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -11,20 +12,12 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class BrandsService {
     /**
      * The repository that stores brands info (name, id)
      */
     private final BrandsRepository brandsRepository;
-
-    /**
-     * The service instance creation.
-     *
-     * @param brandsRepository not an empty {@link BrandsRepository}
-     */
-    public BrandsService(@NonNull BrandsRepository brandsRepository) {
-        this.brandsRepository = brandsRepository;
-    }
 
     /**
      * Adding to DB with an existence check before
