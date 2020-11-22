@@ -67,6 +67,7 @@ public class Parser {
         if (wineDoc.is(":has(.product__header-russian-name)")) {
             sw.name(wineDoc.getElementsByClass("product__header-russian-name").get(0).text());
         } else if (wineDoc.is(":has(.product-card-new__header-info)")) {
+            // log.debug("HEREEEE");
             sw.name(wineDoc.getElementsByClass("product-card-new__header-info").get(0).text());
         } else {
             log.error("The layout has been changed!");
@@ -97,26 +98,30 @@ public class Parser {
         sw.discount(bottleDiscount);
 
 
-        Elements productFacts = wineDoc.getElementsByClass("product__facts-info-text");
+        Elements productFacts = wineDoc.getElementsByClass("product-info__list-item");
         for (Element productFact : productFacts) {
             if (productFact.childrenSize() > 0) {
-                String href = productFact.child(0).attr("href");
-                String fact = href.split("/")[4].split("(-|_)")[0];
+                // String href = productFact.child(0).attr("href");
+                // String fact = href.split("/")[4].split("(-|_)")[0];
+                String fact = productFact.child(0).text();
                 switch (fact) {
-                    case "country":
-                        sw.country(productFact.text().split(",")[0]);
+                    case "Страна, регион:":
+                        sw.country(productFact.child(1).text().split(",")[0]);
                         break;
-                    case "color":
+                    case "Вино:":
                         // colorType = productFact.text();
-                        sw.color(colorMap.getOrDefault(productFact.text(), RED));
+                        sw.color(colorMap.getOrDefault(productFact.child(1).text(), RED));
                         break;
-                    case "sugar":
+                    case "Сахар:":
                         // sugarType = productFact.text();
-                        sw.sugar(sugarMap.getOrDefault(productFact.text(), DRY));
+                        sw.sugar(sugarMap.getOrDefault(productFact.child(1).text(), DRY));
                         break;
-                    case "grape":
+                    case "Виноград:":
                         // grapeType = productFact.text();
-                        sw.grapeSort(Arrays.asList(productFact.text().split(", ")));
+                        sw.grapeSort(Arrays.asList(productFact.child(1).text().split(", ")));
+                        break;
+                    case "Производитель:":
+                        sw.brand(productFact.child(1).text());
                         break;
                     case "aging":
                         break;
@@ -134,9 +139,7 @@ public class Parser {
                 case "Регион:":
                     sw.region(productCharateristic.child(1).text());
                     break;
-                case "Производитель:":
-                    sw.brand(productCharateristic.child(1).text());
-                    break;
+
                 case "Объем:":
                     // bottleVolume = Float.parseFloat(productCharateristic.child(1).text());
                     sw.capacity(Float.parseFloat(productCharateristic.child(1).text()));
