@@ -73,19 +73,20 @@ public class Parser {
         }
 
 
-        sw.rating(Float.parseFloat(wineDoc.getElementsByClass("ui-rating-stars__value").get(0).text()));
+        sw.rating(Float.parseFloat(wineDoc.getElementsByClass("product-info__raiting-count").get(0).text()));
         if (wineDoc.select("img").hasClass("product-slider__slide-img")) {
             sw.image(wineDoc.getElementsByClass("product-slider__slide-img").first().attr("src"));
         }
 
         log.debug("Fetch wine position page takes : {}", System.currentTimeMillis() - wineParseStart);
-        Elements prices = wineDoc.getElementsByClass("product__buy-price");
-        if (!prices.get(0).child(0).text().equals("")) {
-            if (prices.get(0).childrenSize() > 1) {
-                bottlePrice = Float.parseFloat(prices.get(0).child(1).text().replaceAll(" |₽", ""));
-                bottleDiscount = Float.parseFloat(prices.get(0).child(2).text().replaceAll("-|%", ""));
+        Elements prices = wineDoc.getElementsByClass("product-buy__price");
+        Elements discounts = wineDoc.getElementsByClass("product-buy__old-price product-buy__with-one");
+        if (!prices.get(0).text().equals("")) {
+            if (!discounts.isEmpty()) {
+                bottlePrice = Float.parseFloat(prices.get(0).text().replaceAll(" |₽", "").replaceAll("-[0-9]{1,}%", ""));
+                bottleDiscount = Float.parseFloat(prices.get(0).text().split("-")[1].replaceAll("%", ""));
             } else {
-                bottlePrice = Float.parseFloat(prices.get(0).child(0).text().replaceAll(" |₽", ""));
+                bottlePrice = Float.parseFloat(prices.get(0).text().replaceAll(" |₽", ""));
                 bottleDiscount = 0;
             }
         } else {

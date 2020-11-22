@@ -52,7 +52,7 @@ public class ParserService {
         Document wineDoc = null;
         try {
             wineDoc = Jsoup.connect(someURL).get();
-            while (!(wineDoc.getElementsByClass("product-page").first().children().first().className().equals("product"))) {
+            while (!(wineDoc.getElementsByClass("product-page").first().children().first().className().equals("container"))) {
                 log.debug("Doing re-request...");
                 wineDoc = Jsoup.connect(someURL).get();
             }
