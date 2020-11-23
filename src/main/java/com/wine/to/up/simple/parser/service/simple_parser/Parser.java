@@ -63,12 +63,17 @@ public class Parser {
         float bottleDiscount = 0;
 
         var sw = SimpleWine.builder();
+        
+        String header = wineDoc.select("h1").get(0).text();
+        if (header.matches(".{0,}(Игристое|Шипучее|Шампанское).{0,}")) {
+            sw.sparkling(true);
+        }
 
         if (wineDoc.is(":has(.product__header-russian-name)")) {
-            sw.name(wineDoc.getElementsByClass("product__header-russian-name").get(0).text());
+            sw.name(wineDoc.getElementsByClass("product__header-russian-name").get(0).text().split(" ")[2]);
         } else if (wineDoc.is(":has(.product-card-new__header-info)")) {
             // log.debug("HEREEEE");
-            sw.name(wineDoc.getElementsByClass("product-card-new__header-info").get(0).text());
+            sw.name(wineDoc.getElementsByClass("product-card-new__header-info").get(0).text().split(" ")[2]);
         } else {
             log.error("The layout has been changed!");
         }
@@ -123,6 +128,11 @@ public class Parser {
                     case "Производитель:":
                         sw.brand(productFact.child(1).text());
                         break;
+                    
+                    case "Объем:":
+                        // bottleVolume = Float.parseFloat(productCharateristic.child(1).text());
+                        sw.capacity(Float.parseFloat(productFact.child(1).text().replaceAll(" |л", "")));
+                        break;
                     case "aging":
                         break;
 
@@ -140,10 +150,6 @@ public class Parser {
                     sw.region(productCharateristic.child(1).text());
                     break;
 
-                case "Объем:":
-                    // bottleVolume = Float.parseFloat(productCharateristic.child(1).text());
-                    sw.capacity(Float.parseFloat(productCharateristic.child(1).text()));
-                    break;
                 case "Год:":
                     sw.year(Integer.parseInt(productCharateristic.child(1).text()));
                     break;

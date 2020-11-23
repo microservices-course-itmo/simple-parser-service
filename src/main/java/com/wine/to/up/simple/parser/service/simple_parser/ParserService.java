@@ -27,6 +27,8 @@ public class ParserService {
     private String url;
     @Value("${parser.wineurl}")
     private String wineUrl;
+    @Value("${parser.sparkling_wineurl}")
+    private String sparklingWineUrl;
     private static final int NUMBER_OF_THREADS = 15;
     private ParserApi.WineParsedEvent messageToKafka;
     private final ExecutorService pagesExecutor = Executors.newSingleThreadExecutor();
@@ -52,9 +54,11 @@ public class ParserService {
         Document wineDoc = null;
         try {
             wineDoc = Jsoup.connect(someURL).get();
-            while (!(wineDoc.getElementsByClass("product-page").first().children().first().className().equals("container"))) {
-                log.debug("Doing re-request...");
+            int rerequestNumber = 0;
+            while (!wineDoc.getElementsByClass("product-page").first().children().first().className().equals("container") && (rerequestNumber < 3)) {
+                log.debug("Doing re-request: {}", rerequestNumber);
                 wineDoc = Jsoup.connect(someURL).get();
+                rerequestNumber++;
             }
 
         } catch (IOException e) {
@@ -70,7 +74,7 @@ public class ParserService {
      *
      * @param pagesToParse number pages to parse
      */
-    private void parser(int pagesToParse) {
+    private void parser(int pagesToParse, int sparklingPagesToParse) {
         long start = System.currentTimeMillis();
 
         List<CompletableFuture<?>> futures = new ArrayList<>();
@@ -78,8 +82,9 @@ public class ParserService {
         List<ParserApi.Wine> products = new ArrayList<>();
 
         AtomicLong pageCounter = new AtomicLong(1);
+        AtomicLong sparklingPageCounter = new AtomicLong(1);
         for (int i = 0; i < NUMBER_OF_THREADS; i++) {
-            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> addWineUrls(pageCounter, wineURLs, pagesToParse), pagesExecutor);
+            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> addWineUrls(pageCounter, sparklingPageCounter, wineURLs, pagesToParse, sparklingPagesToParse), pagesExecutor);
             futures.add(future);
         }
 
@@ -114,9 +119,11 @@ public class ParserService {
     /**
      * Multithreading simplewine parser with a specified number of pages
      */
-    public void startParser(int pagesToParse) {
-        if (pagesToParse <= Parser.parseNumberOfPages(urlToDocument(url + "/catalog/vino/")) && (pagesToParse > 0)) {
-            parser(pagesToParse);
+    public void startParser(int pagesToParse, int sparklingPagesToParse) {
+        if (pagesToParse <= Parser.parseNumberOfPages(urlToDocument(url + "/catalog/vino/")) 
+        && sparklingPagesToParse <= Parser.parseNumberOfPages(urlToDocument(url + "/catalog/shampanskoe_i_igristoe_vino/"))
+        && (pagesToParse * sparklingPagesToParse > 0) ) {
+            parser(pagesToParse, sparklingPagesToParse);
         } else {
             log.error("Set invalid number of pages: {}", pagesToParse);
         }
@@ -126,7 +133,7 @@ public class ParserService {
      * Multithreading simplewine parser with maximum number of pages
      */
     public void startParser() {
-        parser(Parser.parseNumberOfPages(urlToDocument(url + "/catalog/vino/")));
+        parser(Parser.parseNumberOfPages(urlToDocument(url + "/catalog/vino/")), Parser.parseNumberOfPages(urlToDocument(url + "catalog/shampanskoe_i_igristoe_vino/")));
     }
 
     /**
@@ -147,8 +154,9 @@ public class ParserService {
      * @param wineCounter
      */
     private void addWineToProducts(String wineURL, List<ParserApi.Wine> products, WineService dbHandler, AtomicInteger wineCounter) {
-        if (urlToDocument(url + wineURL) != null) {
-            SimpleWine wine = Parser.parseWine(urlToDocument(url + wineURL));
+        Document wineDocument = urlToDocument(url + wineURL);
+        if (wineDocument != null && wineDocument.getElementsByClass("product-page").first().children().first().className().equals("container")) {
+            SimpleWine wine = Parser.parseWine(wineDocument);
             saveWineToDB(wine, dbHandler);
             ParserApi.Wine newProduct = wineMapper.toKafka(wine).build();
             if (!products.contains(newProduct)) {
@@ -184,7 +192,7 @@ public class ParserService {
      * @param wineURLs
      * @param pagesToParse
      */
-    private void addWineUrls(AtomicLong pageCounter, ArrayBlockingQueue<String> wineURLs, int pagesToParse) {
+    private void addWineUrls(AtomicLong pageCounter, AtomicLong sparklingPageCounter, ArrayBlockingQueue<String> wineURLs, int pagesToParse, int sparklingPagesToParse) {
         try {
             while (pageCounter.longValue() <= pagesToParse) {
                 Document doc = Jsoup.connect(wineUrl + pageCounter.get()).get();
@@ -195,6 +203,16 @@ public class ParserService {
                 }
                 log.debug("Parsed {} wines from url {}", wines.size(),
                         wineUrl + pageCounter.getAndIncrement());
+            }
+            while (sparklingPageCounter.longValue() <= sparklingPagesToParse) {
+                Document doc = Jsoup.connect(sparklingWineUrl + sparklingPageCounter.get()).get();
+                Elements wines = doc.getElementsByClass("catalog-grid__item");
+                for (Element wine : wines) {
+                    if (!wineURLs.contains(wine.getElementsByClass("product-snippet__name").attr("href")))
+                        wineURLs.add(wine.getElementsByClass("product-snippet__name").attr("href"));
+                }
+                log.debug("Parsed {} wines from url {}", wines.size(),
+                        wineUrl + sparklingPageCounter.getAndIncrement());
             }
         } catch (IOException e) {
             log.error("Error while parsing page: ", e);

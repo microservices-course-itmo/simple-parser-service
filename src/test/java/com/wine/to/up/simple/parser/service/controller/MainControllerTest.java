@@ -49,7 +49,7 @@ class MainControllerTest {
 
     @Test
     void testRunParser() {
-        assertEquals("Parser started by request", mainController.runParser(1));
+        assertEquals("Parser started by request", mainController.runParser(1, 1));
     }
 
     @Test

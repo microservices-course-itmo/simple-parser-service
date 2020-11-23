@@ -79,17 +79,17 @@ class ParserServiceTest {
 
     @Test
     void testStartParser() {
-        Assertions.assertDoesNotThrow(() -> parserService.startParser(1));
+        Assertions.assertDoesNotThrow(() -> parserService.startParser(1, 1));
     }
 
     @Test
     void testStartParserNegative() {
-        Assertions.assertDoesNotThrow(() -> parserService.startParser(-1));
+        Assertions.assertDoesNotThrow(() -> parserService.startParser(-1, 3));
     }
 
     @Test
     void testStartParserLimitExceeded() {
-        Assertions.assertDoesNotThrow(() -> parserService.startParser(100500));
+        Assertions.assertDoesNotThrow(() -> parserService.startParser(100500, 123));
     }
 
 
