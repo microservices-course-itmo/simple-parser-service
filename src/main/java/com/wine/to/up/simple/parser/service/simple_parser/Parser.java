@@ -1,6 +1,8 @@
 package com.wine.to.up.simple.parser.service.simple_parser;
 
 import com.wine.to.up.parser.common.api.schema.ParserApi;
+import com.wine.to.up.simple.parser.service.components.SimpleParserMetricsCollector;
+
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +12,7 @@ import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Map;
 
 import static com.wine.to.up.parser.common.api.schema.ParserApi.Wine.Color.*;
@@ -180,16 +183,7 @@ public class Parser {
         }
 
         log.debug("Wine parsing takes : {}", System.currentTimeMillis() - wineParseStart);
-
-        // return
-        // SimpleWine.builder().name(wineName).brand(brandID).country(countryID).newPrice(bottlePrice)
-        // .year(bottleYear).capacity(bottleVolume).strength(bottleABV).color(colorMap.getOrDefault(colorType,
-        // RED)).grapeSort(Arrays.asList(grapeType.split(", ")))
-        // .sugar(sugarMap.getOrDefault(sugarType,
-        // DRY)).discount(bottleDiscount).region(region).link(wineDoc.baseUri())
-        // .image(bottleImage).rating(wineRating).sparkling(sparkling).taste(wineTaste)
-        // .gastronomy(wineGastronomy).oldPrice(100 * bottlePrice / (100 -
-        // bottleDiscount)).build();
+        SimpleParserMetricsCollector.parseWineFetch(new Date().getTime() - wineParseStart);
 
         return sw.link(wineDoc.baseUri()).discount(bottleDiscount).oldPrice(100 * bottlePrice / (100 - bottleDiscount))
                 .build();

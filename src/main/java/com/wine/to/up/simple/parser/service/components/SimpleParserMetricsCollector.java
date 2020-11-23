@@ -1,7 +1,12 @@
 package com.wine.to.up.simple.parser.service.components;
 
+import java.util.concurrent.TimeUnit;
+
 import com.wine.to.up.commonlib.metrics.CommonMetricsCollector;
 import org.springframework.stereotype.Component;
+
+import io.micrometer.core.instrument.Metrics;
+import io.prometheus.client.Summary;
 
 /**
  * This Class expose methods for recording specific metrics It changes metrics
@@ -13,11 +18,23 @@ import org.springframework.stereotype.Component;
 public class SimpleParserMetricsCollector extends CommonMetricsCollector {
     private static final String SERVICE_NAME = "simple_parser_service_test";
 
+    private static final String wine_page_fetching_duration = "wine_page_fetching_duration";
+
     public SimpleParserMetricsCollector() {
         this(SERVICE_NAME);
     }
 
     public SimpleParserMetricsCollector(String serviceName) {
         super(serviceName);
+    }
+
+    private static final Summary parseWineFetchSummary = Summary.build()
+    .name(wine_page_fetching_duration)
+    .help("Wine fetching time")
+    .register();
+
+    public static void parseWineFetch(long time) {
+        Metrics.timer(wine_page_fetching_duration).record(time, TimeUnit.MILLISECONDS);
+        parseWineFetchSummary.observe(time);
     }
 }
