@@ -18,7 +18,7 @@ import io.prometheus.client.Summary;
 public class SimpleParserMetricsCollector extends CommonMetricsCollector {
     private static final String SERVICE_NAME = "simple_parser_service_test";
 
-    private static final String wine_page_fetching_duration = "wine_page_fetching_duration";
+    private static final String WINE_PAGE_FETCHING_DURATION = "wine_page_fetching_duration";
 
     public SimpleParserMetricsCollector() {
         this(SERVICE_NAME);
@@ -29,12 +29,12 @@ public class SimpleParserMetricsCollector extends CommonMetricsCollector {
     }
 
     private static final Summary parseWineFetchSummary = Summary.build()
-    .name(wine_page_fetching_duration)
+    .name(WINE_PAGE_FETCHING_DURATION)
     .help("Wine fetching time")
     .register();
 
     public static void parseWineFetch(long time) {
-        Metrics.timer(wine_page_fetching_duration).record(time, TimeUnit.MILLISECONDS);
+        Metrics.timer(WINE_PAGE_FETCHING_DURATION).record(time, TimeUnit.MILLISECONDS);
         parseWineFetchSummary.observe(time);
     }
 }
