@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import com.wine.to.up.commonlib.messaging.KafkaMessageSender;
 import com.wine.to.up.parser.common.api.schema.ParserApi;
+import com.wine.to.up.simple.parser.service.components.SimpleParserMetricsCollector;
 import com.wine.to.up.simple.parser.service.simple_parser.db_handler.WineService;
 import com.wine.to.up.simple.parser.service.simple_parser.mappers.WineMapper;
 import org.jsoup.*;
@@ -112,6 +113,8 @@ public class ParserService {
         log.info("TIME : {} min {} seconds", TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - start),
                 TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()
                         - TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - start) * 60000 - start));
+        SimpleParserMetricsCollector.parseProcess(System.currentTimeMillis() - start);
+        //SimpleParserMetricsCollector.timeSinceLastSucceededParse(System.currentTimeMillis());
         log.info("End of parsing, {} wines collected and sent to Kafka", products.size());
 
     }
