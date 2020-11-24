@@ -140,7 +140,7 @@ public class ParserService {
      * Multithreading simplewine parser with maximum number of pages
      */
     public void startParser() {
-        parser(Parser.parseNumberOfPages(urlToDocument(url + "/catalog/vino/")), Parser.parseNumberOfPages(urlToDocument(url + "catalog/shampanskoe_i_igristoe_vino/")));
+        parser(Parser.parseNumberOfPages(urlToDocument(url + "/catalog/vino/")), Parser.parseNumberOfPages(urlToDocument(url + "/catalog/shampanskoe_i_igristoe_vino/")));
     }
 
     /**
