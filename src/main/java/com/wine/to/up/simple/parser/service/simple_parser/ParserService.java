@@ -163,6 +163,7 @@ public class ParserService {
             ParserApi.Wine newProduct = wineMapper.toKafka(wine).build();
             if (!products.contains(newProduct)) {
                 products.add(newProduct);
+                SimpleParserMetricsCollector.winesPublishedToKafka();
             }
             log.trace("Wine: {} added to database", wineCounter.getAndIncrement());
         }
