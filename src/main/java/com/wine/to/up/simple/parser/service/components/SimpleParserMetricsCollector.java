@@ -18,8 +18,11 @@ import io.prometheus.client.Gauge;
  */
 @Component
 public class SimpleParserMetricsCollector extends CommonMetricsCollector {
-    private static final String SERVICE_NAME = "simple_parser_service_test";
+    private static final String SERVICE_NAME = "simple_parser_service";
 
+    private static final String WINE_DETAILS_FETCHING_DURATION = "wine_details_fetching_duration";
+    private static final String PARSING_PROCESS_DURATION = "parsing_process_duration";
+    private static final String TIME_SINCE_LAST_SUCCEEDED_PARSING = "time_since_last_succeeded_parsing";
     private static final String wine_page_fetching_duration = "wine_page_fetching_duration";
     private static final String PARSING_STARTED_TOTAL = "parsing_started_total";
     private static final String PARSING_COMPLETE_TOTAL = "parsing_complete_total";
@@ -75,10 +78,29 @@ public class SimpleParserMetricsCollector extends CommonMetricsCollector {
     .register();
 
     public static void parseWineFetch(long time) {
-        Metrics.timer(WINE_PAGE_FETCHING_DURATION).record(time, TimeUnit.MILLISECONDS);
+        Metrics.timer(WINE_DETAILS_FETCHING_DURATION).record(time, TimeUnit.MILLISECONDS);
         parseWineFetchSummary.observe(time);
     }
 
+    private static final Summary parseProcessSummary = Summary.build()
+            .name(PARSING_PROCESS_DURATION)
+            .help("Total parsing process time")
+            .register();
+
+    public static void parseProcess(long time) {
+        Metrics.timer(PARSING_PROCESS_DURATION).record(time, TimeUnit.MILLISECONDS);
+        parseProcessSummary.observe(time);
+    }
+
+    private static final Gauge lastSucceededParseGauge = Gauge.build()
+            .name(TIME_SINCE_LAST_SUCCEEDED_PARSING)
+            .help("Time since last succeeded parsing")
+            .register();
+
+    public static void timeSinceLastSucceededParse(long time) {
+        Metrics.gauge(TIME_SINCE_LAST_SUCCEEDED_PARSING, time);
+        lastSucceededParseGauge.inc();
+    }
     public static void recordParsingStarted() {
         Metrics.counter(PARSING_STARTED_TOTAL).increment();
         activeParsings++;
