@@ -64,6 +64,11 @@ public class MainController {
         parserService.startParser(pagesToParse, sparklingPagesToParse);
         return "Parser started by request";
     }
+    @GetMapping(path = "/run-parser/one_page")
+    public String runParserOnePage() {
+        parserService.startParser(1,0);
+        return "Parser started by request";
+    }
 
     /**
      * The method based on a GET request. Output of all grape types stored in the grapesRepository {@link GrapesRepository}.
