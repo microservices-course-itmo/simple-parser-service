@@ -27,6 +27,8 @@ public class SimpleParserMetricsCollector extends CommonMetricsCollector {
     private static int activeParsings = 0;
     private static final String WINE_PAGE_FETCHING_DURATION = "wine_page_fetching_duration";
     private static final String WINE_DETAILS_PARSING_DURATION = "wine_details_parsing_duration";
+    private static final String WINE_PAGE_PARSING_DURATION = "wine_page_parsing_duration";
+    private static final String WINES_PUBLISHED_TO_KAFKA_COUNT = "wines_published_to_kafka_count";
 
     public SimpleParserMetricsCollector() {
         this(SERVICE_NAME);
@@ -44,6 +46,16 @@ public class SimpleParserMetricsCollector extends CommonMetricsCollector {
     private static final Summary parseWineDetailsParsingSummary = Summary.build()
             .name(WINE_DETAILS_PARSING_DURATION)
             .help("Parsing wine details page time")
+            .register();
+
+    private static final Summary winePageParsingDurationSummary = Summary.build()
+            .name(WINE_PAGE_PARSING_DURATION)
+            .help("Wine catalog page parsing duration")
+            .register();
+
+    private static final Counter winesPublishedToKafkaCount = Counter.build()
+            .name(WINES_PUBLISHED_TO_KAFKA_COUNT)
+            .help("Wines published to kafka count")
             .register();
 
     private static final Counter parsingStartedTotal = Counter.build()
@@ -85,6 +97,16 @@ public class SimpleParserMetricsCollector extends CommonMetricsCollector {
     public static void parseWineDetailsParsing(long time) {
         Metrics.timer(WINE_DETAILS_PARSING_DURATION).record(time, TimeUnit.MILLISECONDS);
         parseWineDetailsParsingSummary.observe(time);
+    }
+
+    public static void winePageParsingDuration(long time) {
+        Metrics.timer(WINE_PAGE_PARSING_DURATION).record(time, TimeUnit.MILLISECONDS);
+        winePageParsingDurationSummary.observe(time);
+    }
+
+    public static void winesPublishedToKafka() {
+        Metrics.counter(WINES_PUBLISHED_TO_KAFKA_COUNT).increment();
+        winesPublishedToKafkaCount.inc();
     }
 
 }
