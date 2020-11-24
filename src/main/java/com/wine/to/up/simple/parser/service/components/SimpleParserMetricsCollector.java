@@ -3,10 +3,13 @@ package com.wine.to.up.simple.parser.service.components;
 import java.util.concurrent.TimeUnit;
 
 import com.wine.to.up.commonlib.metrics.CommonMetricsCollector;
+
 import org.springframework.stereotype.Component;
 
 import io.micrometer.core.instrument.Metrics;
 import io.prometheus.client.Summary;
+import io.prometheus.client.Counter;
+import io.prometheus.client.Gauge;
 
 /**
  * This Class expose methods for recording specific metrics It changes metrics
@@ -19,6 +22,11 @@ public class SimpleParserMetricsCollector extends CommonMetricsCollector {
     private static final String SERVICE_NAME = "simple_parser_service_test";
 
     private static final String wine_page_fetching_duration = "wine_page_fetching_duration";
+    private static final String PARSING_STARTED_TOTAL = "parsing_started_total";
+    private static final String PARSING_COMPLETE_TOTAL = "parsing_complete_total";
+    private static final String PARSING_IN_PROGRESS = "parsing_in_progress";
+    private static int activeParsings = 0;
+
 
     public SimpleParserMetricsCollector() {
         this(SERVICE_NAME);
@@ -33,8 +41,41 @@ public class SimpleParserMetricsCollector extends CommonMetricsCollector {
     .help("Wine fetching time")
     .register();
 
+    private static final Counter parsingStartedTotal = Counter.build()
+    .name(PARSING_STARTED_TOTAL)
+    .help("Number of started parsings")
+    .register();
+
+    private static final Counter parsingCompletedTotal = Counter.build()
+    .name(PARSING_COMPLETE_TOTAL)
+    .help("Number of completed parsings")
+    .labelNames("status")
+    .register();
+
+    private static Gauge parsingInProgress = Gauge.build()
+    .name(PARSING_IN_PROGRESS)
+    .help("Number of parsers in progress")
+    .register();
+
     public static void parseWineFetch(long time) {
         Metrics.timer(wine_page_fetching_duration).record(time, TimeUnit.MILLISECONDS);
         parseWineFetchSummary.observe(time);
     }
+
+    public static void recordParsingStarted() {
+        Metrics.counter(PARSING_STARTED_TOTAL).increment();
+        activeParsings++;
+        Metrics.gauge(PARSING_IN_PROGRESS, activeParsings);
+        parsingInProgress.inc();
+        parsingStartedTotal.inc();
+    }
+
+    public static void recordParsingCompleted(Boolean status) {
+        Metrics.counter(PARSING_COMPLETE_TOTAL, "status", status ? "SUCCESS" : "FAILED").increment();
+        activeParsings--;
+        Metrics.gauge(PARSING_IN_PROGRESS, activeParsings);
+        parsingInProgress.dec();
+        parsingCompletedTotal.labels(status ? "SUCCESS" : "FAILED").inc();
+    }
+
 }

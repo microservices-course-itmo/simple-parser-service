@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import com.wine.to.up.commonlib.messaging.KafkaMessageSender;
 import com.wine.to.up.parser.common.api.schema.ParserApi;
+import com.wine.to.up.simple.parser.service.components.SimpleParserMetricsCollector;
 import com.wine.to.up.simple.parser.service.simple_parser.db_handler.WineService;
 import com.wine.to.up.simple.parser.service.simple_parser.mappers.WineMapper;
 import org.jsoup.*;
@@ -75,6 +76,7 @@ public class ParserService {
      * @param pagesToParse number pages to parse
      */
     private void parser(int pagesToParse, int sparklingPagesToParse) {
+        SimpleParserMetricsCollector.recordParsingStarted();
         long start = System.currentTimeMillis();
 
         List<CompletableFuture<?>> futures = new ArrayList<>();
@@ -113,6 +115,7 @@ public class ParserService {
                 TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()
                         - TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - start) * 60000 - start));
         log.info("End of parsing, {} wines collected and sent to Kafka", products.size());
+        SimpleParserMetricsCollector.recordParsingCompleted(true);
 
     }
 
@@ -126,6 +129,7 @@ public class ParserService {
             parser(pagesToParse, sparklingPagesToParse);
         } else {
             log.error("Set invalid number of pages: {}", pagesToParse);
+            SimpleParserMetricsCollector.recordParsingCompleted(false);
         }
     }
 
