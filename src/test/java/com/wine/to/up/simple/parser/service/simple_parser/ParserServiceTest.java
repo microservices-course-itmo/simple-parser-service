@@ -47,6 +47,7 @@ class ParserServiceTest {
         parserService = new ParserService(kafkaSendMessageService, wineService, wineMapper);
         ReflectionTestUtils.setField(parserService, "url", "https://simplewine.ru");
         ReflectionTestUtils.setField(parserService, "wineUrl", "https://simplewine.ru/catalog/vino/page");
+        ReflectionTestUtils.setField(parserService, "sparklingWineUrl", "https://simplewine.ru/catalog/shampanskoe_i_igristoe_vino/page");
     }
 
     /**

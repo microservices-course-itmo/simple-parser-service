@@ -54,13 +54,13 @@ public class Parser {
      * @return wine {@link SimpleWine}
      */
     public static SimpleWine parseWine(Document wineDoc) {
+        long wineParseStart = System.currentTimeMillis();
 
         Map<String, ParserApi.Wine.Sugar> sugarMap = Map.of("сухое", DRY, "полусухое", MEDIUM_DRY, "полусладкое",
                 MEDIUM, "сладкое", SWEET);
         Map<String, ParserApi.Wine.Color> colorMap = Map.of("красное", RED, "розовое", ROSE, "белое", WHITE,
                 "оранжевое", ORANGE);
 
-        long wineParseStart = System.currentTimeMillis();
 
         float bottlePrice = 0;
         float bottleDiscount = 0;
@@ -183,7 +183,7 @@ public class Parser {
         }
 
         log.debug("Wine parsing takes : {}", System.currentTimeMillis() - wineParseStart);
-        SimpleParserMetricsCollector.parseWineFetch(new Date().getTime() - wineParseStart);
+        SimpleParserMetricsCollector.parseWineDetailsParsing(new Date().getTime() - wineParseStart);
 
         return sw.link(wineDoc.baseUri()).discount(bottleDiscount).oldPrice(100 * bottlePrice / (100 - bottleDiscount))
                 .build();

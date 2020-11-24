@@ -2,6 +2,7 @@ package com.wine.to.up.simple.parser.service.simple_parser;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -123,9 +124,9 @@ public class ParserService {
      * Multithreading simplewine parser with a specified number of pages
      */
     public void startParser(int pagesToParse, int sparklingPagesToParse) {
-        if (pagesToParse <= Parser.parseNumberOfPages(urlToDocument(url + "/catalog/vino/")) 
-        && sparklingPagesToParse <= Parser.parseNumberOfPages(urlToDocument(url + "/catalog/shampanskoe_i_igristoe_vino/"))
-        && (pagesToParse * sparklingPagesToParse > 0) ) {
+        if (pagesToParse <= Parser.parseNumberOfPages(urlToDocument(url + "/catalog/vino/"))
+                && sparklingPagesToParse <= Parser.parseNumberOfPages(urlToDocument(url + "/catalog/shampanskoe_i_igristoe_vino/")) &&
+                (sparklingPagesToParse > 0 || pagesToParse > 0)) {
             parser(pagesToParse, sparklingPagesToParse);
         } else {
             log.error("Set invalid number of pages: {}", pagesToParse);
@@ -199,6 +200,7 @@ public class ParserService {
     private void addWineUrls(AtomicLong pageCounter, AtomicLong sparklingPageCounter, ArrayBlockingQueue<String> wineURLs, int pagesToParse, int sparklingPagesToParse) {
         try {
             while (pageCounter.longValue() <= pagesToParse) {
+                long wineParseStart = System.currentTimeMillis();
                 Document doc = Jsoup.connect(wineUrl + pageCounter.get()).get();
                 Elements wines = doc.getElementsByClass("catalog-grid__item");
                 for (Element wine : wines) {
@@ -207,8 +209,10 @@ public class ParserService {
                 }
                 log.debug("Parsed {} wines from url {}", wines.size(),
                         wineUrl + pageCounter.getAndIncrement());
+                SimpleParserMetricsCollector.parseWineFetch(new Date().getTime() - wineParseStart);
             }
             while (sparklingPageCounter.longValue() <= sparklingPagesToParse) {
+                long wineParseStart = System.currentTimeMillis();
                 Document doc = Jsoup.connect(sparklingWineUrl + sparklingPageCounter.get()).get();
                 Elements wines = doc.getElementsByClass("catalog-grid__item");
                 for (Element wine : wines) {
@@ -217,6 +221,7 @@ public class ParserService {
                 }
                 log.debug("Parsed {} wines from url {}", wines.size(),
                         wineUrl + sparklingPageCounter.getAndIncrement());
+                SimpleParserMetricsCollector.parseWineFetch(new Date().getTime() - wineParseStart);
             }
         } catch (IOException e) {
             log.error("Error while parsing page: ", e);
