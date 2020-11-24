@@ -225,6 +225,7 @@ public class ParserService {
                 log.debug("Parsed {} wines from url {}", wines.size(),
                         wineUrl + sparklingPageCounter.getAndIncrement());
                 SimpleParserMetricsCollector.parseWineFetch(new Date().getTime() - wineParseStart);
+                SimpleParserMetricsCollector.winePageParsingDuration(new Date().getTime() - wineParseStart);
             }
         } catch (IOException e) {
             log.error("Error while parsing page: ", e);
