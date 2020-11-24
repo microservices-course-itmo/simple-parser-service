@@ -1,6 +1,5 @@
 package com.wine.to.up.simple.parser.service.simple_parser;
 
-import com.wine.to.up.parser.common.api.schema.ParserApi;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -12,7 +11,6 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
 
 /**
  * Class for testing {@link Parser}

@@ -43,11 +43,11 @@ public class WineService {
      *
      * @param newWine {@link SimpleWine} class instance containing all wine parsed info
      */
-    public void saveAllWineParsedInfo(SimpleWine newWine) {
+    public Wine saveAllWineParsedInfo(SimpleWine newWine) {
         Float price = newWine.getNewPrice();
         String link = newWine.getLink();
         if (Boolean.TRUE.equals(wineRepository.existsWineByLinkAndNewPrice(link, price))) {
-            return;
+            return wineRepository.findWineByLinkAndNewPrice(link, price);
         }
         String brand = newWine.getBrand();
         Brands brandEntity = null;
@@ -84,7 +84,9 @@ public class WineService {
             for (Grapes grapeEntity : grapesEntity) {
                 wineGrapesService.saveWineGrapes(grapeEntity, wineEntity);
             }
+            return wineEntity;
         }
+        return null;
     }
 
     /**
