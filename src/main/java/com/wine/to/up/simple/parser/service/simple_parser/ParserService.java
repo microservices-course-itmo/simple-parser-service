@@ -77,6 +77,7 @@ public class ParserService {
      * @param pagesToParse number pages to parse
      */
     private void parser(int pagesToParse, int sparklingPagesToParse) {
+        SimpleParserMetricsCollector.recordParsingStarted();
         long start = System.currentTimeMillis();
 
         List<CompletableFuture<?>> futures = new ArrayList<>();
@@ -115,6 +116,7 @@ public class ParserService {
                 TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()
                         - TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - start) * 60000 - start));
         log.info("End of parsing, {} wines collected and sent to Kafka", products.size());
+        SimpleParserMetricsCollector.recordParsingCompleted(true);
 
     }
 
@@ -128,6 +130,7 @@ public class ParserService {
             parser(pagesToParse, sparklingPagesToParse);
         } else {
             log.error("Set invalid number of pages: {}", pagesToParse);
+            SimpleParserMetricsCollector.recordParsingCompleted(false);
         }
     }
 
