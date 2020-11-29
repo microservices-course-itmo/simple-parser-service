@@ -3,11 +3,9 @@ package com.wine.to.up.simple.parser.service.dto;
 import com.wine.to.up.simple.parser.service.domain.entity.Brands;
 import com.wine.to.up.simple.parser.service.domain.entity.Countries;
 import lombok.*;
-import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
-@Component
 @EqualsAndHashCode
 @Data
 @NoArgsConstructor

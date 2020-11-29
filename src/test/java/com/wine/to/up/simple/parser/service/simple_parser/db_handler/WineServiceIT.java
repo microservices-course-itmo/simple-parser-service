@@ -4,10 +4,10 @@ import com.wine.to.up.parser.common.api.schema.ParserApi;
 import com.wine.to.up.simple.parser.service.domain.entity.Wine;
 import com.wine.to.up.simple.parser.service.repository.*;
 import com.wine.to.up.simple.parser.service.simple_parser.SimpleWine;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,7 +18,7 @@ import static org.junit.Assert.*;
  * Class for testing {@link WineService}
  */
 @SpringBootTest
-public class WineServiceIT {
+class WineServiceIT {
     /**
      * The repository that stores all info about wine.
      */
@@ -36,7 +36,7 @@ public class WineServiceIT {
      */
 
     @Test
-    public void testSaveAllWineInfo() {
+    void testSaveAllWineInfo() {
         SimpleWine testWine = SimpleWine.builder().
                 name("Бин 50 Шираз").
                 brand("Lindeman's").
@@ -63,7 +63,7 @@ public class WineServiceIT {
     }
 
     @Test
-    public void testDoubleSaveWine() {
+    void testDoubleSaveWine() {
         SimpleWine testWine = SimpleWine.builder().
                 name("Бин 60 Шираз").
                 brand("Lindeman's").
@@ -101,7 +101,7 @@ public class WineServiceIT {
      * Trying to parse wine without Brand and country<br>
      */
     @Test
-    public void testParseWineWithoutBrandAndCountry() {
+    void testParseWineWithoutBrandAndCountry() {
         SimpleWine testWine = SimpleWine.builder().
                 name("Мое любимое").
                 brand(null).
@@ -132,7 +132,7 @@ public class WineServiceIT {
      * Trying to parse wine without Brand and country<br>
      */
     @Test
-    public void testParseWineWithoutBrand() {
+    void testParseWineWithoutBrand() {
         SimpleWine testWine = SimpleWine.builder().
                 name("Мое любимое").
                 brand(null).
@@ -158,69 +158,8 @@ public class WineServiceIT {
         assertFalse(wineRepository.existsWineByLinkAndNewPrice(testWine.getLink(), testWine.getNewPrice()));
     }
 
-    /**
-     * Testing {@link WineService#saveAllWineParsedInfo(SimpleWine)} method<br>
-     * Trying to parse wine without Grapes<br>
-     */
     @Test
-    public void testParseWineWithoutGrapes() throws NullPointerException {
-        SimpleWine testWine = SimpleWine.builder().
-                name("Мое любимое").
-                brand("Чайка").
-                country("Раися").
-                newPrice((float) 20000.0).
-                year(2018).
-                capacity((float) 0.75).
-                strength((float) 13.0).
-                color(ParserApi.Wine.Color.UNRECOGNIZED).
-                grapeSort(null).
-                sugar(ParserApi.Wine.Sugar.UNRECOGNIZED).
-                discount((float) 20.0).
-                region("Новый Южный").
-                link("https://myfavorite").
-                rating((float) 4.6).
-                image("https://static.simplewine.ru/upload/iblock/3ce/vino-bin-50-shiraz-lindeman-s-2018_1.png@x303").
-                gastronomy("Прекрасно в сочетании с жареным ягненком, свининой с овощами и сырами средней выдержки.").
-                taste("Вино блестящего фиолетово-красного цвета с яркими ароматами темных спелых ягод, ванили, лакрицы и легкими перечными нотками. " +
-                        "Среднетелое, насыщенное и хорошо структурированное во вкусе, с бархатистыми танинами и оттенками черной смородины, сливы и ванили в послевкусии.").
-                sparkling(false).
-                build();
-        assertThrows(NullPointerException.class, () -> wineService.saveAllWineParsedInfo(testWine));
-    }
-
-    @Test
-    public void testCreateConstructor() {
-        assertThrows(NullPointerException.class, () -> new WineService(null, null, null, null, null, null));
-    }
-
-    @Test
-    public void testSaveWineWithoutLink() {
-        SimpleWine testWine = SimpleWine.builder().
-                name("Мое любимое").
-                brand("Чайка").
-                country("Раися").
-                newPrice((float) 20000.0).
-                year(2018).
-                capacity((float) 0.75).
-                strength((float) 13.0).
-                color(ParserApi.Wine.Color.UNRECOGNIZED).
-                grapeSort(null).
-                sugar(ParserApi.Wine.Sugar.UNRECOGNIZED).
-                discount((float) 20.0).
-                region("Новый Южный").
-                link(null).
-                rating((float) 4.6).
-                image("https://static.simplewine.ru/upload/iblock/3ce/vino-bin-50-shiraz-lindeman-s-2018_1.png@x303").
-                gastronomy("Прекрасно в сочетании с жареным ягненком, свининой с овощами и сырами средней выдержки.").
-                taste("Вино блестящего фиолетово-красного цвета с яркими ароматами темных спелых ягод, ванили, лакрицы и легкими перечными нотками. " +
-                        "Среднетелое, насыщенное и хорошо структурированное во вкусе, с бархатистыми танинами и оттенками черной смородины, сливы и ванили в послевкусии.").
-                sparkling(false).
-                build();
-        assertThrows(NullPointerException.class, () -> wineService.saveAllWineParsedInfo(testWine));
-    }
-
-    @Test
-    public void testSaveWineWithoutPrice() throws NullPointerException {
+    void testSaveWineWithoutPrice() throws NullPointerException {
         SimpleWine testWine = SimpleWine.builder().
                 name("Мое любимое").
                 brand("Чайка").
@@ -246,12 +185,12 @@ public class WineServiceIT {
     }
 
     @Test
-    public void testSaveNull() throws NullPointerException {
+    void testSaveNull() throws NullPointerException {
         assertThrows(NullPointerException.class, () -> wineService.saveAllWineParsedInfo(null));
     }
 
     @Test
-    public void testSameGrapesSaveWine() {
+    void testSameGrapesSaveWine() {
         SimpleWine testWine = SimpleWine.builder().
                 name("Бин 50 Шираз").
                 brand("Lindeman's").
@@ -277,35 +216,8 @@ public class WineServiceIT {
         assertNotEquals(testWine.getGrapeSort().toString(), wineRepository.findWineByLinkAndNewPrice(testWine.getLink(), testWine.getNewPrice()).getGrapeSort());
     }
 
-
     @Test
-    public void testSaveWithoutCapacity() {
-        SimpleWine testWine = SimpleWine.builder().
-                name("Мое любимое2").
-                brand("Чайка").
-                country("Раися").
-                newPrice((float) 3000.0).
-                year(2018).
-                strength((float) 13.0).
-                color(ParserApi.Wine.Color.UNRECOGNIZED).
-                grapeSort(Arrays.asList("шираз", "каберне")).
-                sugar(ParserApi.Wine.Sugar.UNRECOGNIZED).
-                discount((float) 20.0).
-                region("Новый Южный").
-                link("https://myfavorite2").
-                rating((float) 4.6).
-                image("https://static.simplewine.ru/upload/iblock/3ce/vino-bin-50-shiraz-lindeman-s-2018_1.png@x303").
-                gastronomy("Прекрасно в сочетании с жареным ягненком, свининой с овощами и сырами средней выдержки.").
-                taste("Вино блестящего фиолетово-красного цвета с яркими ароматами темных спелых ягод, ванили, лакрицы и легкими перечными нотками. " +
-                        "Среднетелое, насыщенное и хорошо структурированное во вкусе, с бархатистыми танинами и оттенками черной смородины, сливы и ванили в послевкусии.").
-                sparkling(false).
-                build();
-        assertThrows(DataIntegrityViolationException.class, () -> wineService.saveAllWineParsedInfo(testWine));
-    }
-
-
-    @Test
-    public void testSaveWineGrapes() {
+    void testSaveWineGrapes() {
         SimpleWine testWine = SimpleWine.builder().
                 name("Мое любимое").
                 brand("Чайка").
