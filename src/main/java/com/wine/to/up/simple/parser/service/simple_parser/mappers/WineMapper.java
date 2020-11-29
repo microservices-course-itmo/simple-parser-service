@@ -16,7 +16,7 @@ public class WineMapper {
     }
 
     /**
-     * @param wine
+     * @param wine - {@link SimpleWine} class instance
      * @return New wine
      */
     public ParserApi.Wine.Builder toKafka(SimpleWine wine) {

@@ -1,11 +1,9 @@
 package com.wine.to.up.simple.parser.service.dto;
 
 import lombok.*;
-import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
-@Component
 @EqualsAndHashCode
 @Data
 @NoArgsConstructor
