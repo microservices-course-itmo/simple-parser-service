@@ -28,7 +28,6 @@ public class WineGrapesServiceTest {
 
     @Before
     public void init() {
-        MockitoAnnotations.initMocks(this);
         Grapes grape = new Grapes("бонано");
         Wine wine = Wine.builder().
                 name("Бин 50 Шираз").

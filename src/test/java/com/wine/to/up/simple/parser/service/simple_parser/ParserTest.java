@@ -6,7 +6,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import static org.junit.Assert.*;
 
@@ -41,7 +41,7 @@ class ParserTest {
      * @throws IOException Wrong input for {@link Jsoup#parse(File, String)}
      */
     @Test
-    void testParseNumberOfPagesNoPagesNavigation() throws IOException {
+    public void testParseNumberOfPagesNoPagesNavigation() throws IOException {
         File testCatalogPageFile = new File("src/test/test-resources/Wine_SimpleWine.html"); //wine page instead of catalog page
         Document testCatalogPage = Jsoup.parse(testCatalogPageFile, "UTF-8");
         Elements elements = testCatalogPage.getElementsByAttributeValue("class", "pagination__navigation");
@@ -57,7 +57,7 @@ class ParserTest {
      * @throws IOException Wrong input for {@link Jsoup#parse(File, String)}
      */
     @Test
-    void testParseWineHTML() throws IOException {
+    public void testParseWineHTML() throws IOException {
         File testWinePageFile = new File("src/test/test-resources/Wine_SimpleWine.html");
         Document testWinePage = Jsoup.parse(testWinePageFile, "UTF-8");
         SimpleWine testWine = SimpleWine.builder().
@@ -93,7 +93,7 @@ class ParserTest {
      * @throws IndexOutOfBoundsException "product__header-russian-name" in input file is absent
      */
     @Test
-    void testParseWineWrongPageFormat() throws IOException {
+    public void testParseWineWrongPageFormat() throws IOException {
         File testWinePageFile = new File("src/test/test-resources/Catalog_107_pages.html"); //catalog page instead of wine page
         Document testWinePage = Jsoup.parse(testWinePageFile, "UTF-8");
         assertThrows(IndexOutOfBoundsException.class, () ->

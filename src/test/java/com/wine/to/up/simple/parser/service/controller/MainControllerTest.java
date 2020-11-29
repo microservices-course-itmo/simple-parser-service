@@ -12,11 +12,10 @@ import com.wine.to.up.simple.parser.service.repository.WineRepository;
 import com.wine.to.up.simple.parser.service.simple_parser.ParserService;
 import com.wine.to.up.simple.parser.service.simple_parser.SimpleWine;
 import com.wine.to.up.simple.parser.service.simple_parser.mappers.WineMapper;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.modelmapper.ModelMapper;
 
@@ -27,7 +26,7 @@ import static org.mockito.Mockito.when;
 import static org.modelmapper.convention.MatchingStrategies.STRICT;
 
 @RunWith(MockitoJUnitRunner.class)
-class MainControllerTest {
+public class MainControllerTest {
     @Mock
     private GrapesRepository grapesRepository;
     @Mock
@@ -38,22 +37,16 @@ class MainControllerTest {
     private WineRepository wineRepository;
     @Mock
     private ParserService parserService;
-
+    @InjectMocks
     private MainController mainController;
 
-    @BeforeEach
-    public void init() {
-        MockitoAnnotations.initMocks(this);
-        mainController = new MainController(grapesRepository, brandsRepository, countriesRepository, wineRepository, parserService);
-    }
-
     @Test
-    void testRunParser() {
+    public void testRunParser() {
         assertEquals("Parser started by request", mainController.runParser(1, 1));
     }
 
     @Test
-    void testGetAllGrapes() {
+    public void testGetAllGrapes() {
         List<Grapes> grapes = new ArrayList<>();
         for (int i = 1; i < 4; i++) {
             Grapes grape = new Grapes();
@@ -68,7 +61,7 @@ class MainControllerTest {
     }
 
     @Test
-    void testGetAllBrands() {
+    public void testGetAllBrands() {
         List<Brands> brands = new ArrayList<>();
         for (int i = 1; i < 4; i++) {
             Brands brand = new Brands();
@@ -83,7 +76,7 @@ class MainControllerTest {
     }
 
     @Test
-    void testGetAllCountries() {
+    public void testGetAllCountries() {
         List<Countries> countries = new ArrayList<>();
         for (int i = 1; i < 4; i++) {
             Countries country = new Countries();
@@ -98,7 +91,7 @@ class MainControllerTest {
     }
 
     @Test
-    void testGetAllWines() {
+    public void testGetAllWines() {
         List<Wine> wines = new ArrayList<>();
         for (int i = 1; i < 4; i++) {
             Wine wine = new Wine();
@@ -123,7 +116,7 @@ class MainControllerTest {
     }
 
     @Test
-    void testGetAllProducts() {
+    public void testGetAllProducts() {
         SimpleWine simpleWine = SimpleWine.builder().
                 name("Бин 60 Шираз").
                 brand("Lindeman's").
@@ -168,7 +161,7 @@ class MainControllerTest {
     }
 
     @Test
-    void testHome() {
+    public void testHome() {
         String expectedHTML = "<ul>";
         expectedHTML += " <li><a href='/simple-parser/run-parser'>Run parser</a></li>";
         expectedHTML += " <li><a href='/simple-parser/all-wines'>Show All Wines</a></li>";

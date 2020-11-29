@@ -2,12 +2,10 @@ package com.wine.to.up.simple.parser.service.simple_parser.db_handler;
 
 import com.wine.to.up.simple.parser.service.domain.entity.Brands;
 import com.wine.to.up.simple.parser.service.repository.BrandsRepository;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
@@ -25,11 +23,6 @@ public class BrandsServiceTest {
     @Mock
     private BrandsRepository brandsRepository;
     private final Brands brand = new Brands("vvvino");
-
-    @Before
-    public void init() {
-        MockitoAnnotations.initMocks(this);
-    }
 
     @Test
     public void saveBrandTest() {

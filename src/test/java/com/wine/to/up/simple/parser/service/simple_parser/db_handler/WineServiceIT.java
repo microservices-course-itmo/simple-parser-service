@@ -4,7 +4,7 @@ import com.wine.to.up.parser.common.api.schema.ParserApi;
 import com.wine.to.up.simple.parser.service.domain.entity.Wine;
 import com.wine.to.up.simple.parser.service.repository.*;
 import com.wine.to.up.simple.parser.service.simple_parser.SimpleWine;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -18,7 +18,7 @@ import static org.junit.Assert.*;
  * Class for testing {@link WineService}
  */
 @SpringBootTest
-class WineServiceIT {
+public class WineServiceIT {
     /**
      * The repository that stores all info about wine.
      */
@@ -36,7 +36,7 @@ class WineServiceIT {
      */
 
     @Test
-    void testSaveAllWineInfo() {
+    public void testSaveAllWineInfo() {
         SimpleWine testWine = SimpleWine.builder().
                 name("Бин 50 Шираз").
                 brand("Lindeman's").
@@ -63,7 +63,7 @@ class WineServiceIT {
     }
 
     @Test
-    void testDoubleSaveWine() {
+    public void testDoubleSaveWine() {
         SimpleWine testWine = SimpleWine.builder().
                 name("Бин 60 Шираз").
                 brand("Lindeman's").
@@ -101,7 +101,7 @@ class WineServiceIT {
      * Trying to parse wine without Brand and country<br>
      */
     @Test
-    void testParseWineWithoutBrandAndCountry() {
+    public void testParseWineWithoutBrandAndCountry() {
         SimpleWine testWine = SimpleWine.builder().
                 name("Мое любимое").
                 brand(null).
@@ -132,7 +132,7 @@ class WineServiceIT {
      * Trying to parse wine without Brand and country<br>
      */
     @Test
-    void testParseWineWithoutBrand() {
+    public void testParseWineWithoutBrand() {
         SimpleWine testWine = SimpleWine.builder().
                 name("Мое любимое").
                 brand(null).
@@ -163,7 +163,7 @@ class WineServiceIT {
      * Trying to parse wine without Grapes<br>
      */
     @Test
-    void testParseWineWithoutGrapes() throws NullPointerException {
+    public void testParseWineWithoutGrapes() throws NullPointerException {
         SimpleWine testWine = SimpleWine.builder().
                 name("Мое любимое").
                 brand("Чайка").
@@ -189,12 +189,12 @@ class WineServiceIT {
     }
 
     @Test
-    void testCreateConstructor() {
+    public void testCreateConstructor() {
         assertThrows(NullPointerException.class, () -> new WineService(null, null, null, null, null, null));
     }
 
     @Test
-    void testSaveWineWithoutLink() {
+    public void testSaveWineWithoutLink() {
         SimpleWine testWine = SimpleWine.builder().
                 name("Мое любимое").
                 brand("Чайка").
@@ -220,7 +220,7 @@ class WineServiceIT {
     }
 
     @Test
-    void testSaveWineWithoutPrice() throws NullPointerException {
+    public void testSaveWineWithoutPrice() throws NullPointerException {
         SimpleWine testWine = SimpleWine.builder().
                 name("Мое любимое").
                 brand("Чайка").
@@ -246,12 +246,12 @@ class WineServiceIT {
     }
 
     @Test
-    void testSaveNull() throws NullPointerException {
+    public void testSaveNull() throws NullPointerException {
         assertThrows(NullPointerException.class, () -> wineService.saveAllWineParsedInfo(null));
     }
 
     @Test
-    void testSameGrapesSaveWine() {
+    public void testSameGrapesSaveWine() {
         SimpleWine testWine = SimpleWine.builder().
                 name("Бин 50 Шираз").
                 brand("Lindeman's").
@@ -279,7 +279,7 @@ class WineServiceIT {
 
 
     @Test
-    void testSaveWithoutCapacity() {
+    public void testSaveWithoutCapacity() {
         SimpleWine testWine = SimpleWine.builder().
                 name("Мое любимое2").
                 brand("Чайка").
@@ -305,7 +305,7 @@ class WineServiceIT {
 
 
     @Test
-    void testSaveWineGrapes() {
+    public void testSaveWineGrapes() {
         SimpleWine testWine = SimpleWine.builder().
                 name("Мое любимое").
                 brand("Чайка").

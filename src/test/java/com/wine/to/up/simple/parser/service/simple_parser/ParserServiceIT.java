@@ -2,7 +2,7 @@ package com.wine.to.up.simple.parser.service.simple_parser;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -15,7 +15,7 @@ import java.io.IOException;
  */
 
 @SpringBootTest
-class ParserServiceIT {
+public class ParserServiceIT {
     /**
      * SimpleWine base URL
      */
@@ -30,7 +30,7 @@ class ParserServiceIT {
      * @throws IOException Wrong input URL string value
      */
     @Test
-    void testURLConnection() throws IOException {
+    public void testURLConnection() throws IOException {
         Connection.Response res = Jsoup.connect(URL).followRedirects(false).execute();
         assertEquals(200, res.statusCode());
     }

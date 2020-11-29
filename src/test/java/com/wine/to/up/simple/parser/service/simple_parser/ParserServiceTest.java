@@ -6,11 +6,11 @@ import com.wine.to.up.simple.parser.service.simple_parser.db_handler.WineService
 import com.wine.to.up.simple.parser.service.simple_parser.mappers.WineMapper;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.modelmapper.ModelMapper;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -24,17 +24,16 @@ import java.lang.reflect.Field;
  * Class for testing {@link ParserService}
  */
 @RunWith(MockitoJUnitRunner.class)
-class ParserServiceTest {
-
+public class ParserServiceTest {
     @Mock
     private KafkaMessageSender<ParserApi.WineParsedEvent> kafkaSendMessageService;
     @Mock
     private WineService wineService;
+    @InjectMocks
     private ParserService parserService;
 
-    @BeforeEach
+    @Before
     public void init() {
-        MockitoAnnotations.initMocks(this);
         ModelMapper modelMapper = new ModelMapper();
         modelMapper
                 .getConfiguration()
@@ -44,7 +43,7 @@ class ParserServiceTest {
                 .setMatchingStrategy(STRICT)
                 .setAmbiguityIgnored(true);
         WineMapper wineMapper = new WineMapper(modelMapper);
-        parserService = new ParserService(kafkaSendMessageService, wineService, wineMapper);
+        ReflectionTestUtils.setField(parserService, "wineMapper", wineMapper);
         ReflectionTestUtils.setField(parserService, "url", "https://simplewine.ru");
         ReflectionTestUtils.setField(parserService, "wineUrl", "https://simplewine.ru/catalog/vino/page");
         ReflectionTestUtils.setField(parserService, "sparklingWineUrl", "https://simplewine.ru/catalog/shampanskoe_i_igristoe_vino/page");
@@ -55,43 +54,41 @@ class ParserServiceTest {
      * Trying to create Jsoup Document from URL
      */
     @Test
-    void testURLtoDocument() {
+    public void testURLtoDocument() {
         Document doc = ParserService.urlToDocument("https://simplewine.ru/catalog/product/lindeman_s_bin_50_shiraz_2018_075/");
         assertTrue(doc.title().contains("Вино Bin 50 Shiraz"));
     }
 
     @Test
-    void testURLtoDocumentWrongUrl() {
+    public void testURLtoDocumentWrongUrl() {
         assertThrows(IllegalArgumentException.class, () -> ParserService.urlToDocument("Mem"));
     }
 
     @Test
-    void testURLtoDocumentWrongSite() {
+    public void testURLtoDocumentWrongSite() {
         Document doc = ParserService.urlToDocument("https://www.google.ru/");
         assertNotNull(doc);
     }
 
     @Test
-    void testGetMessage() throws NoSuchFieldException, IllegalAccessException {
+    public void testGetMessage() throws NoSuchFieldException, IllegalAccessException {
         Field f = ParserService.class.getDeclaredField("messageToKafka");
         f.setAccessible(true);
         assertEquals(f.get(parserService), parserService.getMessage());
     }
 
     @Test
-    void testStartParser() {
+    public void testStartParser() {
         Assertions.assertDoesNotThrow(() -> parserService.startParser(1, 1));
     }
 
     @Test
-    void testStartParserNegative() {
+    public void testStartParserNegative() {
         Assertions.assertDoesNotThrow(() -> parserService.startParser(-1, 3));
     }
 
     @Test
-    void testStartParserLimitExceeded() {
+    public void testStartParserLimitExceeded() {
         Assertions.assertDoesNotThrow(() -> parserService.startParser(100500, 123));
     }
-
-
 }
