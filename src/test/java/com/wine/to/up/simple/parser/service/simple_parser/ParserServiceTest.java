@@ -65,12 +65,6 @@ public class ParserServiceTest {
     }
 
     @Test
-    public void testURLtoDocumentWrongSite() {
-        Document doc = ParserService.urlToDocument("https://www.google.ru/");
-        assertNull(doc);
-    }
-
-    @Test
     public void testGetMessage() throws NoSuchFieldException, IllegalAccessException {
         Field f = ParserService.class.getDeclaredField("messageToKafka");
         f.setAccessible(true);
