@@ -1,6 +1,7 @@
 package com.wine.to.up.simple.parser.service.components;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.wine.to.up.commonlib.metrics.CommonMetricsCollector;
 
@@ -23,11 +24,9 @@ public class SimpleParserMetricsCollector extends CommonMetricsCollector {
     private static final String WINE_DETAILS_FETCHING_DURATION = "wine_details_fetching_duration";
     private static final String PARSING_PROCESS_DURATION = "parsing_process_duration";
     private static final String TIME_SINCE_LAST_SUCCEEDED_PARSING = "time_since_last_succeeded_parsing";
-    private static final String wine_page_fetching_duration = "wine_page_fetching_duration";
     private static final String PARSING_STARTED_TOTAL = "parsing_started_total";
     private static final String PARSING_COMPLETE_TOTAL = "parsing_complete_total";
     private static final String PARSING_IN_PROGRESS = "parsing_in_progress";
-    private static int activeParsings = 0;
     private static final String WINE_PAGE_FETCHING_DURATION = "wine_page_fetching_duration";
     private static final String WINE_DETAILS_PARSING_DURATION = "wine_details_parsing_duration";
     private static final String WINE_PAGE_PARSING_DURATION = "wine_page_parsing_duration";
@@ -41,9 +40,14 @@ public class SimpleParserMetricsCollector extends CommonMetricsCollector {
         super(serviceName);
     }
 
-    private static final Summary parseWineFetchSummary = Summary.build()
+    private static final Summary parsePageWineFetchSummary = Summary.build()
             .name(WINE_PAGE_FETCHING_DURATION)
-            .help("Wine fetching time")
+            .help("Wine page fetching time")
+            .register();
+
+    private static final Summary parseDetailsFetchSummary = Summary.build()
+            .name(WINE_DETAILS_FETCHING_DURATION)
+            .help("Wine details page fetching time")
             .register();
 
     private static final Summary parseWineDetailsParsingSummary = Summary.build()
@@ -62,20 +66,22 @@ public class SimpleParserMetricsCollector extends CommonMetricsCollector {
             .register();
 
     private static final Counter parsingStartedTotal = Counter.build()
-    .name(PARSING_STARTED_TOTAL)
-    .help("Number of started parsings")
-    .register();
+            .name(PARSING_STARTED_TOTAL)
+            .help("Number of started parsings")
+            .register();
 
     private static final Counter parsingCompletedTotal = Counter.build()
-    .name(PARSING_COMPLETE_TOTAL)
-    .help("Number of completed parsings")
-    .labelNames("status")
-    .register();
+            .name(PARSING_COMPLETE_TOTAL)
+            .help("Number of completed parsings")
+            .labelNames("status")
+            .register();
 
     private static Gauge parsingInProgress = Gauge.build()
     .name(PARSING_IN_PROGRESS)
     .help("Number of parsers in progress")
     .register();
+
+    private static final AtomicInteger micrometerParsingInProgressGauge = Metrics.gauge(PARSING_IN_PROGRESS, new AtomicInteger(0));
 
     public static void parseWineFetch(long time) {
         Metrics.timer(WINE_DETAILS_FETCHING_DURATION).record(time, TimeUnit.MILLISECONDS);
@@ -87,35 +93,45 @@ public class SimpleParserMetricsCollector extends CommonMetricsCollector {
             .help("Total parsing process time")
             .register();
 
-    public static void parseProcess(long time) {
-        Metrics.timer(PARSING_PROCESS_DURATION).record(time, TimeUnit.MILLISECONDS);
-        parseProcessSummary.observe(time);
-    }
-
     private static final Gauge lastSucceededParseGauge = Gauge.build()
             .name(TIME_SINCE_LAST_SUCCEEDED_PARSING)
             .help("Time since last succeeded parsing")
             .register();
 
+    public static void parseProcess(long time) {
+        Metrics.timer(PARSING_PROCESS_DURATION).record(time, TimeUnit.MILLISECONDS);
+        parseProcessSummary.observe(time);
+    }
+
+    public static void fetchDetailsWine(long time) {
+        Metrics.timer(WINE_DETAILS_FETCHING_DURATION).record(time, TimeUnit.MILLISECONDS);
+        parseDetailsFetchSummary.observe(time);
+    }
+
+    public static void fetchWinePage(long time) {
+        Metrics.timer(WINE_PAGE_FETCHING_DURATION).record(time, TimeUnit.MILLISECONDS);
+        parsePageWineFetchSummary.observe(time);
+    }
+
     public static void timeSinceLastSucceededParse(long time) {
         Metrics.gauge(TIME_SINCE_LAST_SUCCEEDED_PARSING, time);
         lastSucceededParseGauge.inc();
     }
+
     public static void recordParsingStarted() {
         Metrics.counter(PARSING_STARTED_TOTAL).increment();
-        activeParsings++;
-        Metrics.gauge(PARSING_IN_PROGRESS, activeParsings);
+        micrometerParsingInProgressGauge.incrementAndGet();
         parsingInProgress.inc();
         parsingStartedTotal.inc();
     }
 
-    public static void recordParsingCompleted(Boolean status) {
+    public static void recordParsingCompleted(boolean status) {
         Metrics.counter(PARSING_COMPLETE_TOTAL, "status", status ? "SUCCESS" : "FAILED").increment();
-        activeParsings--;
-        Metrics.gauge(PARSING_IN_PROGRESS, activeParsings);
+        micrometerParsingInProgressGauge.decrementAndGet();
         parsingInProgress.dec();
         parsingCompletedTotal.labels(status ? "SUCCESS" : "FAILED").inc();
     }
+
     public static void parseWineDetailsParsing(long time) {
         Metrics.timer(WINE_DETAILS_PARSING_DURATION).record(time, TimeUnit.MILLISECONDS);
         parseWineDetailsParsingSummary.observe(time);

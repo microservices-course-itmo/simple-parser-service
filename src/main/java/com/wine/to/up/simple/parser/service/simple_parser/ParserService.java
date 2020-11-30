@@ -202,9 +202,11 @@ public class ParserService {
      */
     private void addWineUrls(AtomicLong pageCounter, AtomicLong sparklingPageCounter, ArrayBlockingQueue<String> wineURLs, int pagesToParse, int sparklingPagesToParse) {
         try {
+            long winePageCatalogParseStart = System.currentTimeMillis();
             while (pageCounter.longValue() <= pagesToParse) {
                 long wineParseStart = System.currentTimeMillis();
                 Document doc = Jsoup.connect(wineUrl + pageCounter.get()).get();
+                SimpleParserMetricsCollector.fetchDetailsWine(new Date().getTime() - wineParseStart);
                 Elements wines = doc.getElementsByClass("catalog-grid__item");
                 for (Element wine : wines) {
                     if (!wineURLs.contains(wine.getElementsByClass("product-snippet__name").attr("href")))
@@ -212,11 +214,15 @@ public class ParserService {
                 }
                 log.debug("Parsed {} wines from url {}", wines.size(),
                         wineUrl + pageCounter.getAndIncrement());
-                SimpleParserMetricsCollector.parseWineFetch(new Date().getTime() - wineParseStart);
+                SimpleParserMetricsCollector.winePageParsingDuration(new Date().getTime() - wineParseStart);
             }
+            SimpleParserMetricsCollector.fetchWinePage(new Date().getTime() - winePageCatalogParseStart);
+
+            winePageCatalogParseStart = System.currentTimeMillis();
             while (sparklingPageCounter.longValue() <= sparklingPagesToParse) {
                 long wineParseStart = System.currentTimeMillis();
                 Document doc = Jsoup.connect(sparklingWineUrl + sparklingPageCounter.get()).get();
+                SimpleParserMetricsCollector.fetchDetailsWine(new Date().getTime() - wineParseStart);
                 Elements wines = doc.getElementsByClass("catalog-grid__item");
                 for (Element wine : wines) {
                     if (!wineURLs.contains(wine.getElementsByClass("product-snippet__name").attr("href")))
@@ -224,9 +230,10 @@ public class ParserService {
                 }
                 log.debug("Parsed {} wines from url {}", wines.size(),
                         wineUrl + sparklingPageCounter.getAndIncrement());
-                SimpleParserMetricsCollector.parseWineFetch(new Date().getTime() - wineParseStart);
                 SimpleParserMetricsCollector.winePageParsingDuration(new Date().getTime() - wineParseStart);
             }
+            SimpleParserMetricsCollector.fetchWinePage(new Date().getTime() - winePageCatalogParseStart);
+
         } catch (IOException e) {
             log.error("Error while parsing page: ", e);
         }
@@ -239,21 +246,21 @@ public class ParserService {
         if (products.isEmpty()) {
             log.error("\t Z E R O\tP A R S I N G");
         } else {
-            ParserApi.WineParsedEvent message = null;
+            ParserApi.WineParsedEvent.Builder message = ParserApi.WineParsedEvent.newBuilder();
             if (products.size() >= 1000) {
                 int messageSize = (int) Math.round(products.size() / 4.0);
                 for (int i = 0; i < 4; i++) {
                     if (i == 3)
-                        message = ParserApi.WineParsedEvent.newBuilder()
-                                .addAllWines(products.subList(i * messageSize, products.size() - 1)).build();
+                        message = message
+                                .addAllWines(products.subList(i * messageSize, products.size() - 1));
                     else
-                        message = ParserApi.WineParsedEvent.newBuilder()
-                                .addAllWines(products.subList(i * messageSize, (i + 1) * messageSize - 1)).build();
+                        message = message
+                                .addAllWines(products.subList(i * messageSize, (i + 1) * messageSize - 1));
                 }
             } else {
-                message = ParserApi.WineParsedEvent.newBuilder().addAllWines(products).build();
+                message = message.addAllWines(products);
             }
-            kafkaSendMessageService.sendMessage(message);
+            kafkaSendMessageService.sendMessage(message.setShopLink(url).build());
             messageToKafka = ParserApi.WineParsedEvent.newBuilder().addAllWines(products).build();
         }
     }
