@@ -132,9 +132,10 @@ public class SimpleParserMetricsCollector extends CommonMetricsCollector {
         parseWineDetailsParsingSummary.observe(time);
     }
 
-    public static void winePageParsingDuration(long time) {
-        Metrics.timer(WINE_PAGE_PARSING_DURATION).record(time, TimeUnit.MILLISECONDS);
-        winePageParsingDurationSummary.observe(time);
+    public static void winePageParsingDuration(long nanoTime) {
+        long milliTime = TimeUnit.NANOSECONDS.toMillis(nanoTime);
+        winePageParsingDurationSummary.observe(milliTime);
+        Metrics.summary(WINE_PAGE_PARSING_DURATION).record(milliTime);
     }
 
     public static void winesPublishedToKafka() {
