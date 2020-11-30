@@ -110,7 +110,7 @@ public class SimpleParserMetricsCollector extends CommonMetricsCollector {
 
     public static void timeSinceLastSucceededParse(long time) {
         Metrics.gauge(TIME_SINCE_LAST_SUCCEEDED_PARSING, time);
-        lastSucceededParseGauge.inc();
+        lastSucceededParseGauge.set(time);
     }
 
     public static void recordParsingStarted() {
@@ -125,6 +125,7 @@ public class SimpleParserMetricsCollector extends CommonMetricsCollector {
         micrometerParsingInProgressGauge.decrementAndGet();
         parsingInProgress.dec();
         parsingCompletedTotal.labels(status ? "SUCCESS" : "FAILED").inc();
+        timeSinceLastSucceededParse(System.currentTimeMillis());
     }
 
     public static void parseWineDetailsParsing(long time) {
