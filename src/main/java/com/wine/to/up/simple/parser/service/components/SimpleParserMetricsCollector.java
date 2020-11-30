@@ -77,16 +77,11 @@ public class SimpleParserMetricsCollector extends CommonMetricsCollector {
             .register();
 
     private static Gauge parsingInProgress = Gauge.build()
-    .name(PARSING_IN_PROGRESS)
-    .help("Number of parsers in progress")
-    .register();
+            .name(PARSING_IN_PROGRESS)
+            .help("Number of parsers in progress")
+            .register();
 
     private static final AtomicInteger micrometerParsingInProgressGauge = Metrics.gauge(PARSING_IN_PROGRESS, new AtomicInteger(0));
-
-    public static void parseWineFetch(long time) {
-        Metrics.timer(WINE_DETAILS_FETCHING_DURATION).record(time, TimeUnit.MILLISECONDS);
-        parseWineFetchSummary.observe(time);
-    }
 
     private static final Summary parseProcessSummary = Summary.build()
             .name(PARSING_PROCESS_DURATION)
