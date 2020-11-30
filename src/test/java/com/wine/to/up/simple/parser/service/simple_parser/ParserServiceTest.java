@@ -67,7 +67,7 @@ public class ParserServiceTest {
     @Test
     public void testURLtoDocumentWrongSite() {
         Document doc = ParserService.urlToDocument("https://www.google.ru/");
-        assertNotNull(doc);
+        assertNull(doc);
     }
 
     @Test
