@@ -115,6 +115,8 @@ public class ParserService {
         log.info("TIME : {} min {} seconds", TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - start),
                 TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()
                         - TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - start) * 60000 - start));
+        SimpleParserMetricsCollector.parseProcess(System.currentTimeMillis() - start);
+        //SimpleParserMetricsCollector.timeSinceLastSucceededParse(System.currentTimeMillis());
         log.info("End of parsing, {} wines collected and sent to Kafka", products.size());
         SimpleParserMetricsCollector.recordParsingCompleted(true);
 
@@ -138,7 +140,7 @@ public class ParserService {
      * Multithreading simplewine parser with maximum number of pages
      */
     public void startParser() {
-        parser(Parser.parseNumberOfPages(urlToDocument(url + "/catalog/vino/")), Parser.parseNumberOfPages(urlToDocument(url + "catalog/shampanskoe_i_igristoe_vino/")));
+        parser(Parser.parseNumberOfPages(urlToDocument(url + "/catalog/vino/")), Parser.parseNumberOfPages(urlToDocument(url + "/catalog/shampanskoe_i_igristoe_vino/")));
     }
 
     /**

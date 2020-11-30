@@ -4,7 +4,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.wine.to.up.parser.common.api.schema.ParserApi;
 import com.wine.to.up.simple.parser.service.simple_parser.SimpleWine;
 import com.wine.to.up.simple.parser.service.simple_parser.mappers.WineMapper;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import static org.junit.Assert.*;
 
@@ -16,11 +16,11 @@ import java.util.List;
 
 import static org.modelmapper.convention.MatchingStrategies.STRICT;
 
-class EventSerializerTest {
+public class EventSerializerTest {
     EventSerializer eventSerializer = new EventSerializer();
 
     @Test
-    void testSerialize() throws InvalidProtocolBufferException {
+    public void testSerialize() throws InvalidProtocolBufferException {
         String testTopic = "test";
         ModelMapper modelMapper = new ModelMapper();
         modelMapper

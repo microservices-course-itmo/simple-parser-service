@@ -3,7 +3,6 @@ package com.wine.to.up.simple.parser.service.simple_parser.db_handler;
 import com.wine.to.up.parser.common.api.schema.ParserApi;
 import com.wine.to.up.simple.parser.service.domain.entity.Brands;
 import com.wine.to.up.simple.parser.service.domain.entity.Countries;
-import com.wine.to.up.simple.parser.service.domain.entity.Grapes;
 import com.wine.to.up.simple.parser.service.domain.entity.Wine;
 import com.wine.to.up.simple.parser.service.repository.*;
 import com.wine.to.up.simple.parser.service.simple_parser.SimpleWine;
@@ -13,7 +12,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.modelmapper.ModelMapper;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -35,7 +33,6 @@ public class WineServiceTest {
      */
     @InjectMocks
     private WineService wineService;
-
     @Mock
     private WineRepository wineRepository;
     @Mock
@@ -46,16 +43,11 @@ public class WineServiceTest {
     private CountriesRepository countriesRepository;
     @Mock
     private WineGrapesRepository wineGrapesRepository;
-
     private Wine wine;
     private SimpleWine simpleWine;
-    private Grapes grapes;
-    private Brands brand;
-    private Countries country;
 
     @Before
     public void init() {
-        MockitoAnnotations.initMocks(this);
         simpleWine = SimpleWine.builder().
                 name("Бин 60 Шираз").
                 brand("Lindeman's").
@@ -77,9 +69,8 @@ public class WineServiceTest {
                         "Среднетелое, насыщенное и хорошо структурированное во вкусе, с бархатистыми танинами и оттенками черной смородины, сливы и ванили в послевкусии.").
                 sparkling(false).
                 build();
-        grapes = new Grapes("шираз");
-        brand = new Brands("Lindeman's");
-        country = new Countries("Австралия");
+        Brands brand = new Brands("Lindeman's");
+        Countries country = new Countries("Австралия");
         wine = Wine.builder().
                 name("Бин 50 Шираз").
                 brandID(brand).

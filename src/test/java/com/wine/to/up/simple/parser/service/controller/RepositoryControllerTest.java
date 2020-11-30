@@ -8,18 +8,16 @@ import com.wine.to.up.simple.parser.service.dto.CountriesDTO;
 import com.wine.to.up.simple.parser.service.dto.GrapesDTO;
 import com.wine.to.up.simple.parser.service.dto.WineDTO;
 import com.wine.to.up.simple.parser.service.repository.*;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
-
 
 import static org.junit.Assert.*;
 
 @RunWith(MockitoJUnitRunner.class)
-class RepositoryControllerTest {
+public class RepositoryControllerTest {
     @Mock
     private GrapesRepository grapesRepository;
     @Mock
@@ -30,37 +28,32 @@ class RepositoryControllerTest {
     private WineGrapesRepository wineGrapesRepository;
     @Mock
     private WineRepository wineRepository;
+    @InjectMocks
     private RepositoryController repositoryController;
 
-    @BeforeEach
-    public void init() {
-        MockitoAnnotations.initMocks(this);
-        repositoryController = new RepositoryController(grapesRepository, brandsRepository, countriesRepository, wineGrapesRepository, wineRepository);
-    }
-
     @Test
-    void testAddGrape() {
+    public void testAddGrape() {
         GrapesDTO grapesDTO = new GrapesDTO("Test grape");
         assertNotNull(repositoryController.addGrape(grapesDTO));
         assertEquals("Test grape", repositoryController.addGrape(grapesDTO).getGrapeName());
     }
 
     @Test
-    void testAddBrand() {
+    public void testAddBrand() {
         BrandsDTO brandsDTO = new BrandsDTO("Test brand");
         assertNotNull(repositoryController.addBrand(brandsDTO));
         assertEquals("Test brand", repositoryController.addBrand(brandsDTO).getBrandName());
     }
 
     @Test
-    void testAddCountry() {
+    public void testAddCountry() {
         CountriesDTO countriesDTO = new CountriesDTO("Test country");
         assertNotNull(repositoryController.addCountry(countriesDTO));
         assertEquals("Test country", repositoryController.addCountry(countriesDTO).getCountryName());
     }
 
     @Test
-    void testAddWine() {
+    public void testAddWine() {
         WineDTO wineDTO = new WineDTO();
         wineDTO.setName("Test wine");
         wineDTO.setBrandID(new Brands());

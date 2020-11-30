@@ -4,6 +4,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.Assert.*;
 
@@ -12,11 +14,13 @@ import java.io.IOException;
 /**
  * Class for integration testing of {@link Parser}
  */
+@SpringBootTest
 class ParserIT {
     /**
      * SimpleWine base URL
      */
-    private static final String URL = "https://simplewine.ru";
+    @Value("${parser.url}")
+    private String URL;
 
     /**
      * Testing {@link Parser#parseNumberOfPages(Document)} method<br>

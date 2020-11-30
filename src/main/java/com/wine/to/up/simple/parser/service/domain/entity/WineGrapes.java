@@ -14,10 +14,12 @@ import java.util.UUID;
 @NoArgsConstructor
 public class WineGrapes {
 
-    /** Unique identifier */
+    /**
+     * Unique identifier
+     */
     @Id
     @Column(name = "id")
-    private UUID uuID = UUID.randomUUID();
+    private UUID uuid = UUID.randomUUID();
 
     /** Foreign key that refers to the {@link Wine} entity */
     @ManyToOne
