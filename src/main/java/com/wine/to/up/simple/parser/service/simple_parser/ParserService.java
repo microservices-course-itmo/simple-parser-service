@@ -62,7 +62,6 @@ public class ParserService {
                 wineDoc = Jsoup.connect(someURL).get();
                 rerequestNumber++;
             }
-
         } catch (IOException e) {
             log.error("Incorrect URL address: " + someURL);
         } catch (NullPointerException e) {
