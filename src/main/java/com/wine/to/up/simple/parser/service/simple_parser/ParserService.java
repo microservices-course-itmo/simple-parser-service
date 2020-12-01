@@ -58,7 +58,7 @@ public class ParserService {
      * @param someURL URL to get jsoup Document
      * @return Jsoup Document class
      */
-    public static synchronized Document urlToDocument(String someURL) {
+    public static Document urlToDocument(String someURL) {
         Document wineDoc = null;
         try {
             wineDoc = Jsoup.connect(someURL).get();
