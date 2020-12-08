@@ -111,7 +111,6 @@ public class SimpleParserMetricsCollector extends CommonMetricsCollector {
     }
 
     public static void timeSinceLastSucceededParse(long time) {
-        // Metrics.gauge(TIME_SINCE_LAST_SUCCEEDED_PARSING, time);
         micrometerTimeSinceLastSucceededParsingGauge.set(time);
         lastSucceededParseGauge.set(time);
     }
@@ -139,7 +138,7 @@ public class SimpleParserMetricsCollector extends CommonMetricsCollector {
     public static void winePageParsingDuration(long time) {
         Metrics.timer(WINE_PAGE_PARSING_DURATION).record(time, TimeUnit.MILLISECONDS);
         winePageParsingDurationSummary.observe(time);
-        
+
     }
 
     public static void winesPublishedToKafka() {

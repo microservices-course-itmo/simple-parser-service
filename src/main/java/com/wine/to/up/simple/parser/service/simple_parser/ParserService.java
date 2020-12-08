@@ -256,7 +256,7 @@ public class ParserService {
             } else {
                 message = message.addAllWines(products);
             }
-            kafkaSendMessageService.sendMessage(message.setShopLink(url).build());
+            kafkaSendMessageService.sendMessage(message.setShopLink(url).setParserName("simple-parser-service").build());
             messageToKafka = ParserApi.WineParsedEvent.newBuilder().addAllWines(products).build();
         }
     }
