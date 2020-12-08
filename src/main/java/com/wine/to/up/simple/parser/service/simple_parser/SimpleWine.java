@@ -10,8 +10,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-/**Data structure for storing parsed information
- * @see com.wine.to.up.simple.parser.service.domain.entity.Wine*/
+/**
+ * Data structure for storing parsed information
+ *
+ * @see com.wine.to.up.simple.parser.service.domain.entity.Wine
+ */
 @ToString
 @Builder
 @AllArgsConstructor

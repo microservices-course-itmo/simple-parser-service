@@ -1,8 +1,9 @@
 package com.wine.to.up.simple.parser.service.simple_parser;
 
-import com.wine.to.up.parser.common.api.schema.ParserApi;
 import com.wine.to.up.simple.parser.service.components.SimpleParserMetricsCollector;
 
+import com.wine.to.up.simple.parser.service.simple_parser.enums.Color;
+import com.wine.to.up.simple.parser.service.simple_parser.enums.Sugar;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,12 +15,7 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Map;
 
-import static com.wine.to.up.parser.common.api.schema.ParserApi.Wine.Color.*;
-import static com.wine.to.up.parser.common.api.schema.ParserApi.Wine.Color.ORANGE;
-import static com.wine.to.up.parser.common.api.schema.ParserApi.Wine.Sugar.*;
-import static com.wine.to.up.parser.common.api.schema.ParserApi.Wine.Sugar.SWEET;
 import static com.wine.to.up.simple.parser.service.logging.SimpleParserNotableEvents.*;
 
 /**
@@ -122,10 +118,6 @@ public class Parser {
     }
 
     private static void parseProductFacts(SimpleWine.SimpleWineBuilder sw, Elements productFacts) {
-        Map<String, ParserApi.Wine.Sugar> sugarMap = Map.of("сухое", DRY, "полусухое", MEDIUM_DRY, "полусладкое",
-                MEDIUM, "сладкое", SWEET);
-        Map<String, ParserApi.Wine.Color> colorMap = Map.of("красное", RED, "розовое", ROSE, "белое", WHITE,
-                "оранжевое", ORANGE);
         for (Element productFact : productFacts) {
             if (productFact.childrenSize() > 0) {
                 String fact = productFact.child(0).text();
@@ -134,10 +126,10 @@ public class Parser {
                         sw.country(productFact.child(1).text().split(",")[0]);
                         break;
                     case "Вино:":
-                        sw.color(colorMap.getOrDefault(productFact.child(1).text(), RED));
+                        sw.color(Color.getApiColor(productFact.child(1).text()));
                         break;
                     case "Сахар:":
-                        sw.sugar(sugarMap.getOrDefault(productFact.child(1).text(), DRY));
+                        sw.sugar(Sugar.getApiSugar(productFact.child(1).text()));
                         break;
                     case "Виноград:":
                         sw.grapeSort(Arrays.asList(productFact.child(1).text().split(", ")));
