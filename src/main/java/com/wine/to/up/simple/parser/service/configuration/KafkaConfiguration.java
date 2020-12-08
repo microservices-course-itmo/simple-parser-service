@@ -5,6 +5,7 @@ import com.wine.to.up.parser.common.api.ParserCommonApiProperties;
 import com.wine.to.up.parser.common.api.schema.ParserApi;
 import com.wine.to.up.simple.parser.service.components.SimpleParserMetricsCollector;
 import com.wine.to.up.simple.parser.service.messaging.serialization.EventSerializer;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.OffsetResetStrategy;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -19,8 +20,7 @@ import org.springframework.context.annotation.Scope;
 
 import java.util.Properties;
 
-import static org.apache.kafka.common.requests.FetchMetadata.log;
-
+@Slf4j
 @Configuration
 public class KafkaConfiguration {
     /**

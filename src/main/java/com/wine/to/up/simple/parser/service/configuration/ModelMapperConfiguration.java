@@ -3,15 +3,14 @@ package com.wine.to.up.simple.parser.service.configuration;
 import com.wine.to.up.parser.common.api.schema.ParserApi;
 import com.wine.to.up.simple.parser.service.domain.entity.Wine;
 import com.wine.to.up.simple.parser.service.simple_parser.SimpleWine;
+import com.wine.to.up.simple.parser.service.simple_parser.enums.Color;
+import com.wine.to.up.simple.parser.service.simple_parser.enums.Sugar;
 import org.modelmapper.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
-import java.util.Map;
 
-import static com.wine.to.up.parser.common.api.schema.ParserApi.Wine.Color.*;
-import static com.wine.to.up.parser.common.api.schema.ParserApi.Wine.Sugar.*;
 import static org.modelmapper.convention.MatchingStrategies.STRICT;
 
 
@@ -40,10 +39,8 @@ public class ModelMapperConfiguration {
 
         modelMapper.createTypeMap(SimpleWine.class, ParserApi.Wine.Builder.class);
 
-        Map<ParserApi.Wine.Color, String> colorMap = Map.of(RED, "красное", ROSE, "розовое", WHITE, "белое", ORANGE, "оранжевое", ParserApi.Wine.Color.UNRECOGNIZED, "");
-        Map<ParserApi.Wine.Sugar, String> sugarMap = Map.of(DRY, "сухое", MEDIUM_DRY, "полусухое", MEDIUM, "полусладкое", SWEET, "сладкое", ParserApi.Wine.Sugar.UNRECOGNIZED, "");
-        Converter<ParserApi.Wine.Color, String> colorToString = ctx -> ctx.getSource() == null ? "нет информации" : colorMap.getOrDefault(ctx.getSource(), "иное");
-        Converter<ParserApi.Wine.Sugar, String> sugarToString = ctx -> ctx.getSource() == null ? "нет информации" : sugarMap.getOrDefault(ctx.getSource(), "иное");
+        Converter<ParserApi.Wine.Color, String> colorToString = ctx -> ctx.getSource() == null ? "нет информации" : Color.getStringColor(ctx.getSource());
+        Converter<ParserApi.Wine.Sugar, String> sugarToString = ctx -> ctx.getSource() == null ? "нет информации" : Sugar.getStringSugar(ctx.getSource());
 
         PropertyMap<SimpleWine, Wine> propertyMapDB = new PropertyMap<>() {
             protected void configure() {
