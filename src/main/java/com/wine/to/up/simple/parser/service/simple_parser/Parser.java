@@ -57,12 +57,6 @@ public class Parser {
     public static SimpleWine parseWine(Document wineDoc) {
         long wineParseStart = System.currentTimeMillis();
 
-        Map<String, ParserApi.Wine.Sugar> sugarMap = Map.of("сухое", DRY, "полусухое", MEDIUM_DRY, "полусладкое",
-                MEDIUM, "сладкое", SWEET);
-        Map<String, ParserApi.Wine.Color> colorMap = Map.of("красное", RED, "розовое", ROSE, "белое", WHITE,
-                "оранжевое", ORANGE);
-
-
         float bottlePrice = 0;
         float bottleDiscount = 0;
 
@@ -92,8 +86,8 @@ public class Parser {
         Elements discounts = wineDoc.getElementsByClass("product-buy__old-price product-buy__with-one");
         if (!prices.get(0).text().equals("")) {
             if (!discounts.isEmpty()) {
-                bottlePrice = Float.parseFloat(prices.get(0).text().replaceAll(" |₽", "").replaceAll("-[0-9]{1,}%", ""));
-                bottleDiscount = Float.parseFloat(prices.get(0).text().split("-")[1].replaceAll("%", ""));
+                bottlePrice = Float.parseFloat(prices.get(0).text().split("-")[0].replaceAll(" |₽", ""));
+                bottleDiscount = Float.parseFloat(prices.get(0).text().split("-")[1].replace("%", ""));
             } else {
                 bottlePrice = Float.parseFloat(prices.get(0).text().replaceAll(" |₽", ""));
                 bottleDiscount = 0;
@@ -108,38 +102,60 @@ public class Parser {
 
         if (wineDoc.is(":has(.product-info__list-item)")) {
             Elements productFacts = wineDoc.getElementsByClass("product-info__list-item");
-            for (Element productFact : productFacts) {
-                if (productFact.childrenSize() > 0) {
-                    String fact = productFact.child(0).text();
-                    switch (fact) {
-                        case "Страна, регион:":
-                            sw.country(productFact.child(1).text().split(",")[0]);
-                            break;
-                        case "Вино:":
-                            sw.color(colorMap.getOrDefault(productFact.child(1).text(), RED));
-                            break;
-                        case "Сахар:":
-                            sw.sugar(sugarMap.getOrDefault(productFact.child(1).text(), DRY));
-                            break;
-                        case "Виноград:":
-                            sw.grapeSort(Arrays.asList(productFact.child(1).text().split(", ")));
-                            break;
-                        case "Производитель:":
-                            sw.brand(productFact.child(1).text());
-                            break;
-                        case "Объем:":
-                            sw.capacity(Float.parseFloat(productFact.child(1).text().replaceAll(" |л", "")));
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
+            parseProductFacts(sw, productFacts);
         } else {
             ParserService.eventLogger.warn(W_WINE_DETAILS_PARSING_FAILED, wineDoc.baseUri());
         }
 
         Elements productCharateristics = wineDoc.getElementsByClass("characteristics-params__item");
+        parseProductCharateristics(sw, productCharateristics);
+
+        Elements productDescriptions = wineDoc.getElementsByClass("characteristics-description__item");
+        parseProductDescriptions(sw, productDescriptions);
+
+        log.debug("Wine parsing takes : {}", System.currentTimeMillis() - wineParseStart);
+        SimpleParserMetricsCollector.parseWineDetailsParsing(new Date().getTime() - wineParseStart);
+        SimpleWine wineRes = sw.link(wineDoc.baseUri()).discount(bottleDiscount).oldPrice(100 * bottlePrice / (100 - bottleDiscount))
+                .build();
+        checkAbsentFields(wineDoc, wineRes);
+        return wineRes;
+    }
+
+    private static void parseProductFacts(SimpleWine.SimpleWineBuilder sw, Elements productFacts) {
+        Map<String, ParserApi.Wine.Sugar> sugarMap = Map.of("сухое", DRY, "полусухое", MEDIUM_DRY, "полусладкое",
+                MEDIUM, "сладкое", SWEET);
+        Map<String, ParserApi.Wine.Color> colorMap = Map.of("красное", RED, "розовое", ROSE, "белое", WHITE,
+                "оранжевое", ORANGE);
+        for (Element productFact : productFacts) {
+            if (productFact.childrenSize() > 0) {
+                String fact = productFact.child(0).text();
+                switch (fact) {
+                    case "Страна, регион:":
+                        sw.country(productFact.child(1).text().split(",")[0]);
+                        break;
+                    case "Вино:":
+                        sw.color(colorMap.getOrDefault(productFact.child(1).text(), RED));
+                        break;
+                    case "Сахар:":
+                        sw.sugar(sugarMap.getOrDefault(productFact.child(1).text(), DRY));
+                        break;
+                    case "Виноград:":
+                        sw.grapeSort(Arrays.asList(productFact.child(1).text().split(", ")));
+                        break;
+                    case "Производитель:":
+                        sw.brand(productFact.child(1).text());
+                        break;
+                    case "Объем:":
+                        sw.capacity(Float.parseFloat(productFact.child(1).text().replaceAll(" |л", "")));
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    }
+
+    private static void parseProductCharateristics(SimpleWine.SimpleWineBuilder sw, Elements productCharateristics) {
         for (Element productCharateristic : productCharateristics) {
             String charateristicTitle = productCharateristic.child(0).text();
             switch (charateristicTitle) {
@@ -156,8 +172,9 @@ public class Parser {
                     break;
             }
         }
+    }
 
-        Elements productDescriptions = wineDoc.getElementsByClass("characteristics-description__item");
+    private static void parseProductDescriptions(SimpleWine.SimpleWineBuilder sw, Elements productDescriptions) {
         for (Element productDescription : productDescriptions) {
             String descriptionItem = productDescription.children().first().text();
             switch (descriptionItem) {
@@ -171,10 +188,9 @@ public class Parser {
                     break;
             }
         }
-        log.debug("Wine parsing takes : {}", System.currentTimeMillis() - wineParseStart);
-        SimpleParserMetricsCollector.parseWineDetailsParsing(new Date().getTime() - wineParseStart);
-        SimpleWine wineRes = sw.link(wineDoc.baseUri()).discount(bottleDiscount).oldPrice(100 * bottlePrice / (100 - bottleDiscount))
-                .build();
+    }
+
+    private static void checkAbsentFields(Document wineDoc, SimpleWine wineRes) {
         for (Field f : wineRes.getClass().getDeclaredFields()) {
             f.setAccessible(true);
             try {
@@ -185,6 +201,5 @@ public class Parser {
                 log.warn("Field is not accessible");
             }
         }
-        return wineRes;
     }
 }
