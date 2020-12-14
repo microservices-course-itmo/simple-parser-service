@@ -157,7 +157,8 @@ public class MainController {
             html.append("<a>Sugar: </a>").append(someProduct.getSugar()).append("<br>");
             html.append("<a>Color: </a>").append(someProduct.getColor()).append("<br>");
             html.append("<a>New Price: </a>").append(someProduct.getNewPrice()).append("<br>");
-            html.append("<a>Old Price: </a>").append(someProduct.getOldPrice()).append("<br><br>");
+            html.append("<a>Old Price: </a>").append(someProduct.getOldPrice()).append("<br>");
+            html.append("<a>Sparkling: </a>").append(someProduct.getSparkling()).append("<br><br>");
         }
         return html.toString();
     }

@@ -207,16 +207,16 @@ public class ParserService {
      * @param pagesToParse
      */
     private void addWineUrls(AtomicLong pageCounter, AtomicLong sparklingPageCounter, ArrayBlockingQueue<String> wineURLs, int pagesToParse, int sparklingPagesToParse) {
-        parseUrls(pageCounter, pagesToParse, wineURLs);
-        parseUrls(sparklingPageCounter, sparklingPagesToParse, wineURLs);
+        parseUrls(wineUrl, pageCounter, pagesToParse, wineURLs);
+        parseUrls(sparklingWineUrl, sparklingPageCounter, sparklingPagesToParse, wineURLs);
     }
 
-    private void parseUrls(AtomicLong pageCounter, int pagesToParse, ArrayBlockingQueue<String> wineURLs) {
+    private void parseUrls(String baseURL, AtomicLong pageCounter, int pagesToParse, ArrayBlockingQueue<String> wineURLs) {
         try {
             long winePageCatalogParseStart = System.currentTimeMillis();
             while (pageCounter.longValue() <= pagesToParse) {
                 long wineParseStart = System.currentTimeMillis();
-                Document doc = Jsoup.connect(wineUrl + pageCounter.get()).get();
+                Document doc = Jsoup.connect(baseURL + pageCounter.get()).get();
                 SimpleParserMetricsCollector.fetchDetailsWine(new Date().getTime() - wineParseStart);
                 Elements wines = doc.getElementsByClass("catalog-grid__item");
                 for (Element wine : wines) {
@@ -224,14 +224,14 @@ public class ParserService {
                         wineURLs.add(wine.getElementsByClass("product-snippet__name").attr("href"));
                 }
                 log.debug("Parsed {} wines from url {}", wines.size(),
-                        wineUrl + pageCounter.get());
-                eventLogger.info(I_WINES_PAGE_PARSED, wineUrl + pageCounter.getAndIncrement());
+                        baseURL + pageCounter.get());
+                eventLogger.info(I_WINES_PAGE_PARSED, baseURL + pageCounter.getAndIncrement());
                 SimpleParserMetricsCollector.winePageParsingDuration(new Date().getTime() - wineParseStart);
             }
             SimpleParserMetricsCollector.fetchWinePage(new Date().getTime() - winePageCatalogParseStart);
         } catch (IOException e) {
             log.error("Error while parsing page: ", e);
-            eventLogger.warn(W_WINE_PAGE_PARSING_FAILED, wineUrl + pageCounter.get());
+            eventLogger.warn(W_WINE_PAGE_PARSING_FAILED, baseURL + pageCounter.get());
         }
     }
 
