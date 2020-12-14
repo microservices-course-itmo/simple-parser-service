@@ -242,21 +242,21 @@ public class ParserService {
         if (products.isEmpty()) {
             log.error("\t Z E R O\tP A R S I N G");
         } else {
-            ParserApi.WineParsedEvent.Builder message = ParserApi.WineParsedEvent.newBuilder();
             if (products.size() >= 1000) {
-                int messageSize = (int) Math.round(products.size() / 4.0);
-                for (int i = 0; i < 4; i++) {
-                    if (i == 3)
-                        message = message
-                                .addAllWines(products.subList(i * messageSize, products.size() - 1));
+                int messageSize = (int) Math.round(products.size() / 5.0);
+                for (int i = 0; i < 5; i++) {
+                    ParserApi.WineParsedEvent.Builder dividedMessage = ParserApi.WineParsedEvent
+                            .newBuilder().setShopLink(url).setParserName("simple-parser-service");
+                    if (i == 4)
+                        dividedMessage.addAllWines(products.subList(i * messageSize, products.size()));
                     else
-                        message = message
-                                .addAllWines(products.subList(i * messageSize, (i + 1) * messageSize - 1));
+                        dividedMessage.addAllWines(products.subList(i * messageSize, (i + 1) * messageSize));
+                    kafkaSendMessageService.sendMessage(dividedMessage.build());
                 }
             } else {
-                message = message.addAllWines(products);
+                kafkaSendMessageService.sendMessage(ParserApi.WineParsedEvent.newBuilder()
+                        .setShopLink(url).setParserName("simple-parser-service").addAllWines(products).build());
             }
-            kafkaSendMessageService.sendMessage(message.setShopLink(url).setParserName("simple-parser-service").build());
             messageToKafka = ParserApi.WineParsedEvent.newBuilder().addAllWines(products).build();
         }
     }
