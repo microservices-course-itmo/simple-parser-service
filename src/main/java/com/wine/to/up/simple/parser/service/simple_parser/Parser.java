@@ -65,8 +65,8 @@ public class Parser {
 
         if (wineDoc.is(":has(.product__header-russian-name)")) {
             sw.name(wineDoc.getElementsByClass("product__header-russian-name").get(0).text().split(" ")[2]);
-        } else if (wineDoc.is(":has(.product-card-new__header-info)")) {
-            sw.name(wineDoc.getElementsByClass("product-card-new__header-info").get(0).text().split(" ")[2]);
+        } else if (wineDoc.is(":has(.product-card-new__header-title)")) {
+            sw.name(wineDoc.getElementsByClass("product-card-new__header-title").get(0).text().split(",")[0]);
         } else {
             log.error("The layout has been changed!");
             ParserService.eventLogger.warn(W_WINE_DETAILS_PARSING_FAILED, wineDoc.baseUri());
