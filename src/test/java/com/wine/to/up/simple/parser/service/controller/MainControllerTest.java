@@ -156,7 +156,7 @@ public class MainControllerTest {
         assertEquals("<a>Name: </a>Бин 60 Шираз<br><a>Link: </a>https://simplewine/catalog/product/lindeman_s_bin_50_shiraz_2018_075/<br>" +
                         "<a>Brand: </a>Lindeman's<br><a>Country: </a>Австралия<br><a>Region: </a>Новый Южный Уэльс<br>" +
                         "<a>Year: </a>2018<br><a>Grapes: </a>[шираз]<br><a>Volume: </a>0.75<br><a>ABV: </a>13.0<br><a>Sugar: </a>MEDIUM_DRY<br>" +
-                        "<a>Color: </a>RED<br><a>New Price: </a>902.0<br><a>Old Price: </a>0.0<br><br>"
+                        "<a>Color: </a>RED<br><a>New Price: </a>902.0<br><a>Old Price: </a>0.0<br><a>Sparkling: </a>false<br><br>"
                 , mainController.getAllProducts());
     }
 
