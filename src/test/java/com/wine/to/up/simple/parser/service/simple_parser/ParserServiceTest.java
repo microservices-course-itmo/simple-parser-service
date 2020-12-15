@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.modelmapper.ModelMapper;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -69,15 +70,24 @@ public class ParserServiceTest {
     @Test
     public void testStartParser() {
         Assertions.assertDoesNotThrow(() -> parserService.startParser(1, 1));
+        Mockito.verify(eventLogger, Mockito.atLeastOnce()).info(Mockito.any(), Mockito.any());
+        Mockito.verify(wineService, Mockito.atLeastOnce()).saveAllWineParsedInfo(Mockito.any());
+        Mockito.verify(kafkaSendMessageService, Mockito.atLeastOnce()).sendMessage(Mockito.any());
     }
 
     @Test
     public void testStartParserNegative() {
         Assertions.assertDoesNotThrow(() -> parserService.startParser(-1, -1));
+        Mockito.verify(eventLogger, Mockito.never()).info(Mockito.any(), Mockito.any());
+        Mockito.verify(wineService, Mockito.never()).saveAllWineParsedInfo(Mockito.any());
+        Mockito.verify(kafkaSendMessageService, Mockito.never()).sendMessage(Mockito.any());
     }
 
     @Test
     public void testStartParserLimitExceeded() {
         Assertions.assertDoesNotThrow(() -> parserService.startParser(100500, 123));
+        Mockito.verify(eventLogger, Mockito.never()).info(Mockito.any(), Mockito.any());
+        Mockito.verify(wineService, Mockito.never()).saveAllWineParsedInfo(Mockito.any());
+        Mockito.verify(kafkaSendMessageService, Mockito.never()).sendMessage(Mockito.any());
     }
 }
