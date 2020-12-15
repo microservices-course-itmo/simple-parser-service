@@ -27,5 +27,4 @@ public enum SimpleParserNotableEvents implements NotableEvent {
     public String getName() {
         return name();
     }
-
 }

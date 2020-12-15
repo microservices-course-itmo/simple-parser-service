@@ -1,6 +1,5 @@
 package com.wine.to.up.simple.parser.service.repository;
 
-
 import com.wine.to.up.simple.parser.service.domain.entity.Grapes;
 import com.wine.to.up.simple.parser.service.domain.entity.Wine;
 import com.wine.to.up.simple.parser.service.domain.entity.WineGrapes;
@@ -27,7 +26,7 @@ public interface WineGrapesRepository extends CrudRepository<WineGrapes, UUID> {
      * Finding a connection between the wine and its grape sort by ID
      *
      * @param grape grape ID
-     * @param wine wine ID
+     * @param wine  wine ID
      * @return found instance of the {@link WineGrapes} entity.
      */
     WineGrapes findByGrapeIdAndAndWineId(Grapes grape, Wine wine);

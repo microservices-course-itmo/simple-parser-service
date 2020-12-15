@@ -61,9 +61,10 @@ public class MainController {
         parserService.startParser(pagesToParse, sparklingPagesToParse);
         return "Parser started by request";
     }
+
     @GetMapping(path = "/run-parser/one_page")
     public String runParserOnePage() {
-        parserService.startParser(1,0);
+        parserService.startParser(1, 0);
         return "Parser started by request";
     }
 
@@ -130,7 +131,6 @@ public class MainController {
         }
         return html.toString();
     }
-
 
     /**
      * Parser's homepage which contains links to some methods.

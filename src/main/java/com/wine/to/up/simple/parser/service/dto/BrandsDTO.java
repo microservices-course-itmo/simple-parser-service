@@ -9,12 +9,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BrandsDTO {
-
     private UUID brandID = UUID.randomUUID();
     private String brandName;
 
     public BrandsDTO(String brandName) {
         this.brandName = brandName;
     }
-
 }
