@@ -1,11 +1,9 @@
 package com.wine.to.up.simple.parser.service.controller;
 
-import com.wine.to.up.parser.common.api.schema.ParserApi;
 import com.wine.to.up.simple.parser.service.simple_parser.ParserService;
 import com.wine.to.up.simple.parser.service.domain.entity.*;
 import com.wine.to.up.simple.parser.service.repository.*;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @Validated
-@Slf4j
 @RequestMapping(path = "/simple-parser")
 public class MainController {
 
@@ -134,35 +131,6 @@ public class MainController {
         return html.toString();
     }
 
-    /**
-     * The method based on a GET request. Output of a message created to be sent to Kafka, contains all parsed wine information.
-     *
-     * @return list of all parsed wine info as HTML
-     */
-    @GetMapping(path = "/all-products")
-    @ResponseBody
-    public String getAllProducts() {
-        ParserApi.WineParsedEvent message = parserService.getMessage();
-        StringBuilder html = new StringBuilder();
-        for (ParserApi.Wine someProduct : message.getWinesList()) {
-            html.append("<a>Name: </a>").append(someProduct.getName()).append("<br>");
-            html.append("<a>Link: </a>").append(someProduct.getLink()).append("<br>");
-            html.append("<a>Brand: </a>").append(someProduct.getBrand()).append("<br>");
-            html.append("<a>Country: </a>").append(someProduct.getCountry()).append("<br>");
-            html.append("<a>Region: </a>").append(someProduct.getRegion(0)).append("<br>");
-            html.append("<a>Year: </a>").append(someProduct.getYear()).append("<br>");
-            html.append("<a>Grapes: </a>").append(someProduct.getGrapeSortList()).append("<br>");
-            html.append("<a>Volume: </a>").append(someProduct.getCapacity()).append("<br>");
-            html.append("<a>ABV: </a>").append(someProduct.getStrength()).append("<br>");
-            html.append("<a>Sugar: </a>").append(someProduct.getSugar()).append("<br>");
-            html.append("<a>Color: </a>").append(someProduct.getColor()).append("<br>");
-            html.append("<a>New Price: </a>").append(someProduct.getNewPrice()).append("<br>");
-            html.append("<a>Old Price: </a>").append(someProduct.getOldPrice()).append("<br>");
-            html.append("<a>Sparkling: </a>").append(someProduct.getSparkling()).append("<br><br>");
-        }
-        return html.toString();
-    }
-
 
     /**
      * Parser's homepage which contains links to some methods.
@@ -179,7 +147,6 @@ public class MainController {
         html += " <li><a href='/simple-parser/all-countries'>Show All Countries</a></li>";
         html += " <li><a href='/simple-parser/all-brands'>Show All Brands</a></li>";
         html += " <li><a href='/simple-parser/all-grapes'>Show All Grapes</a></li>";
-        html += " <li><a href='/simple-parser/all-products'>Show All Products as a Message to Kafka</a></li>";
         html += "</ul>";
         return html;
     }

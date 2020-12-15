@@ -1,6 +1,5 @@
 package com.wine.to.up.simple.parser.service.simple_parser;
 
-import com.wine.to.up.commonlib.annotations.InjectEventLogger;
 import com.wine.to.up.commonlib.logging.EventLogger;
 import com.wine.to.up.commonlib.messaging.KafkaMessageSender;
 import com.wine.to.up.parser.common.api.schema.ParserApi;
@@ -19,8 +18,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.junit.Assert.*;
 import static org.modelmapper.convention.MatchingStrategies.STRICT;
-
-import java.lang.reflect.Field;
 
 /**
  * Class for testing {@link ParserService}
@@ -67,13 +64,6 @@ public class ParserServiceTest {
     @Test
     public void testURLtoDocumentWrongUrl() {
         assertThrows(IllegalArgumentException.class, () -> ParserService.urlToDocument("Mem"));
-    }
-
-    @Test
-    public void testGetMessage() throws NoSuchFieldException, IllegalAccessException {
-        Field f = ParserService.class.getDeclaredField("messageToKafka");
-        f.setAccessible(true);
-        assertEquals(f.get(parserService), parserService.getMessage());
     }
 
     @Test

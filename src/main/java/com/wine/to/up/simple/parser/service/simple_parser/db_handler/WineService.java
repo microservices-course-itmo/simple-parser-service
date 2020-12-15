@@ -4,7 +4,10 @@ import com.wine.to.up.simple.parser.service.simple_parser.SimpleWine;
 import com.wine.to.up.simple.parser.service.domain.entity.*;
 import com.wine.to.up.simple.parser.service.repository.*;
 import com.wine.to.up.simple.parser.service.simple_parser.mappers.WineMapper;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
@@ -15,6 +18,7 @@ import java.util.List;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class WineService {
     /**
      * The repository that stores all info about wine.
@@ -25,18 +29,6 @@ public class WineService {
     private final GrapesService grapesService;
     private final WineGrapesService wineGrapesService;
     private final WineMapper wineMapper;
-
-    /**
-     * The service instance creation.
-     */
-    public WineService(GrapesRepository grapesRepository, BrandsRepository brandsRepository, CountriesRepository countriesRepository, WineGrapesRepository wineGrapesRepository, WineRepository wineRepository, WineMapper wineMapper) {
-        brandsService = new BrandsService(brandsRepository);
-        countriesService = new CountriesService(countriesRepository);
-        grapesService = new GrapesService(grapesRepository);
-        wineGrapesService = new WineGrapesService(wineGrapesRepository);
-        this.wineRepository = wineRepository;
-        this.wineMapper = wineMapper;
-    }
 
     /**
      * Adding all parsed info to the corresponding DB tables/repositories.)
@@ -96,7 +88,7 @@ public class WineService {
      * @return instance of the {@link Wine} entity
      */
     private Wine saveWine(SimpleWine newWine) {
-        Wine wineEntity = wineMapper.toDB(newWine);
+        Wine wineEntity = wineMapper.toEntity(newWine);
         wineRepository.save(wineEntity);
         log.trace("New Wine was added to DB: {}", wineEntity.toString());
 

@@ -38,7 +38,6 @@ public class ParserService {
     @Value("${parser.sparkling_wineurl}")
     private String sparklingWineUrl;
     private static final int NUMBER_OF_THREADS = 15;
-    private ParserApi.WineParsedEvent messageToKafka;
     private final ExecutorService pagesExecutor = Executors.newSingleThreadExecutor();
     private final ExecutorService winesExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
 
@@ -71,7 +70,7 @@ public class ParserService {
                 }
             }
         } catch (IOException e) {
-            log.error("Incorrect URL address: " + someURL);
+            log.error("Incorrect URL address: {}", someURL);
         }
         return wineDoc;
     }
@@ -146,14 +145,6 @@ public class ParserService {
         parser(Parser.parseNumberOfPages(urlToDocument(url + "/catalog/vino/")), Parser.parseNumberOfPages(urlToDocument(url + "/catalog/shampanskoe_i_igristoe_vino/")));
     }
 
-    /**
-     * Getting of all products
-     *
-     * @return Message to Kafka
-     */
-    public ParserApi.WineParsedEvent getMessage() {
-        return messageToKafka;
-    }
 
     /**
      * Adding wine to the Product list
@@ -195,7 +186,7 @@ public class ParserService {
             }
         } catch (Exception e) {
             log.error("DB error ", e);
-            eventLogger.warn(W_SOME_WARN_EVENT, e.getMessage() + " caused by: " + e.getCause());
+            eventLogger.warn(W_SOME_WARN_EVENT, "{} caused by: {}", e.getMessage(), e.getCause());
         }
     }
 
@@ -257,7 +248,6 @@ public class ParserService {
                 kafkaSendMessageService.sendMessage(ParserApi.WineParsedEvent.newBuilder()
                         .setShopLink(url).setParserName("simple-parser-service").addAllWines(products).build());
             }
-            messageToKafka = ParserApi.WineParsedEvent.newBuilder().addAllWines(products).build();
         }
     }
 }

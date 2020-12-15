@@ -1,6 +1,5 @@
 package com.wine.to.up.simple.parser.service.controller;
 
-import com.wine.to.up.parser.common.api.schema.ParserApi;
 import com.wine.to.up.simple.parser.service.domain.entity.Brands;
 import com.wine.to.up.simple.parser.service.domain.entity.Countries;
 import com.wine.to.up.simple.parser.service.domain.entity.Grapes;
@@ -10,20 +9,15 @@ import com.wine.to.up.simple.parser.service.repository.CountriesRepository;
 import com.wine.to.up.simple.parser.service.repository.GrapesRepository;
 import com.wine.to.up.simple.parser.service.repository.WineRepository;
 import com.wine.to.up.simple.parser.service.simple_parser.ParserService;
-import com.wine.to.up.simple.parser.service.simple_parser.SimpleWine;
-import com.wine.to.up.simple.parser.service.simple_parser.mappers.WineMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.modelmapper.ModelMapper;
-
 import java.util.*;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
-import static org.modelmapper.convention.MatchingStrategies.STRICT;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MainControllerTest {
@@ -116,51 +110,6 @@ public class MainControllerTest {
     }
 
     @Test
-    public void testGetAllProducts() {
-        SimpleWine simpleWine = SimpleWine.builder().
-                name("Бин 60 Шираз").
-                brand("Lindeman's").
-                country("Австралия").
-                newPrice((float) 902.0).
-                year(2018).
-                capacity((float) 0.75).
-                strength((float) 13.0).
-                color(ParserApi.Wine.Color.RED).
-                grapeSort(Collections.singleton("шираз")).
-                sugar(ParserApi.Wine.Sugar.MEDIUM_DRY).
-                discount((float) 20.0).
-                region("Новый Южный Уэльс").
-                link("https://simplewine/catalog/product/lindeman_s_bin_50_shiraz_2018_075/").
-                rating((float) 4.6).
-                image("https://static.simplewine.ru/upload/iblock/3ce/vino-bin-50-shiraz-lindeman-s-2018_1.png@x303").
-                gastronomy("Прекрасно в сочетании с жареным ягненком, свининой с овощами и сырами средней выдержки.").
-                taste("Вино блестящего фиолетово-красного цвета с яркими ароматами темных спелых ягод, ванили, лакрицы и легкими перечными нотками. " +
-                        "Среднетелое, насыщенное и хорошо структурированное во вкусе, с бархатистыми танинами и оттенками черной смородины, сливы и ванили в послевкусии.").
-                sparkling(false).
-                build();
-
-        ModelMapper modelMapper = new ModelMapper();
-        modelMapper
-                .getConfiguration()
-                .setSkipNullEnabled(true)
-                .setFieldMatchingEnabled(true)
-                .setFieldAccessLevel(org.modelmapper.config.Configuration.AccessLevel.PRIVATE)
-                .setMatchingStrategy(STRICT)
-                .setAmbiguityIgnored(true);
-        WineMapper wineMapper = new WineMapper(modelMapper);
-
-        List<ParserApi.Wine> products = new ArrayList<>();
-        products.add(wineMapper.toKafka(simpleWine).build());
-        ParserApi.WineParsedEvent message = ParserApi.WineParsedEvent.newBuilder().addAllWines(products).build();
-        when(parserService.getMessage()).thenReturn(message);
-        assertEquals("<a>Name: </a>Бин 60 Шираз<br><a>Link: </a>https://simplewine/catalog/product/lindeman_s_bin_50_shiraz_2018_075/<br>" +
-                        "<a>Brand: </a>Lindeman's<br><a>Country: </a>Австралия<br><a>Region: </a>Новый Южный Уэльс<br>" +
-                        "<a>Year: </a>2018<br><a>Grapes: </a>[шираз]<br><a>Volume: </a>0.75<br><a>ABV: </a>13.0<br><a>Sugar: </a>MEDIUM_DRY<br>" +
-                        "<a>Color: </a>RED<br><a>New Price: </a>902.0<br><a>Old Price: </a>0.0<br><a>Sparkling: </a>false<br><br>"
-                , mainController.getAllProducts());
-    }
-
-    @Test
     public void testHome() {
         String expectedHTML = "<ul>";
         expectedHTML += " <li><a href='/simple-parser/run-parser'>Run parser</a></li>";
@@ -168,7 +117,6 @@ public class MainControllerTest {
         expectedHTML += " <li><a href='/simple-parser/all-countries'>Show All Countries</a></li>";
         expectedHTML += " <li><a href='/simple-parser/all-brands'>Show All Brands</a></li>";
         expectedHTML += " <li><a href='/simple-parser/all-grapes'>Show All Grapes</a></li>";
-        expectedHTML += " <li><a href='/simple-parser/all-products'>Show All Products as a Message to Kafka</a></li>";
         expectedHTML += "</ul>";
         assertEquals(expectedHTML, mainController.home());
     }

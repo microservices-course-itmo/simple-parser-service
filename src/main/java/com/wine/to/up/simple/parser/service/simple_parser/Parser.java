@@ -38,7 +38,7 @@ public class Parser {
             numberOfPages = Integer.parseInt(mainPage.getElementsByAttributeValue("class", "pagination__navigation")
                     .get(0).children().last().previousElementSibling().text());
         } catch (IndexOutOfBoundsException e) {
-            log.error("No pagination__navigation was found on page: " + mainPage.baseUri());
+            log.error("No pagination__navigation was found on page: {}", mainPage.baseUri());
         }
         log.trace("Number of pages to parse: {}", numberOfPages);
         return numberOfPages;

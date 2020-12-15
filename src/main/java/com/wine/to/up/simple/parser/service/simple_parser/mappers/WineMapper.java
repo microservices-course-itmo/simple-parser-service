@@ -39,7 +39,7 @@ public class WineMapper {
         return newWine;
     }
 
-    public Wine toDB(SimpleWine wine) {
+    public Wine toEntity(SimpleWine wine) {
         return wine == null ? null : modelMapper.map(wine, Wine.class);
     }
 }
