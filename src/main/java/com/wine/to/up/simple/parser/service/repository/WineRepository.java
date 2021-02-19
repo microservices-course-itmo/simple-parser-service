@@ -29,6 +29,14 @@ public interface WineRepository extends CrudRepository<Wine, UUID> {
     Wine findWineByLinkAndNewPrice(String link, float price);
 
     /**
+     * Finding wines by name
+     *
+     * @param name  name of wines
+     * @return found list of wines entity with the entered name.
+     */
+    Iterable<Wine> findWineByName(String name);
+
+    /**
      * Existence check by link and price. One wine has one link.
      *
      * @param link  link to the wine page
