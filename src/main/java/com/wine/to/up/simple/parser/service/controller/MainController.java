@@ -58,96 +58,77 @@ public class MainController {
      */
     @GetMapping(path = "/run-parser")
     public String runParser(@RequestParam int pagesToParse, @RequestParam int sparklingPagesToParse) {
-        parserService.startParser(pagesToParse, sparklingPagesToParse);
-        return "Parser started by request";
+        if (pagesToParse > 0 || sparklingPagesToParse > 0) {
+            parserService.startParser(pagesToParse, sparklingPagesToParse);
+            return "Parser started by request";
+        } else {
+            return "Parser didn't start";
+        }
     }
 
-    @GetMapping(path = "/run-parser/one_page")
-    public String runParserOnePage() {
-        parserService.startParser(1, 0);
+    /**
+     * The method based on a GET request. The parser runs on all pages when the request is received.
+     *
+     * @return message about successful execution.
+     */
+    @GetMapping(path = "/run-parser-all-pages")
+    public String runParserAllPages() {
+        parserService.startParser();
         return "Parser started by request";
     }
 
     /**
      * The method based on a GET request. Output of all grape types stored in the grapesRepository {@link GrapesRepository}.
      *
-     * @return list of all grape types as HTML
+     * @return list of all {@link Grapes}
      */
     @GetMapping(path = "/all-grapes")
     @ResponseBody
-    public String getAllGrapes() {
-        Iterable<Grapes> grapes = grapesRepository.findAll();
-        StringBuilder html = new StringBuilder();
-        for (Grapes someGrape : grapes) {
-            html.append(someGrape).append("<br>");
-        }
-        return html.toString();
+    public Iterable<Grapes> getAllGrapes() {
+        return grapesRepository.findAll();
     }
 
     /**
      * The method based on a GET request. Output of all brands stored in the {@link BrandsRepository}.
      *
-     * @return list of all brands as HTML
+     * @return list of all {@link Brands}
      */
     @GetMapping(path = "/all-brands")
     @ResponseBody
-    public String getAllBrands() {
-        Iterable<Brands> brands = brandsRepository.findAll();
-        StringBuilder html = new StringBuilder();
-        for (Brands someBrand : brands) {
-            html.append(someBrand).append("<br>");
-        }
-        return html.toString();
+    public Iterable<Brands> getAllBrands() {
+        return brandsRepository.findAll();
     }
 
     /**
      * The method based on a GET request. Output of all countries stored in the {@link CountriesRepository}.
      *
-     * @return list of all countries as HTML
+     * @return list of {@link Countries}
      */
     @GetMapping(path = "/all-countries")
     @ResponseBody
-    public String getAllCountries() {
-        Iterable<Countries> countries = countriesRepository.findAll();
-        StringBuilder html = new StringBuilder();
-        for (Countries someCountry : countries) {
-            html.append(someCountry).append("<br>");
-        }
-        return html.toString();
+    public Iterable<Countries> getAllCountries() {
+        return countriesRepository.findAll();
     }
 
     /**
      * A method based on a GET request. Output of all wines stored in the {@link WineRepository}.
      *
-     * @return list of all wines as HTML
+     * @return list of all wines as iterable list
      */
     @GetMapping(path = "/all-wines")
     @ResponseBody
-    public String getAllWines() {
-        Iterable<Wine> wines = wineRepository.findAll();
-        StringBuilder html = new StringBuilder();
-        for (Wine someWine : wines) {
-            html.append(someWine).append("<br>");
-        }
-        return html.toString();
+    public Iterable<Wine> getAllWines() {
+        return wineRepository.findAll();
     }
 
     /**
-     * Parser's homepage which contains links to some methods.
+     * A method based on a GET request. Output of a wine stored in the {@link WineRepository} by name.
      *
-     * @return HTML page with links
+     * @return instance list of {@link Wine}s
      */
+    @GetMapping(path = "/wine-by-name")
     @ResponseBody
-    @GetMapping(path = "/")
-    public String home() {
-        String html = "";
-        html += "<ul>";
-        html += " <li><a href='/simple-parser/run-parser'>Run parser</a></li>";
-        html += " <li><a href='/simple-parser/all-wines'>Show All Wines</a></li>";
-        html += " <li><a href='/simple-parser/all-countries'>Show All Countries</a></li>";
-        html += " <li><a href='/simple-parser/all-brands'>Show All Brands</a></li>";
-        html += " <li><a href='/simple-parser/all-grapes'>Show All Grapes</a></li>";
-        html += "</ul>";
-        return html;
+    public Iterable<Wine> getWineByName(@RequestParam String name) {
+        return wineRepository.findWineByName(name);
     }
 }
