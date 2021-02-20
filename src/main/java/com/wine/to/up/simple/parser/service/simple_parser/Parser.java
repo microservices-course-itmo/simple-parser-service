@@ -12,7 +12,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
-import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -183,14 +183,16 @@ public class Parser {
     }
 
     private static void checkAbsentFields(Document wineDoc, SimpleWine wineRes) {
-        for (Field f : wineRes.getClass().getDeclaredFields()) {
-            f.setAccessible(true);
-            try {
-                if (!f.getName().equals("brandID") && !f.getName().equals("countryID") && f.get(wineRes) == null) {
-                    ParserService.eventLogger.warn(W_WINE_ATTRIBUTE_ABSENT, f.getName(), wineDoc.baseUri());
+        for (Method m : wineRes.getClass().getMethods()) {
+            if (m.getName().startsWith("get") && m.getParameterTypes().length == 0 && !m.getName().endsWith("BrandID") && !m.getName().endsWith("CountryID")) {
+                try {
+                    if (m.invoke(wineRes) == null) {
+                        String fieldName = m.getName().substring(3);
+                        ParserService.eventLogger.warn(W_WINE_ATTRIBUTE_ABSENT, fieldName.substring(0, 1).toLowerCase() + fieldName.substring(1), wineDoc.baseUri());
+                    }
+                } catch (Exception e) {
+                    log.warn("Field is not accessible");
                 }
-            } catch (IllegalAccessException e) {
-                log.warn("Field is not accessible");
             }
         }
     }
