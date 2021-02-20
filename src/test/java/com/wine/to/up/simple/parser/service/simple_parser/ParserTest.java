@@ -17,7 +17,7 @@ import java.util.Collections;
 /**
  * Class for testing {@link Parser}
  */
-class ParserTest {
+public class ParserTest {
     /**
      * Testing {@link Parser#parseNumberOfPages(Document)} method<br>
      * Trying to get number of pages from downloaded SimpleWine HTML catalog page with 1, 3, 5 and 107 pages
@@ -27,7 +27,7 @@ class ParserTest {
 
     @ParameterizedTest
     @CsvSource({"Catalog_1_page.html,1", "Catalog_3_pages.html,3", "Catalog_5_pages.html,5", "Catalog_107_pages.html,107"})
-    void testParseNumberOfPages(String fileName, int expectedNumOfPages) throws IOException {
+    public void testParseNumberOfPages(String fileName, int expectedNumOfPages) throws IOException {
         File testCatalogPageFile = new File("src/test/test-resources/" + fileName);
         Document testCatalogPage = Jsoup.parse(testCatalogPageFile, "UTF-8");
         int numberOfPages = Parser.parseNumberOfPages(testCatalogPage);
@@ -61,7 +61,7 @@ class ParserTest {
         File testWinePageFile = new File("src/test/test-resources/Wine_SimpleWine.html");
         Document testWinePage = Jsoup.parse(testWinePageFile, "UTF-8");
         SimpleWine testWine = SimpleWine.builder().
-                name("Бин").
+                name("Вино Bin 50 Shiraz").
                 brand("Lindeman's").
                 country("Австралия").
                 newPrice((float) 833.0).
@@ -96,7 +96,7 @@ class ParserTest {
     public void testParseWineWrongPageFormat() throws IOException {
         File testWinePageFile = new File("src/test/test-resources/Catalog_107_pages.html"); //catalog page instead of wine page
         Document testWinePage = Jsoup.parse(testWinePageFile, "UTF-8");
-        assertThrows(IndexOutOfBoundsException.class, () ->
+        assertThrows(NullPointerException.class, () ->
                 Parser.parseWine(testWinePage)
         );
     }
