@@ -93,7 +93,7 @@ public class MainController {
         for (Wine wine : wineIterable) {
             wineList.add(wineMapper.toKafka(wine).build());
         }
-        parserService.generateMessageToKafka(wineList);
+        parserService.generateDividedMessageToKafka(wineList);
     }
 
     /**
