@@ -37,13 +37,15 @@ public class ParserService {
     private String wineUrl;
     @Value("${parser.sparkling_wineurl}")
     private String sparklingWineUrl;
-    private static final int NUMBER_OF_THREADS = 15;
+    private static final int NUMBER_OF_THREADS = 1;
     private final ExecutorService pagesExecutor = Executors.newSingleThreadExecutor();
     private final ExecutorService winesExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
 
     private final KafkaMessageSender<ParserApi.WineParsedEvent> kafkaSendMessageService;
     private final WineService wineService;
     private final WineMapper wineMapper;
+
+    private int wineCounter = 0;
 
     public ParserService(KafkaMessageSender<ParserApi.WineParsedEvent> kafkaSendMessageService, WineService wineService, WineMapper wineMapper) {
         this.kafkaSendMessageService = kafkaSendMessageService;
@@ -115,12 +117,19 @@ public class ParserService {
         }
         futures.forEach(CompletableFuture::join);
         log.info("End of adding information to the database.");
-        generateMessageToKafka(products);
+
+        if (!products.isEmpty()) {
+            generateMessageToKafka(products);
+        }
+        if (this.wineCounter == 0) {
+            log.error("\t Z E R O\tP A R S I N G");
+        }
+
         log.info("TIME : {} min {} seconds", TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - start),
                 TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()
                         - TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - start) * 60000 - start));
         SimpleParserMetricsCollector.parseProcess(System.currentTimeMillis() - start);
-        log.info("End of parsing, {} wines collected and sent to Kafka", products.size());
+        log.info("End of parsing, {} wines collected and sent to Kafka", this.wineCounter);
         SimpleParserMetricsCollector.recordParsingCompleted(true);
     }
 
@@ -145,7 +154,6 @@ public class ParserService {
         parser(Parser.parseNumberOfPages(urlToDocument(url + "/catalog/vino/")), Parser.parseNumberOfPages(urlToDocument(url + "/catalog/shampanskoe_i_igristoe_vino/")));
     }
 
-
     /**
      * Adding wine to the Product list
      *
@@ -154,7 +162,7 @@ public class ParserService {
      * @param dbHandler
      * @param wineCounter
      */
-    private void addWineToProducts(String wineURL, List<ParserApi.Wine> products, WineService dbHandler, AtomicInteger wineCounter) {
+    private void addWineToProducts(String wineURL, List<ParserApi.Wine> products, WineService dbHandler, AtomicInteger wineCounter) throws InterruptedException {
         Document wineDocument = urlToDocument(url + wineURL);
         if (wineDocument != null && wineDocument.getElementsByClass("product-page").first().children().first().className().equals("container")) {
             SimpleWine wine = Parser.parseWine(wineDocument);
@@ -162,6 +170,9 @@ public class ParserService {
             ParserApi.Wine newProduct = wineMapper.toKafka(wine).build();
             if (!products.contains(newProduct)) {
                 products.add(newProduct);
+                if (products.size() == 5) {
+                    generateMessageToKafka(products);
+                }
                 SimpleParserMetricsCollector.winesPublishedToKafka();
                 eventLogger.info(I_WINE_DETAILS_PARSED, url + wineURL);
             }
@@ -169,6 +180,7 @@ public class ParserService {
         } else {
             eventLogger.warn(W_WINE_DETAILS_PARSING_FAILED, url + wineURL);
         }
+        Thread.sleep(8_000);
     }
 
     /**
@@ -230,24 +242,12 @@ public class ParserService {
      * @param products
      */
     private void generateMessageToKafka(List<ParserApi.Wine> products) {
-        if (products.isEmpty()) {
-            log.error("\t Z E R O\tP A R S I N G");
-        } else {
-            if (products.size() >= 1000) {
-                int messageSize = (int) Math.round(products.size() / 5.0);
-                for (int i = 0; i < 5; i++) {
-                    ParserApi.WineParsedEvent.Builder dividedMessage = ParserApi.WineParsedEvent
-                            .newBuilder().setShopLink(url).setParserName("simple-parser-service");
-                    if (i == 4)
-                        dividedMessage.addAllWines(products.subList(i * messageSize, products.size()));
-                    else
-                        dividedMessage.addAllWines(products.subList(i * messageSize, (i + 1) * messageSize));
-                    kafkaSendMessageService.sendMessage(dividedMessage.build());
-                }
-            } else {
-                kafkaSendMessageService.sendMessage(ParserApi.WineParsedEvent.newBuilder()
-                        .setShopLink(url).setParserName("simple-parser-service").addAllWines(products).build());
-            }
-        }
+        this.wineCounter += products.size();
+        kafkaSendMessageService.sendMessage(ParserApi.WineParsedEvent.newBuilder().
+                setShopLink(url).
+                setParserName("simple-parser-service").
+                addAllWines(products).
+                build());
+        products.clear();
     }
 }
