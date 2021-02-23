@@ -229,7 +229,7 @@ public class ParserService {
     /**
      * @param products
      */
-    private void generateMessageToKafka(List<ParserApi.Wine> products) {
+    public void generateMessageToKafka(List<ParserApi.Wine> products) {
         if (products.isEmpty()) {
             log.error("\t Z E R O\tP A R S I N G");
         } else {
