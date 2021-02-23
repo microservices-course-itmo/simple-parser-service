@@ -94,7 +94,7 @@ public class MainController {
             wineList.add(wineMapper.toKafka(wine).build());
         }
         parserService.generateDividedMessageToKafka(wineList);
-        return "Sent " + wineList.size() +" wine to kafka.";
+        return "Sent " + wineList.size() +" wines to kafka.";
     }
 
     /**
