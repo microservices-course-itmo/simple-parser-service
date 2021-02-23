@@ -87,13 +87,14 @@ public class MainController {
      * The method based on a POST request. Wine data transfer from the database to Kafka.
      */
     @PostMapping(path = "/update")
-    public void sendMessageToKafka() {
+    public String sendMessageToKafka() {
         Iterable<Wine> wineIterable = wineRepository.findAll();
         List<ParserApi.Wine> wineList = new ArrayList<>();
         for (Wine wine : wineIterable) {
             wineList.add(wineMapper.toKafka(wine).build());
         }
         parserService.generateDividedMessageToKafka(wineList);
+        return "Sent " + wineList.size() +" wines to kafka.";
     }
 
     /**
