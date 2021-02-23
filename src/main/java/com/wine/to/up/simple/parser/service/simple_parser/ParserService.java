@@ -153,7 +153,7 @@ public class ParserService {
     public void startParser() {
         parser(Parser.parseNumberOfPages(urlToDocument(url + "/catalog/vino/")), Parser.parseNumberOfPages(urlToDocument(url + "/catalog/shampanskoe_i_igristoe_vino/")));
     }
-
+    
     /**
      * Adding wine to the Product list
      *
@@ -249,5 +249,27 @@ public class ParserService {
                 addAllWines(products).
                 build());
         products.clear();
+    }
+
+    public void generateDividedMessageToKafka(List<ParserApi.Wine> products) {
+        if (products.isEmpty()) {
+            log.error("Database is empty");
+        } else {
+            if (products.size() >= 1000) {
+                int messageSize = (int) Math.round(products.size() / 5.0);
+                for (int i = 0; i < 5; i++) {
+                    ParserApi.WineParsedEvent.Builder dividedMessage = ParserApi.WineParsedEvent
+                            .newBuilder().setShopLink(url).setParserName("simple-parser-service");
+                    if (i == 4)
+                        dividedMessage.addAllWines(products.subList(i * messageSize, products.size()));
+                    else
+                        dividedMessage.addAllWines(products.subList(i * messageSize, (i + 1) * messageSize));
+                    kafkaSendMessageService.sendMessage(dividedMessage.build());
+                }
+            } else {
+                kafkaSendMessageService.sendMessage(ParserApi.WineParsedEvent.newBuilder()
+                        .setShopLink(url).setParserName("simple-parser-service").addAllWines(products).build());
+            }
+        }
     }
 }
