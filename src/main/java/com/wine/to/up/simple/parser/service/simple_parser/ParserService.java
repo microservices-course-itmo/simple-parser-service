@@ -62,7 +62,7 @@ public class ParserService {
     public static Document urlToDocument(String someURL) {
         Document wineDoc = null;
         try {
-            wineDoc = Jsoup.connect(someURL).get();
+            wineDoc = Jsoup.connect(someURL).maxBodySize(0).get();
             if (wineDoc.is(":has(.product-page)")) {
                 int rerequestNumber = 0;
                 while ((rerequestNumber < 3) && !wineDoc.getElementsByClass("product-page").first().children().first().className().equals("container")) {
@@ -219,7 +219,7 @@ public class ParserService {
             long winePageCatalogParseStart = System.currentTimeMillis();
             while (pageCounter.longValue() <= pagesToParse) {
                 long wineParseStart = System.currentTimeMillis();
-                Document doc = Jsoup.connect(baseURL + pageCounter.get()).get();
+                Document doc = Jsoup.connect(baseURL + pageCounter.get()).maxBodySize(0).get();
                 SimpleParserMetricsCollector.fetchDetailsWine(new Date().getTime() - wineParseStart);
                 Elements wines = doc.getElementsByClass("catalog-grid__item");
                 for (Element wine : wines) {

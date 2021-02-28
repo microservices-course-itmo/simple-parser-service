@@ -3,7 +3,6 @@ package com.wine.to.up.simple.parser.service.simple_parser;
 import com.wine.to.up.parser.common.api.schema.ParserApi;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.Test;
@@ -26,7 +25,8 @@ public class ParserTest {
      */
 
     @ParameterizedTest
-    @CsvSource({"Catalog_1_page.html,1", "Catalog_3_pages.html,3", "Catalog_5_pages.html,5", "Catalog_107_pages.html,107"})
+    @CsvSource({"Catalog_1_page.html,1",
+            "Catalog_150_pages.html,150"})
     public void testParseNumberOfPages(String fileName, int expectedNumOfPages) throws IOException {
         File testCatalogPageFile = new File("src/test/test-resources/" + fileName);
         Document testCatalogPage = Jsoup.parse(testCatalogPageFile, "UTF-8");
@@ -44,8 +44,6 @@ public class ParserTest {
     public void testParseNumberOfPagesNoPagesNavigation() throws IOException {
         File testCatalogPageFile = new File("src/test/test-resources/Wine_SimpleWine.html"); //wine page instead of catalog page
         Document testCatalogPage = Jsoup.parse(testCatalogPageFile, "UTF-8");
-        Elements elements = testCatalogPage.getElementsByAttributeValue("class", "pagination__navigation");
-        assertTrue(elements.isEmpty()); //"pagination__navigation" in input file is absent
         int numberOfPages = Parser.parseNumberOfPages(testCatalogPage);
         assertEquals(0, numberOfPages);
     }
@@ -64,23 +62,23 @@ public class ParserTest {
                 name("Вино Bin 50 Shiraz").
                 brand("Lindeman's").
                 country("Австралия").
-                newPrice((float) 833.0).
+                newPrice((float) 1054.0).
                 year(2018).
                 capacity((float) 0.75).
                 strength((float) 13.0).
                 color(ParserApi.Wine.Color.RED).
                 grapeSort(Collections.singleton("шираз")).
                 sugar(ParserApi.Wine.Sugar.MEDIUM_DRY).
-                discount((float) 30.0).
-                region("Новый Южный Уэльс").
+                discount((float) 15.0).
+                region("Южная Австралия").
                 link(testWinePage.baseUri()).
-                rating((float) 4.6).
-                image("https://static.simplewine.ru/upload/iblock/3ce/vino-bin-50-shiraz-lindeman-s-2018_1.png@x303").
+                rating((float) 4.4).
+                image("https://static.simplewine.ru/upload/iblock/4b6/4b61e9ce6183007cebdafeede881aa43.png@x303").
                 gastronomy("Прекрасно в сочетании с жареным ягненком, свининой с овощами и сырами средней выдержки.").
                 taste("Вино блестящего фиолетово-красного цвета с яркими ароматами темных спелых ягод, ванили, лакрицы и легкими перечными нотками. " +
                         "Среднетелое, насыщенное и хорошо структурированное во вкусе, с бархатистыми танинами и оттенками черной смородины, сливы и ванили в послевкусии.").
                 sparkling(false).
-                oldPrice((float) 1190.0).
+                oldPrice((float) 1240.0).
                 build();
         assertEquals(testWine.toString(), Parser.parseWine(testWinePage).toString());
     }
