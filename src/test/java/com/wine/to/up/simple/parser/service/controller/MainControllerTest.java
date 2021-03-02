@@ -56,7 +56,7 @@ public class MainControllerTest {
 
     @Test
     public void testRunParserAllPages() {
-        mainController.runParserAllPages();
+        Assertions.assertDoesNotThrow(() -> mainController.runParserAllPages());
         Mockito.verify(parserService, Mockito.atLeastOnce()).startParser();
     }
 
