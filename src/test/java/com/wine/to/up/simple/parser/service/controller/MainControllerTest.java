@@ -9,6 +9,7 @@ import com.wine.to.up.simple.parser.service.repository.CountriesRepository;
 import com.wine.to.up.simple.parser.service.repository.GrapesRepository;
 import com.wine.to.up.simple.parser.service.repository.WineRepository;
 import com.wine.to.up.simple.parser.service.simple_parser.ParserService;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,6 +18,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -25,7 +27,7 @@ import java.util.*;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-class MainControllerTest {
+public class MainControllerTest {
     @Mock
     private GrapesRepository grapesRepository;
     @Mock
@@ -40,23 +42,22 @@ class MainControllerTest {
     private MainController mainController;
 
     @BeforeEach
+    @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
     }
 
     @ParameterizedTest
-    @CsvSource({"1, 1", "0, 1", "1, 0", "-1, -1", "0, 0"})
-    void testRunParser(int pagesToParse, int sparklingPagesToParse) {
-        if (pagesToParse > 0 || sparklingPagesToParse > 0) {
-            Assertions.assertEquals("Parser started by request", mainController.runParser(pagesToParse, sparklingPagesToParse));
-        } else {
-            Assertions.assertEquals("Parser didn't start", mainController.runParser(pagesToParse, sparklingPagesToParse));
-        }
+    @CsvSource({"1, 1", "0, 1", "1, 0", "-1, -1", "0, 0", "1000, 1000"})
+    public void testRunParser(int pagesToParse, int sparklingPagesToParse) {
+        Assertions.assertDoesNotThrow(() -> mainController.runParser(pagesToParse, sparklingPagesToParse));
+        Mockito.verify(parserService, Mockito.atLeastOnce()).startParser(pagesToParse, sparklingPagesToParse);
     }
 
     @Test
     public void testRunParserAllPages() {
-        Assertions.assertEquals("Parser started by request", mainController.runParserAllPages());
+        Assertions.assertDoesNotThrow(() -> mainController.runParserAllPages());
+        Mockito.verify(parserService, Mockito.atLeastOnce()).startParser();
     }
 
     @Test
