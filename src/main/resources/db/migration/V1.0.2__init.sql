@@ -3,3 +3,4 @@ ALTER TABLE wine
 	ADD discount INTEGER DEFAULT 0,
 	ADD year INTEGER DEFAULT -1,
 	ADD grape_type TEXT NOT NULL;
+

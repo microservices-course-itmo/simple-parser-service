@@ -1,147 +1,134 @@
 package com.wine.to.up.simple.parser.service.controller;
 
-import com.wine.to.up.simple.parser.service.SimpleParser.Parser;
+import com.wine.to.up.simple.parser.service.simple_parser.ParserService;
 import com.wine.to.up.simple.parser.service.domain.entity.*;
 import com.wine.to.up.simple.parser.service.repository.*;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.util.List;
-
+/**
+ * REST Controller that processes user requests to parser and to DB
+ */
 @RestController
 @RequiredArgsConstructor
 @Validated
-@Slf4j
 @RequestMapping(path = "/simple-parser")
 public class MainController {
 
-    @Autowired
+    /**
+     * The repository that stores grapes (name, id) info. It's autowired by Spring.
+     */
     private GrapesRepository grapesRepository;
-    @Autowired
-    private BrandsRepository brandsRepository;
-    @Autowired
-    private CountriesRepository countriesRepository;
-    @Autowired
-    private WineGrapesRepository wineGrapesRepository;
-    @Autowired
-    private WineRepository wineRepository;
-    @Autowired
-    private Parser parser;
 
+    /**
+     * The repository that stores brands info (name, id). It's autowired by Spring.
+     */
+    private BrandsRepository brandsRepository;
+
+    /**
+     * The repository that stores countries info (name, id). It's autowired by Spring.
+     */
+    private CountriesRepository countriesRepository;
+
+    /**
+     * The repository that stores all info about wine. It's autowired by Spring.
+     */
+    private WineRepository wineRepository;
+
+    /**
+     * The service that is responsible for parser start up. It's autowired by Spring.
+     */
+    private ParserService parserService;
+
+    @Autowired
+    public MainController(GrapesRepository grapesRepository, BrandsRepository brandsRepository, CountriesRepository countriesRepository, WineRepository wineRepository, ParserService parserService) {
+        this.grapesRepository = grapesRepository;
+        this.brandsRepository = brandsRepository;
+        this.countriesRepository = countriesRepository;
+        this.wineRepository = wineRepository;
+        this.parserService = parserService;
+    }
+
+    /**
+     * The method based on a GET request. The parser runs when the request is received.
+     *
+     * @return message about successful execution.
+     */
     @GetMapping(path = "/run-parser")
-    public String runParser() throws IOException {
-        parser.startParser();
+    public String runParser(@RequestParam int pagesToParse, @RequestParam int sparklingPagesToParse) {
+        if (pagesToParse > 0 || sparklingPagesToParse > 0) {
+            parserService.startParser(pagesToParse, sparklingPagesToParse);
+            return "Parser started by request";
+        } else {
+            return "Parser didn't start";
+        }
+    }
+
+    /**
+     * The method based on a GET request. The parser runs on all pages when the request is received.
+     *
+     * @return message about successful execution.
+     */
+    @GetMapping(path = "/run-parser-all-pages")
+    public String runParserAllPages() {
+        parserService.startParser();
         return "Parser started by request";
     }
 
-    @PostMapping(path = "/grape")
-    @ResponseBody
-    public String addGrape(@RequestParam String grapeName) {
-        grapesRepository.save(new Grapes(grapeName));
-        return "New Grape Added";
-    }
-
-    @PostMapping(path = "/brand")
-    @ResponseBody
-    public String addBrand(@RequestParam String brandName) {
-        brandsRepository.save(new Brands(brandName));
-        return "New Brand Added";
-    }
-
-    @PostMapping(path = "/country")
-    @ResponseBody
-    public String addCountry(@RequestParam String countryName) {
-        countriesRepository.save(new Countries(countryName));
-        return "New Country Added";
-    }
-
-    @PostMapping(path = "/wine")
-    @ResponseBody
-    public String addWine(@RequestParam String name, @RequestParam String brandS, @RequestParam String countryS,
-            @RequestParam float price, @RequestParam Float volume, @RequestParam Float abv,
-            @RequestParam String colorType, @RequestParam String sugarType, @RequestParam List<String> wineGrapes,
-            @RequestParam int discount, @RequestParam int year) {
-
-        Brands brand = brandsRepository.findBrandByBrandName(brandS);
-        Countries country = countriesRepository.findCountryByCountryName(countryS);
-        Wine newWine = new Wine(name, brand, country, price, discount, volume, abv, year, colorType, sugarType,
-                wineGrapes.toString());
-        wineRepository.save(newWine);
-
-        for (String someGrape : wineGrapes) {
-            wineGrapesRepository.save(new WineGrapes(newWine, grapesRepository.findGrapeByGrapeName(someGrape)));
-        }
-
-        return "New Wine Added";
-    }
-
+    /**
+     * The method based on a GET request. Output of all grape types stored in the grapesRepository {@link GrapesRepository}.
+     *
+     * @return list of all {@link Grapes}
+     */
     @GetMapping(path = "/all-grapes")
     @ResponseBody
-    public String getAllGrapes() {
-        Iterable<Grapes> grapes = grapesRepository.findAll();
-        String html = "";
-        for (Grapes someGrape : grapes) {
-            html += someGrape + "<br>";
-        }
-
-        return html;
+    public Iterable<Grapes> getAllGrapes() {
+        return grapesRepository.findAll();
     }
 
+    /**
+     * The method based on a GET request. Output of all brands stored in the {@link BrandsRepository}.
+     *
+     * @return list of all {@link Brands}
+     */
     @GetMapping(path = "/all-brands")
     @ResponseBody
-    public String getAllBrands() {
-        Iterable<Brands> brands = brandsRepository.findAll();
-        String html = "";
-        for (Brands someBrand : brands) {
-            html += someBrand + "<br>";
-        }
-
-        return html;
+    public Iterable<Brands> getAllBrands() {
+        return brandsRepository.findAll();
     }
 
+    /**
+     * The method based on a GET request. Output of all countries stored in the {@link CountriesRepository}.
+     *
+     * @return list of {@link Countries}
+     */
     @GetMapping(path = "/all-countries")
     @ResponseBody
-    public String getAllCountries() {
-        Iterable<Countries> countries = countriesRepository.findAll();
-        String html = "";
-        for (Countries someCountry : countries) {
-            html += someCountry + "<br>";
-        }
-        return html;
+    public Iterable<Countries> getAllCountries() {
+        return countriesRepository.findAll();
     }
 
-    // @GetMapping(path="/all-wine-grapes")
-    // @ResponseBody
-    // public Iterable<WineGrapesInfo> getAllWineGrapesInfo() {
-    // return wineGrapesRepository.findAll();
-    // }
-
+    /**
+     * A method based on a GET request. Output of all wines stored in the {@link WineRepository}.
+     *
+     * @return list of all wines as iterable list
+     */
     @GetMapping(path = "/all-wines")
     @ResponseBody
-    public String getAllWines() {
-        Iterable<Wine> wines = wineRepository.findAll();
-        String html = "";
-        for (Wine someWine : wines) {
-            html += someWine + "<br>";
-        }
-        return html;
+    public Iterable<Wine> getAllWines() {
+        return wineRepository.findAll();
     }
 
+    /**
+     * A method based on a GET request. Output of a wine stored in the {@link WineRepository} by name.
+     *
+     * @return instance list of {@link Wine}s
+     */
+    @GetMapping(path = "/wine-by-name")
     @ResponseBody
-    @GetMapping(path = "/")
-    public String home() {
-        String html = "";
-        html += "<ul>";
-        html += " <li><a href='/simple-parser/run-parser'>Run parser</a></li>";
-        html += " <li><a href='/simple-parser/all-wines'>Show All Wines</a></li>";
-        html += " <li><a href='/simple-parser/all-countries'>Show All Countries</a></li>";
-        html += " <li><a href='/simple-parser/all-brands'>Show All Brands</a></li>";
-        html += " <li><a href='/simple-parser/all-grapes'>Show All Grapes</a></li>";
-        html += "</ul>";
-        return html;
+    public Iterable<Wine> getWineByName(@RequestParam String name) {
+        return wineRepository.findWineByName(name);
     }
 }
