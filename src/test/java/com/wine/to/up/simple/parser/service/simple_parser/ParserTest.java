@@ -3,11 +3,10 @@ package com.wine.to.up.simple.parser.service.simple_parser;
 import com.wine.to.up.parser.common.api.schema.ParserApi;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +30,7 @@ public class ParserTest {
         File testCatalogPageFile = new File("src/test/test-resources/" + fileName);
         Document testCatalogPage = Jsoup.parse(testCatalogPageFile, "UTF-8");
         int numberOfPages = Parser.parseNumberOfPages(testCatalogPage);
-        assertEquals(expectedNumOfPages, numberOfPages);
+        Assertions.assertEquals(expectedNumOfPages, numberOfPages);
     }
 
     /**
@@ -45,7 +44,7 @@ public class ParserTest {
         File testCatalogPageFile = new File("src/test/test-resources/Wine_SimpleWine.html"); //wine page instead of catalog page
         Document testCatalogPage = Jsoup.parse(testCatalogPageFile, "UTF-8");
         int numberOfPages = Parser.parseNumberOfPages(testCatalogPage);
-        assertEquals(0, numberOfPages);
+        Assertions.assertEquals(0, numberOfPages);
     }
 
     /**
@@ -80,21 +79,21 @@ public class ParserTest {
                 sparkling(false).
                 oldPrice((float) 1240.0).
                 build();
-        assertEquals(testWine.toString(), Parser.parseWine(testWinePage).toString());
+        Assertions.assertEquals(testWine.toString(), Parser.parseWine(testWinePage).toString());
     }
 
     /**
      * Testing {@link Parser#parseWine(Document)} method<br>
      * Trying to parse wine from wrong page<br>
      *
-     * @throws IOException               Wrong input for {@link Jsoup#parse(File, String)}
+     * @throws Exception                 Wrong input for {@link Jsoup#parse(File, String)}
      * @throws IndexOutOfBoundsException "product__header-russian-name" in input file is absent
      */
     @Test
-    public void testParseWineWrongPageFormat() throws IOException {
+    public void testParseWineWrongPageFormat() throws Exception {
         File testWinePageFile = new File("src/test/test-resources/Catalog_107_pages.html"); //catalog page instead of wine page
         Document testWinePage = Jsoup.parse(testWinePageFile, "UTF-8");
-        assertThrows(NullPointerException.class, () ->
+        Assertions.assertThrows(Exception.class, () ->
                 Parser.parseWine(testWinePage)
         );
     }
