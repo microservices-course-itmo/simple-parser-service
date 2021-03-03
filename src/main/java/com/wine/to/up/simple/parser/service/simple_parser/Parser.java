@@ -9,12 +9,15 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.wine.to.up.simple.parser.service.logging.SimpleParserNotableEvents.*;
 
@@ -35,10 +38,17 @@ public class Parser {
     public static int parseNumberOfPages(Document mainPage) {
         int numberOfPages = 0;
         try {
-            numberOfPages = Integer.parseInt(mainPage.getElementsByAttributeValue("class", "pagination__navigation")
-                    .get(0).children().last().previousElementSibling().text());
+            Node scriptElement = mainPage.getElementsByTag("script").get(26).childNode(0);
+            Pattern pattern = Pattern.compile("data-total-page=\\\\\"\\d+\\\\\""); //a pattern for string like "data-total-page=\"150\""
+            Matcher matcher = pattern.matcher(scriptElement.toString());
+            if (matcher.find()) {
+                String res = scriptElement.toString().substring(matcher.start(), matcher.end());
+                numberOfPages = Integer.parseInt(res.substring(res.indexOf('"') + 1, res.length() - 2)); //to extract a numerical part
+            } else {
+                log.error("No match for \"data-total-page\" was found on page: {}", mainPage.baseUri());
+            }
         } catch (IndexOutOfBoundsException e) {
-            log.error("No pagination__navigation was found on page: {}", mainPage.baseUri());
+            log.error("No element with number of pages was found on page: {}", mainPage.baseUri());
         }
         log.trace("Number of pages to parse: {}", numberOfPages);
         return numberOfPages;

@@ -58,29 +58,19 @@ public class MainController {
     }
 
     /**
-     * The method based on a GET request. The parser runs when the request is received.
-     *
-     * @return message about successful execution.
+     * The method based on a GET request. The parser runs when the request is received. If an incorrect number of pages is entered, the error is written to the logs.
      */
     @GetMapping(path = "/run-parser")
-    public String runParser(@RequestParam int pagesToParse, @RequestParam int sparklingPagesToParse) {
-        if (pagesToParse > 0 || sparklingPagesToParse > 0) {
-            parserService.startParser(pagesToParse, sparklingPagesToParse);
-            return "Parser started by request";
-        } else {
-            return "Parser didn't start";
-        }
+    public void runParser(@RequestParam int pagesToParse, @RequestParam int sparklingPagesToParse) {
+        parserService.startParser(pagesToParse, sparklingPagesToParse);
     }
 
     /**
      * The method based on a GET request. The parser runs on all pages when the request is received.
-     *
-     * @return message about successful execution.
      */
     @GetMapping(path = "/run-parser-all-pages")
-    public String runParserAllPages() {
+    public void runParserAllPages() {
         parserService.startParser();
-        return "Parser started by request";
     }
 
     /**
@@ -94,7 +84,7 @@ public class MainController {
             wineList.add(wineMapper.toKafka(wine).build());
         }
         parserService.generateDividedMessageToKafka(wineList);
-        return "Sent " + wineList.size() +" wines to kafka.";
+        return "Sent " + wineList.size() + " wines to kafka.";
     }
 
     /**

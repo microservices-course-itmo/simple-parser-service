@@ -62,7 +62,7 @@ public class ParserService {
     public static Document urlToDocument(String someURL) {
         Document wineDoc = null;
         try {
-            wineDoc = Jsoup.connect(someURL).get();
+            wineDoc = Jsoup.connect(someURL).maxBodySize(0).get();
             if (wineDoc.is(":has(.product-page)")) {
                 int rerequestNumber = 0;
                 while ((rerequestNumber < 3) && !wineDoc.getElementsByClass("product-page").first().children().first().className().equals("container")) {
@@ -130,7 +130,7 @@ public class ParserService {
                         - TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - start) * 60000 - start));
         SimpleParserMetricsCollector.parseProcess(System.currentTimeMillis() - start);
         log.info("End of parsing, {} wines collected and sent to Kafka", this.parsedWineCounter);
-        SimpleParserMetricsCollector.recordParsingCompleted(true);
+        SimpleParserMetricsCollector.recordParsingCompleted("SUCCESS");
     }
 
     /**
@@ -143,7 +143,7 @@ public class ParserService {
             parser(pagesToParse, sparklingPagesToParse);
         } else {
             log.error("Set invalid number of pages: {}", pagesToParse);
-            SimpleParserMetricsCollector.recordParsingCompleted(false);
+            SimpleParserMetricsCollector.recordParsingCompleted("FAILED");
         }
     }
 
@@ -163,7 +163,9 @@ public class ParserService {
      * @param wineCounter
      */
     private void addWineToProducts(String wineURL, List<ParserApi.Wine> products, WineService dbHandler, AtomicInteger wineCounter) throws InterruptedException {
+        long winePageParseStart = System.currentTimeMillis();
         Document wineDocument = urlToDocument(url + wineURL);
+        SimpleParserMetricsCollector.fetchDetailsWine(new Date().getTime() - winePageParseStart);
         if (wineDocument != null && wineDocument.getElementsByClass("product-page").first().children().first().className().equals("container")) {
             SimpleWine wine = Parser.parseWine(wineDocument);
             saveWineToDB(wine, dbHandler);
@@ -216,11 +218,12 @@ public class ParserService {
 
     private void parseUrls(String baseURL, AtomicLong pageCounter, int pagesToParse, ArrayBlockingQueue<String> wineURLs) {
         try {
-            long winePageCatalogParseStart = System.currentTimeMillis();
             while (pageCounter.longValue() <= pagesToParse) {
-                long wineParseStart = System.currentTimeMillis();
-                Document doc = Jsoup.connect(baseURL + pageCounter.get()).get();
-                SimpleParserMetricsCollector.fetchDetailsWine(new Date().getTime() - wineParseStart);
+                long winePageCatalogFetchStart = System.currentTimeMillis();
+                Document doc = Jsoup.connect(baseURL + pageCounter.get()).maxBodySize(0).get();
+                SimpleParserMetricsCollector.fetchWinePage(new Date().getTime() - winePageCatalogFetchStart);
+
+                long winePageCatalogParseStart = System.currentTimeMillis();
                 Elements wines = doc.getElementsByClass("catalog-grid__item");
                 for (Element wine : wines) {
                     if (!wineURLs.contains(wine.getElementsByClass("product-snippet__name").attr("href")))
@@ -229,9 +232,8 @@ public class ParserService {
                 log.debug("Parsed {} wines from url {}", wines.size(),
                         baseURL + pageCounter.get());
                 eventLogger.info(I_WINES_PAGE_PARSED, baseURL + pageCounter.getAndIncrement());
-                SimpleParserMetricsCollector.winePageParsingDuration(new Date().getTime() - wineParseStart);
+                SimpleParserMetricsCollector.winePageParsingDuration(new Date().getTime() - winePageCatalogParseStart);
             }
-            SimpleParserMetricsCollector.fetchWinePage(new Date().getTime() - winePageCatalogParseStart);
         } catch (IOException e) {
             log.error("Error while parsing page: ", e);
             eventLogger.warn(W_WINE_PAGE_PARSING_FAILED, baseURL + pageCounter.get());

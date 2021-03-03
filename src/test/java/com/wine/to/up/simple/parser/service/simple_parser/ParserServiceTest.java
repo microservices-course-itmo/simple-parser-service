@@ -69,7 +69,7 @@ public class ParserServiceTest {
 
     @Test
     public void testStartParser() {
-        Assertions.assertDoesNotThrow(() -> parserService.startParser(1, 1));
+        Assertions.assertDoesNotThrow(() -> parserService.startParser(0, 1));
         Mockito.verify(eventLogger, Mockito.atLeastOnce()).info(Mockito.any(), Mockito.any());
         Mockito.verify(wineService, Mockito.atLeastOnce()).saveAllWineParsedInfo(Mockito.any());
         Mockito.verify(kafkaSendMessageService, Mockito.atLeastOnce()).sendMessage(Mockito.any());
