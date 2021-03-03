@@ -1,12 +1,17 @@
 package com.wine.to.up.simple.parser.service.controller;
 
+import com.wine.to.up.parser.common.api.schema.ParserApi;
 import com.wine.to.up.simple.parser.service.simple_parser.ParserService;
 import com.wine.to.up.simple.parser.service.domain.entity.*;
 import com.wine.to.up.simple.parser.service.repository.*;
+import com.wine.to.up.simple.parser.service.simple_parser.mappers.WineMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * REST Controller that processes user requests to parser and to DB
@@ -14,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @Validated
-@RequestMapping(path = "/simple-parser")
+@RequestMapping(path = "/parser")
 public class MainController {
 
     /**
@@ -42,13 +47,14 @@ public class MainController {
      */
     private ParserService parserService;
 
+    private final WineMapper wineMapper;
+
+
     @Autowired
-    public MainController(GrapesRepository grapesRepository, BrandsRepository brandsRepository, CountriesRepository countriesRepository, WineRepository wineRepository, ParserService parserService) {
-        this.grapesRepository = grapesRepository;
-        this.brandsRepository = brandsRepository;
-        this.countriesRepository = countriesRepository;
+    public MainController(WineRepository wineRepository, ParserService parserService, WineMapper wineMapper) {
         this.wineRepository = wineRepository;
         this.parserService = parserService;
+        this.wineMapper = wineMapper;
     }
 
     /**
@@ -75,6 +81,20 @@ public class MainController {
     public String runParserAllPages() {
         parserService.startParser();
         return "Parser started by request";
+    }
+
+    /**
+     * The method based on a POST request. Wine data transfer from the database to Kafka.
+     */
+    @PostMapping(path = "/update")
+    public String sendMessageToKafka() {
+        Iterable<Wine> wineIterable = wineRepository.findAll();
+        List<ParserApi.Wine> wineList = new ArrayList<>();
+        for (Wine wine : wineIterable) {
+            wineList.add(wineMapper.toKafka(wine).build());
+        }
+        parserService.generateDividedMessageToKafka(wineList);
+        return "Sent " + wineList.size() +" wines to kafka.";
     }
 
     /**

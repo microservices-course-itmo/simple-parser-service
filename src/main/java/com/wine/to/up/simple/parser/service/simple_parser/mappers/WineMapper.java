@@ -39,6 +39,11 @@ public class WineMapper {
         return newWine;
     }
 
+    public ParserApi.Wine.Builder toKafka(Wine wine) {
+        return modelMapper.map(wine, ParserApi.Wine.Builder.class)
+                .addRegion(wine.getRegion());
+    }
+
     public Wine toEntity(SimpleWine wine) {
         return wine == null ? null : modelMapper.map(wine, Wine.class);
     }
