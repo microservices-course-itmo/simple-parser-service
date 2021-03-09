@@ -82,7 +82,7 @@ public class ParserService {
      *
      * @param pagesToParse number pages to parse
      */
-    private void parser(int pagesToParse, int sparklingPagesToParse) {
+    private void parser(int pagesToParse, int sparklingPagesToParse, int city) {
         SimpleParserMetricsCollector.recordParsingStarted();
         long start = System.currentTimeMillis();
 
@@ -93,7 +93,7 @@ public class ParserService {
         AtomicLong pageCounter = new AtomicLong(1);
         AtomicLong sparklingPageCounter = new AtomicLong(1);
         for (int i = 0; i < NUMBER_OF_THREADS; i++) {
-            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> addWineUrls(pageCounter, sparklingPageCounter, wineURLs, pagesToParse, sparklingPagesToParse), pagesExecutor);
+            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> addWineUrls(pageCounter, sparklingPageCounter, wineURLs, pagesToParse, sparklingPagesToParse, city), pagesExecutor);
             futures.add(future);
         }
 
@@ -140,7 +140,7 @@ public class ParserService {
         if (pagesToParse <= Parser.parseNumberOfPages(urlToDocument(url + "/catalog/vino/?setVisitorCityId=" + city))
                 && sparklingPagesToParse <= Parser.parseNumberOfPages(urlToDocument(url + "/catalog/shampanskoe_i_igristoe_vino/?setVisitorCityId=" + city)) &&
                 (sparklingPagesToParse > 0 || pagesToParse > 0)) {
-            parser(pagesToParse, sparklingPagesToParse);
+            parser(pagesToParse, sparklingPagesToParse, city);
         } else {
             log.error("Set invalid number of pages: {}", pagesToParse);
             SimpleParserMetricsCollector.recordParsingCompleted("FAILED");
@@ -152,12 +152,12 @@ public class ParserService {
      */
     public void startParser() {
         for (int i = 1; i <= 13; i++) {
-            parser(Parser.parseNumberOfPages(urlToDocument(url + "/catalog/vino/?setVisitorCityId=" + i)), Parser.parseNumberOfPages(urlToDocument(url + "/catalog/shampanskoe_i_igristoe_vino/?setVisitorCityId=" + i)));
+            parser(Parser.parseNumberOfPages(urlToDocument(url + "/catalog/vino/?setVisitorCityId=" + i)), Parser.parseNumberOfPages(urlToDocument(url + "/catalog/shampanskoe_i_igristoe_vino/?setVisitorCityId=" + i)), i);
         }
     }
 
     public void startParser(int city) {
-        parser(Parser.parseNumberOfPages(urlToDocument(url + "/catalog/vino/?setVisitorCityId=" + city)), Parser.parseNumberOfPages(urlToDocument(url + "/catalog/shampanskoe_i_igristoe_vino/?setVisitorCityId=" + city)));
+        parser(Parser.parseNumberOfPages(urlToDocument(url + "/catalog/vino/?setVisitorCityId=" + city)), Parser.parseNumberOfPages(urlToDocument(url + "/catalog/shampanskoe_i_igristoe_vino/?setVisitorCityId=" + city)), city);
     }
 
     /**
@@ -216,16 +216,16 @@ public class ParserService {
      * @param wineURLs
      * @param pagesToParse
      */
-    private void addWineUrls(AtomicLong pageCounter, AtomicLong sparklingPageCounter, ArrayBlockingQueue<String> wineURLs, int pagesToParse, int sparklingPagesToParse) {
-        parseUrls(wineUrl, pageCounter, pagesToParse, wineURLs);
-        parseUrls(sparklingWineUrl, sparklingPageCounter, sparklingPagesToParse, wineURLs);
+    private void addWineUrls(AtomicLong pageCounter, AtomicLong sparklingPageCounter, ArrayBlockingQueue<String> wineURLs, int pagesToParse, int sparklingPagesToParse, int city) {
+        parseUrls(wineUrl, pageCounter, pagesToParse, wineURLs, city);
+        parseUrls(sparklingWineUrl, sparklingPageCounter, sparklingPagesToParse, wineURLs, city);
     }
 
-    private void parseUrls(String baseURL, AtomicLong pageCounter, int pagesToParse, ArrayBlockingQueue<String> wineURLs) {
+    private void parseUrls(String baseURL, AtomicLong pageCounter, int pagesToParse, ArrayBlockingQueue<String> wineURLs, int city) {
         try {
             while (pageCounter.longValue() <= pagesToParse) {
                 long winePageCatalogFetchStart = System.currentTimeMillis();
-                Document doc = Jsoup.connect(baseURL + pageCounter.get()).maxBodySize(0).get();
+                Document doc = Jsoup.connect(baseURL + pageCounter.get() + "/?setVisitorCityId=" + city).maxBodySize(0).get();
                 SimpleParserMetricsCollector.fetchWinePage(new Date().getTime() - winePageCatalogFetchStart);
 
                 long winePageCatalogParseStart = System.currentTimeMillis();
