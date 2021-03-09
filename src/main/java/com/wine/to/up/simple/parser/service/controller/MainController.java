@@ -62,7 +62,7 @@ public class MainController {
      */
     @GetMapping(path = "/run-parser")
     public void runParser(@RequestParam int pagesToParse, @RequestParam int sparklingPagesToParse) {
-        parserService.startParser(pagesToParse, sparklingPagesToParse);
+        parserService.startParser(pagesToParse, sparklingPagesToParse, 1);
     }
 
     /**

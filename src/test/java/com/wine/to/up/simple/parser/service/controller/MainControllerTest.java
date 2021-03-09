@@ -51,7 +51,7 @@ public class MainControllerTest {
     @CsvSource({"1, 1", "0, 1", "1, 0", "-1, -1", "0, 0", "1000, 1000"})
     public void testRunParser(int pagesToParse, int sparklingPagesToParse) {
         Assertions.assertDoesNotThrow(() -> mainController.runParser(pagesToParse, sparklingPagesToParse));
-        Mockito.verify(parserService, Mockito.atLeastOnce()).startParser(pagesToParse, sparklingPagesToParse);
+        Mockito.verify(parserService, Mockito.atLeastOnce()).startParser(pagesToParse, sparklingPagesToParse, 1);
     }
 
     @Test
