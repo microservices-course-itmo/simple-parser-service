@@ -37,7 +37,7 @@ public class ParserService {
     private String wineUrl;
     @Value("${parser.sparkling_wineurl}")
     private String sparklingWineUrl;
-    private static final int NUMBER_OF_THREADS = 1;
+    private static final int NUMBER_OF_THREADS = 2;
     private static final String SERVICE_NAME = "simple-parser-service";
     private final ExecutorService pagesExecutor = Executors.newSingleThreadExecutor();
     private final ExecutorService winesExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
@@ -136,9 +136,9 @@ public class ParserService {
     /**
      * Multithreading simplewine parser with a specified number of pages
      */
-    public void startParser(int pagesToParse, int sparklingPagesToParse) {
-        if (pagesToParse <= Parser.parseNumberOfPages(urlToDocument(url + "/catalog/vino/"))
-                && sparklingPagesToParse <= Parser.parseNumberOfPages(urlToDocument(url + "/catalog/shampanskoe_i_igristoe_vino/")) &&
+    public void startParser(int pagesToParse, int sparklingPagesToParse, int city) {
+        if (pagesToParse <= Parser.parseNumberOfPages(urlToDocument(url + "/catalog/vino/?setVisitorCityId=" + city))
+                && sparklingPagesToParse <= Parser.parseNumberOfPages(urlToDocument(url + "/catalog/shampanskoe_i_igristoe_vino/?setVisitorCityId=" + city)) &&
                 (sparklingPagesToParse > 0 || pagesToParse > 0)) {
             parser(pagesToParse, sparklingPagesToParse);
         } else {
@@ -151,7 +151,13 @@ public class ParserService {
      * Multithreading simplewine parser with maximum number of pages
      */
     public void startParser() {
-        parser(Parser.parseNumberOfPages(urlToDocument(url + "/catalog/vino/")), Parser.parseNumberOfPages(urlToDocument(url + "/catalog/shampanskoe_i_igristoe_vino/")));
+        for (int i = 1; i <= 13; i++) {
+            parser(Parser.parseNumberOfPages(urlToDocument(url + "/catalog/vino/?setVisitorCityId=" + i)), Parser.parseNumberOfPages(urlToDocument(url + "/catalog/shampanskoe_i_igristoe_vino/?setVisitorCityId=" + i)));
+        }
+    }
+
+    public void startParser(int city) {
+        parser(Parser.parseNumberOfPages(urlToDocument(url + "/catalog/vino/?setVisitorCityId=" + city)), Parser.parseNumberOfPages(urlToDocument(url + "/catalog/shampanskoe_i_igristoe_vino/?setVisitorCityId=" + city)));
     }
 
     /**
@@ -182,7 +188,6 @@ public class ParserService {
         } else {
             eventLogger.warn(W_WINE_DETAILS_PARSING_FAILED, url + wineURL);
         }
-        Thread.sleep(8_000);
     }
 
     /**
