@@ -9,6 +9,7 @@ import com.wine.to.up.simple.parser.service.repository.CountriesRepository;
 import com.wine.to.up.simple.parser.service.repository.GrapesRepository;
 import com.wine.to.up.simple.parser.service.repository.WineRepository;
 import com.wine.to.up.simple.parser.service.simple_parser.ParserService;
+import com.wine.to.up.simple.parser.service.simple_parser.enums.Cities;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
@@ -50,8 +51,8 @@ public class MainControllerTest {
     @ParameterizedTest
     @CsvSource({"1, 1", "0, 1", "1, 0", "-1, -1", "0, 0", "1000, 1000"})
     public void testRunParser(int pagesToParse, int sparklingPagesToParse) {
-        Assertions.assertDoesNotThrow(() -> mainController.runParser(pagesToParse, sparklingPagesToParse));
-        Mockito.verify(parserService, Mockito.atLeastOnce()).startParser(pagesToParse, sparklingPagesToParse);
+        Assertions.assertDoesNotThrow(() -> mainController.runParser(pagesToParse, sparklingPagesToParse, Cities.MOSCOW));
+        Mockito.verify(parserService, Mockito.atLeastOnce()).startParser(pagesToParse, sparklingPagesToParse, 1);
     }
 
     @Test
