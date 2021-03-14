@@ -42,6 +42,7 @@ public class ParserService {
     private static final String SERVICE_NAME = "simple-parser-service";
     private static final String WINE_CITY_PATH = "/catalog/vino/?setVisitorCityId=";
     private static final String SPARKLING_WINE_CITY_PATH = "/catalog/shampanskoe_i_igristoe_vino/?setVisitorCityId=";
+    private static final String SUCCESS_MESSAGE = "SUCCESS";
     private final ExecutorService pagesExecutor = Executors.newSingleThreadExecutor();
     private final ExecutorService winesExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
 
@@ -86,7 +87,6 @@ public class ParserService {
      * @param pagesToParse number pages to parse
      */
     private void parser(int pagesToParse, int sparklingPagesToParse, int city) {
-        SimpleParserMetricsCollector.recordParsingStarted();
         long start = System.currentTimeMillis();
 
         List<CompletableFuture<?>> futures = new ArrayList<>();
@@ -133,13 +133,13 @@ public class ParserService {
                         - TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - start) * 60000 - start));
         SimpleParserMetricsCollector.parseProcess(System.currentTimeMillis() - start);
         log.info("End of parsing, {} wines collected and sent to Kafka", this.parsedWineCounter);
-        SimpleParserMetricsCollector.recordParsingCompleted("SUCCESS");
     }
 
     /**
      * Multithreading simplewine parser with a specified number of pages
      */
     public void startParser(int pagesToParse, int sparklingPagesToParse, int city) {
+        SimpleParserMetricsCollector.recordParsingStarted();
         if (pagesToParse <= Parser.parseNumberOfPages(urlToDocument(url + WINE_CITY_PATH + city))
                 && sparklingPagesToParse <= Parser.parseNumberOfPages(urlToDocument(url + SPARKLING_WINE_CITY_PATH + city)) &&
                 (sparklingPagesToParse > 0 || pagesToParse > 0)) {
@@ -148,19 +148,24 @@ public class ParserService {
             log.error("Set invalid number of pages: {}", pagesToParse);
             SimpleParserMetricsCollector.recordParsingCompleted("FAILED");
         }
+        SimpleParserMetricsCollector.recordParsingCompleted(SUCCESS_MESSAGE);
     }
 
     /**
      * Multithreading simplewine parser with maximum number of pages
      */
     public void startParser() {
+        SimpleParserMetricsCollector.recordParsingStarted();
         for (int i = 1; i <= 13; i++) {
             parser(Parser.parseNumberOfPages(urlToDocument(url + WINE_CITY_PATH + i)), Parser.parseNumberOfPages(urlToDocument(url + SPARKLING_WINE_CITY_PATH + i)), i);
         }
+        SimpleParserMetricsCollector.recordParsingCompleted(SUCCESS_MESSAGE);
     }
 
     public void startParser(int city) {
+        SimpleParserMetricsCollector.recordParsingStarted();
         parser(Parser.parseNumberOfPages(urlToDocument(url + WINE_CITY_PATH + city)), Parser.parseNumberOfPages(urlToDocument(url + SPARKLING_WINE_CITY_PATH + city)), city);
+        SimpleParserMetricsCollector.recordParsingCompleted(SUCCESS_MESSAGE);
     }
 
     /**
