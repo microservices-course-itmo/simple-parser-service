@@ -3,6 +3,7 @@ package com.wine.to.up.simple.parser.service.simple_parser;
 import com.wine.to.up.parser.common.api.schema.ParserApi;
 import com.wine.to.up.simple.parser.service.domain.entity.Brands;
 import com.wine.to.up.simple.parser.service.domain.entity.Countries;
+import com.wine.to.up.simple.parser.service.simple_parser.enums.City;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -47,4 +48,5 @@ public class SimpleWine {
     private boolean sparkling;
     private String gastronomy;
     private String taste;
+    private City city;
 }

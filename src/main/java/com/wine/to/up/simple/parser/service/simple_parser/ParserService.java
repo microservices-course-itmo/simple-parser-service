@@ -14,6 +14,7 @@ import com.wine.to.up.commonlib.messaging.KafkaMessageSender;
 import com.wine.to.up.parser.common.api.schema.ParserApi;
 import com.wine.to.up.simple.parser.service.components.SimpleParserMetricsCollector;
 import com.wine.to.up.simple.parser.service.simple_parser.db_handler.WineService;
+import com.wine.to.up.simple.parser.service.simple_parser.enums.City;
 import com.wine.to.up.simple.parser.service.simple_parser.mappers.WineMapper;
 import org.jsoup.*;
 import org.jsoup.nodes.Document;
@@ -108,7 +109,7 @@ public class ParserService {
                         if (wineURL == null) {
                             return;
                         }
-                        addWineToProducts(wineURL, products, wineService, wineCounter);
+                        addWineToProducts(wineURL, products, wineService, wineCounter, city);
                     }
                 } catch (InterruptedException e) {
                     log.error("Interrupt ", e);
@@ -170,12 +171,13 @@ public class ParserService {
      * @param dbHandler
      * @param wineCounter
      */
-    private void addWineToProducts(String wineURL, List<ParserApi.Wine> products, WineService dbHandler, AtomicInteger wineCounter) throws InterruptedException {
+    private void addWineToProducts(String wineURL, List<ParserApi.Wine> products, WineService dbHandler, AtomicInteger wineCounter, int city) throws InterruptedException {
         long winePageParseStart = System.currentTimeMillis();
         Document wineDocument = urlToDocument(url + wineURL);
         SimpleParserMetricsCollector.fetchDetailsWine(new Date().getTime() - winePageParseStart);
         if (wineDocument != null && wineDocument.getElementsByClass("product-page").first().children().first().className().equals("container")) {
             SimpleWine wine = Parser.parseWine(wineDocument);
+            wine.setCity(City.get(city));
             saveWineToDB(wine, dbHandler);
             ParserApi.Wine newProduct = wineMapper.toKafka(wine).build();
             if (!products.contains(newProduct)) {
