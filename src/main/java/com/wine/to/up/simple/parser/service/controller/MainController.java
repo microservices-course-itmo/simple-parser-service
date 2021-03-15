@@ -4,6 +4,7 @@ import com.wine.to.up.parser.common.api.schema.ParserApi;
 import com.wine.to.up.simple.parser.service.simple_parser.ParserService;
 import com.wine.to.up.simple.parser.service.domain.entity.*;
 import com.wine.to.up.simple.parser.service.repository.*;
+import com.wine.to.up.simple.parser.service.simple_parser.enums.Cities;
 import com.wine.to.up.simple.parser.service.simple_parser.mappers.WineMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,15 +61,15 @@ public class MainController {
     /**
      * The method based on a GET request. The parser runs when the request is received. If an incorrect number of pages is entered, the error is written to the logs.
      */
-    @GetMapping(path = "/run-parser")
-    public void runParser(@RequestParam int pagesToParse, @RequestParam int sparklingPagesToParse) {
-        parserService.startParser(pagesToParse, sparklingPagesToParse, 1);
+    @PostMapping(path = "/run-parser")
+    public void runParser(@RequestParam int pagesToParse, @RequestParam int sparklingPagesToParse, @RequestParam Cities city) {
+        parserService.startParser(pagesToParse, sparklingPagesToParse, city.getNumber());
     }
 
     /**
      * The method based on a GET request. The parser runs on all pages when the request is received.
      */
-    @GetMapping(path = "/run-parser-all-pages")
+    @PostMapping(path = "/run-parser-all-pages")
     public void runParserAllPages() {
         parserService.startParser();
     }
