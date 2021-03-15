@@ -23,8 +23,7 @@ public class ServiceApplication {
         SpringApplication.run(ServiceApplication.class, args);
     }
 
-    @Scheduled(fixedDelayString = "PT24H")
-        // run once in 24 hours
+    @Scheduled(fixedDelayString = "PT1M")
     void scheduledRunParser() {
         log.info("SCHEDULED PARSER START");
         parserService.startParser(); //to run on all pages, remove the parameter

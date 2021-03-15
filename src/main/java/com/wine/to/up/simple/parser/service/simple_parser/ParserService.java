@@ -37,7 +37,7 @@ public class ParserService {
     private String wineUrl;
     @Value("${parser.sparkling_wineurl}")
     private String sparklingWineUrl;
-    private static final int NUMBER_OF_THREADS = 2;
+    private static final int NUMBER_OF_THREADS = 1;
     private static final String SERVICE_NAME = "simple-parser-service";
     private final ExecutorService pagesExecutor = Executors.newSingleThreadExecutor();
     private final ExecutorService winesExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
