@@ -67,6 +67,14 @@ public class MainController {
     }
 
     /**
+     * The method based on a GET request. The parser runs on all pages of the city when the request is received.
+     */
+    @PostMapping(path = "/run-parser-city-all-pages")
+    public void runParserCityAllPages(@RequestParam Cities city) {
+        parserService.startParser(city.getNumber());
+    }
+
+    /**
      * The method based on a GET request. The parser runs on all pages when the request is received.
      */
     @PostMapping(path = "/run-parser-all-pages")
