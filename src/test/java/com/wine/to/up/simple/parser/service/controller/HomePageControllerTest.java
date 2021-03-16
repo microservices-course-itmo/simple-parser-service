@@ -90,15 +90,15 @@ public class HomePageControllerTest {
         assertEquals("Wine(wineID=5211e915-c3e2-4dcb-0776-c7b900f38ab7, name=Wine 1," +
                         " image=null, brandID=null, countryID=null, newPrice=null, discount=null," +
                         " capacity=null, strength=null, year=0, color=null, sugar=null, grapeSort=null," +
-                        " region=null, link=null, rating=null, sparkling=false, gastronomy=null, taste=null)<br><br>" +
+                        " region=null, link=null, rating=null, sparkling=false, gastronomy=null, taste=null, city=null)<br><br>" +
                         "Wine(wineID=5211e915-c3e2-4dcb-0776-c7b900f38ab7, name=Wine 2," +
                         " image=null, brandID=null, countryID=null, newPrice=null, discount=null," +
                         " capacity=null, strength=null, year=0, color=null, sugar=null, grapeSort=null," +
-                        " region=null, link=null, rating=null, sparkling=false, gastronomy=null, taste=null)<br><br>" +
+                        " region=null, link=null, rating=null, sparkling=false, gastronomy=null, taste=null, city=null)<br><br>" +
                         "Wine(wineID=5211e915-c3e2-4dcb-0776-c7b900f38ab7, name=Wine 3," +
                         " image=null, brandID=null, countryID=null, newPrice=null, discount=null," +
                         " capacity=null, strength=null, year=0, color=null, sugar=null, grapeSort=null," +
-                        " region=null, link=null, rating=null, sparkling=false, gastronomy=null, taste=null)<br><br>"
+                        " region=null, link=null, rating=null, sparkling=false, gastronomy=null, taste=null, city=null)<br><br>"
                 , homePageController.getAllWinesHTML());
     }
 

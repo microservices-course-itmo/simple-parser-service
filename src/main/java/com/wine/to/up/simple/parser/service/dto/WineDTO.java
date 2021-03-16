@@ -30,4 +30,5 @@ public class WineDTO {
     private boolean sparkling;
     private String gastronomy;
     private String taste;
+    private String city;
 }
