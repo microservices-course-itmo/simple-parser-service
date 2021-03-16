@@ -38,7 +38,7 @@ public class ParserService {
     private String wineUrl;
     @Value("${parser.sparkling_wineurl}")
     private String sparklingWineUrl;
-    private static final int NUMBER_OF_THREADS = 2;
+    private static final int NUMBER_OF_THREADS = 1;
     private static final String SERVICE_NAME = "simple-parser-service";
     private static final String WINE_CITY_PATH = "/catalog/vino/?setVisitorCityId=";
     private static final String SPARKLING_WINE_CITY_PATH = "/catalog/shampanskoe_i_igristoe_vino/?setVisitorCityId=";
