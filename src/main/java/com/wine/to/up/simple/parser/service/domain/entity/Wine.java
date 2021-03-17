@@ -138,4 +138,10 @@ public class Wine {
      */
     @Column(name = "taste")
     private String taste;
+
+    /**
+     * City from which the wine was parsed
+     */
+    @Column(name = "city")
+    private String city;
 }
