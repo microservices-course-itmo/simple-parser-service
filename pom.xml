@@ -20,7 +20,7 @@
 
         <service.commonlib.version>0.2.3-SNAPSHOT</service.commonlib.version>
         <demo.service.api.version>0.3.0-SNAPSHOT</demo.service.api.version>
-        <parser.common.api.version>0.2.4-SNAPSHOT</parser.common.api.version>
+        <parser.common.api.version>0.2.5-SNAPSHOT</parser.common.api.version>
 
         <org.jsoup.version>1.13.1</org.jsoup.version>
     </properties>
