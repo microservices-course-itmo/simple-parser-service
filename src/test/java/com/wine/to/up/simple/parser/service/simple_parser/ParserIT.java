@@ -35,4 +35,12 @@ class ParserIT {
         int numberOfPages = Parser.parseNumberOfPages(testCatalogPage);
         assertTrue(numberOfPages >= 0);
     }
+
+    @Test
+    void testInStock() {
+        Document testWinePage = ParserService.urlToDocument("https://simplewine.ru/catalog/product/two_hands_aerope_2013_075_1/"); //wine not in stock
+        Document testWinePage2 = ParserService.urlToDocument("https://simplewine.ru/catalog/product/frescobaldi_chianti_castiglioni_2019_075/"); //wine in stock
+        assertTrue(testWinePage.is(":has(.js-offer-reservation-btn)"));
+        assertFalse(testWinePage2.is(":has(.js-offer-reservation-btn)"));
+    }
 }
