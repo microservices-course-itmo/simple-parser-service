@@ -144,4 +144,10 @@ public class Wine {
      */
     @Column(name = "city")
     private String city;
+
+    /**
+     * Amount of wine in stock
+     */
+    @Column(name = "inStock")
+    private Integer inStock;
 }

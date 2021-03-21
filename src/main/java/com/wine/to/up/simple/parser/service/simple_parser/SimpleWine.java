@@ -49,4 +49,6 @@ public class SimpleWine {
     private String gastronomy;
     private String taste;
     private City city;
+    @Builder.Default
+    private Integer inStock = null;
 }
