@@ -110,9 +110,9 @@ class WineServiceIT {
                 year(2018).
                 capacity((float) 0.75).
                 strength((float) 13.0).
-                color(ParserApi.Wine.Color.UNRECOGNIZED).
+                color(ParserApi.Wine.Color.UNDEFINED_COLOR).
                 grapeSort(Collections.singleton("шираз")).
-                sugar(ParserApi.Wine.Sugar.UNRECOGNIZED).
+                sugar(ParserApi.Wine.Sugar.UNDEFINED_SUGAR).
                 discount((float) 20.0).
                 region("Новый Южный").
                 link("https://myfavorite").
@@ -141,9 +141,9 @@ class WineServiceIT {
                 year(2018).
                 capacity((float) 0.75).
                 strength((float) 13.0).
-                color(ParserApi.Wine.Color.UNRECOGNIZED).
+                color(ParserApi.Wine.Color.UNDEFINED_COLOR).
                 grapeSort(Collections.singleton("шираз")).
-                sugar(ParserApi.Wine.Sugar.UNRECOGNIZED).
+                sugar(ParserApi.Wine.Sugar.UNDEFINED_SUGAR).
                 discount((float) 20.0).
                 region("Новый Южный").
                 link("https://myfavorite").
@@ -168,9 +168,9 @@ class WineServiceIT {
                 year(2018).
                 capacity((float) 0.75).
                 strength((float) 13.0).
-                color(ParserApi.Wine.Color.UNRECOGNIZED).
+                color(ParserApi.Wine.Color.UNDEFINED_COLOR).
                 grapeSort(null).
-                sugar(ParserApi.Wine.Sugar.UNRECOGNIZED).
+                sugar(ParserApi.Wine.Sugar.UNDEFINED_SUGAR).
                 discount((float) 20.0).
                 region("Новый Южный").
                 link("https://myfavorite").
@@ -226,9 +226,9 @@ class WineServiceIT {
                 year(2018).
                 capacity((float) 0.75).
                 strength((float) 13.0).
-                color(ParserApi.Wine.Color.UNRECOGNIZED).
+                color(ParserApi.Wine.Color.RED).
                 grapeSort(Arrays.asList("шираз", "каберне")).
-                sugar(ParserApi.Wine.Sugar.UNRECOGNIZED).
+                sugar(ParserApi.Wine.Sugar.DRY).
                 discount((float) 20.0).
                 region("Новый Южный").
                 link("https://myfavorite").

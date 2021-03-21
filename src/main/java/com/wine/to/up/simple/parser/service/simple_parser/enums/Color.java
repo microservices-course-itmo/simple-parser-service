@@ -13,7 +13,8 @@ import java.util.Map;
 public enum Color {
     RED(ParserApi.Wine.Color.RED, "красное"),
     ROSE(ParserApi.Wine.Color.ROSE, "розовое"),
-    WHITE(ParserApi.Wine.Color.WHITE, "белое");
+    WHITE(ParserApi.Wine.Color.WHITE, "белое"),
+    UNDEFINED_COLOR(ParserApi.Wine.Color.UNDEFINED_COLOR, "нет информации");
 
     private final ParserApi.Wine.Color apiColor;
     private final String colorWine;
@@ -29,11 +30,11 @@ public enum Color {
     }
 
     public static ParserApi.Wine.Color getApiColor(String color) {
-        return stringColorMap.getOrDefault(color, RED).apiColor;
+        return stringColorMap.getOrDefault(color, UNDEFINED_COLOR).apiColor;
     }
 
     public static String getStringColor(ParserApi.Wine.Color apiColor) {
-        return apiColorHashMap.getOrDefault(apiColor, RED).colorWine;
+        return apiColorHashMap.getOrDefault(apiColor, UNDEFINED_COLOR).colorWine;
     }
 }
 

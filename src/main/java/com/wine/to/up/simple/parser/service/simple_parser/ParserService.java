@@ -182,7 +182,7 @@ public class ParserService {
         SimpleParserMetricsCollector.fetchDetailsWine(new Date().getTime() - winePageParseStart);
         if (wineDocument != null && wineDocument.getElementsByClass("product-page").first().children().first().className().equals("container")) {
             SimpleWine wine = Parser.parseWine(wineDocument);
-            wine.setCity(City.get(city));
+            wine.setCity(City.get(city).getRussianName());
             saveWineToDB(wine, dbHandler);
             ParserApi.Wine newProduct = wineMapper.toKafka(wine).build();
             if (!products.contains(newProduct)) {
