@@ -5,34 +5,40 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum City {
-    MOSCOW(1),
-    SAINT_PETERSBURG(2),
-    KRASNODAR(3),
-    ROSTOV(4),
-    SOCHI(5),
-    NOVGOROD(6),
-    YEKATERINBURG(7),
-    NOVOSIBIRSK(8),
-    CHELYABINSK(9),
-    SAMARA(10),
-    VORONEZH(11),
-    UFA(12),
-    KAZAN(13);
+    MOSCOW(1, "Москва"),
+    SAINT_PETERSBURG(2, "Санкт-Петербург"),
+    KRASNODAR(3, "Краснодар"),
+    ROSTOV(4, "Ростов"),
+    SOCHI(5, "Сочи"),
+    NOVGOROD(6, "Новгород"),
+    YEKATERINBURG(7, "Екатеринбург"),
+    NOVOSIBIRSK(8, "Новосибирск"),
+    CHELYABINSK(9, "Челябинск"),
+    SAMARA(10, "Самара"),
+    VORONEZH(11, "Воронеж"),
+    UFA(12, "Уфа"),
+    KAZAN(13, "Казань");
 
     private static final Map<Integer, City> lookup = new HashMap<>();
-    private int code;
+    private final int code;
+    private final String russianName;
 
     static {
         for (City w : EnumSet.allOf(City.class))
             lookup.put(w.getCode(), w);
     }
 
-    City(int code) {
+    City(int code, String russianName) {
         this.code = code;
+        this.russianName = russianName;
     }
 
     public int getCode() {
         return code;
+    }
+
+    public String getRussianName() {
+        return russianName;
     }
 
     public static City get(int code) {

@@ -39,15 +39,15 @@ public class SimpleParserMetricsCollector extends CommonMetricsCollector {
     private static final AtomicLong micrometerTimeSinceLastSucceededParsingGauge = Metrics.gauge(TIME_SINCE_LAST_SUCCEEDED_PARSING, new AtomicLong(0));
 
     public static void parseProcess(long time, int number) {
-        Metrics.timer(PARSING_PROCESS_DURATION, "city", City.get(number).name()).record(time, TimeUnit.MILLISECONDS);
+        Metrics.timer(PARSING_PROCESS_DURATION, "city", City.get(number).getRussianName()).record(time, TimeUnit.MILLISECONDS);
     }
 
     public static void fetchDetailsWine(long time, int number) {
-        Metrics.timer(WINE_DETAILS_FETCHING_DURATION,"city", City.get(number).name()).record(time, TimeUnit.MILLISECONDS);
+        Metrics.timer(WINE_DETAILS_FETCHING_DURATION,"city", City.get(number).getRussianName()).record(time, TimeUnit.MILLISECONDS);
     }
 
     public static void fetchWinePage(long time, int number) {
-        Metrics.timer(WINE_PAGE_FETCHING_DURATION,"city", City.get(number).name()).record(time, TimeUnit.MILLISECONDS);
+        Metrics.timer(WINE_PAGE_FETCHING_DURATION,"city", City.get(number).getRussianName()).record(time, TimeUnit.MILLISECONDS);
     }
 
     public static void timeSinceLastSucceededParse(long time) {
@@ -60,12 +60,12 @@ public class SimpleParserMetricsCollector extends CommonMetricsCollector {
     }
 
     public static void recordParsingStarted(int number) {
-        Metrics.counter(PARSING_STARTED_TOTAL,"city", City.get(number).name()).increment();
+        Metrics.counter(PARSING_STARTED_TOTAL,"city", City.get(number).getRussianName()).increment();
         micrometerParsingInProgressGauge.incrementAndGet();
     }
 
     public static void recordParsingCompleted(String status, int number) {
-        Metrics.counter(PARSING_COMPLETE_TOTAL, "status", status, "city", City.get(number).name()).increment();
+        Metrics.counter(PARSING_COMPLETE_TOTAL, "status", status, "city", City.get(number).getRussianName()).increment();
         micrometerParsingInProgressGauge.decrementAndGet();
         timeSinceLastSucceededParse(System.currentTimeMillis());
     }
@@ -77,14 +77,14 @@ public class SimpleParserMetricsCollector extends CommonMetricsCollector {
     }
 
     public static void parseWineDetailsParsing(long time, int number) {
-        Metrics.timer(WINE_DETAILS_PARSING_DURATION, "city", City.get(number).name()).record(time, TimeUnit.MILLISECONDS);
+        Metrics.timer(WINE_DETAILS_PARSING_DURATION, "city", City.get(number).getRussianName()).record(time, TimeUnit.MILLISECONDS);
     }
 
     public static void winePageParsingDuration(long time, int number) {
-        Metrics.timer(WINE_PAGE_PARSING_DURATION, "city", City.get(number).name()).record(time, TimeUnit.MILLISECONDS);
+        Metrics.timer(WINE_PAGE_PARSING_DURATION, "city", City.get(number).getRussianName()).record(time, TimeUnit.MILLISECONDS);
     }
 
     public static void winesPublishedToKafka(int number) {
-        Metrics.counter(WINES_PUBLISHED_TO_KAFKA_COUNT,"city", City.get(number).name()).increment();
+        Metrics.counter(WINES_PUBLISHED_TO_KAFKA_COUNT,"city", City.get(number).getRussianName()).increment();
     }
 }

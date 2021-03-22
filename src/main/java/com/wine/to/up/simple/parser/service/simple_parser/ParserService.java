@@ -139,16 +139,16 @@ public class ParserService {
      * Multithreading simplewine parser with a specified number of pages
      */
     public void startParser(int pagesToParse, int sparklingPagesToParse, int city) {
-        SimpleParserMetricsCollector.recordParsingStarted(city);
+        SimpleParserMetricsCollector.recordParsingStarted();
         if (pagesToParse <= Parser.parseNumberOfPages(urlToDocument(url + WINE_CITY_PATH + city))
                 && sparklingPagesToParse <= Parser.parseNumberOfPages(urlToDocument(url + SPARKLING_WINE_CITY_PATH + city)) &&
                 (sparklingPagesToParse > 0 || pagesToParse > 0)) {
             parser(pagesToParse, sparklingPagesToParse, city);
         } else {
             log.error("Set invalid number of pages: {}", pagesToParse);
-            SimpleParserMetricsCollector.recordParsingCompleted("FAILED", city);
+            SimpleParserMetricsCollector.recordParsingCompleted("FAILED");
         }
-        SimpleParserMetricsCollector.recordParsingCompleted(SUCCESS_MESSAGE, city);
+        SimpleParserMetricsCollector.recordParsingCompleted(SUCCESS_MESSAGE);
     }
 
     /**
@@ -163,9 +163,9 @@ public class ParserService {
     }
 
     public void startParser(int city) {
-        SimpleParserMetricsCollector.recordParsingStarted(city);
+        SimpleParserMetricsCollector.recordParsingStarted();
         parser(Parser.parseNumberOfPages(urlToDocument(url + WINE_CITY_PATH + city)), Parser.parseNumberOfPages(urlToDocument(url + SPARKLING_WINE_CITY_PATH + city)), city);
-        SimpleParserMetricsCollector.recordParsingCompleted(SUCCESS_MESSAGE, city);
+        SimpleParserMetricsCollector.recordParsingCompleted(SUCCESS_MESSAGE);
     }
 
     /**
@@ -182,7 +182,7 @@ public class ParserService {
         SimpleParserMetricsCollector.fetchDetailsWine(new Date().getTime() - winePageParseStart, city);
         if (wineDocument != null && wineDocument.getElementsByClass("product-page").first().children().first().className().equals("container")) {
             SimpleWine wine = Parser.parseWine(wineDocument, city);
-            wine.setCity(City.get(city));
+            wine.setCity(City.get(city).getRussianName());
             saveWineToDB(wine, dbHandler);
             ParserApi.Wine newProduct = wineMapper.toKafka(wine).build();
             if (!products.contains(newProduct)) {

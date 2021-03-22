@@ -117,8 +117,8 @@ public class Parser {
             ParserService.eventLogger.warn(W_WINE_DETAILS_PARSING_FAILED, wineDoc.baseUri());
         }
 
-        Elements productCharateristics = wineDoc.getElementsByClass("characteristics-params__item");
-        parseProductCharateristics(sw, productCharateristics);
+        Elements productCharacteristics = wineDoc.getElementsByClass("characteristics-params__item");
+        parseProductCharateristics(sw, productCharacteristics);
 
         Elements productDescriptions = wineDoc.getElementsByClass("characteristics-description__item");
         parseProductDescriptions(sw, productDescriptions);
@@ -198,7 +198,7 @@ public class Parser {
 
     private static void checkAbsentFields(Document wineDoc, SimpleWine wineRes) {
         for (Method m : wineRes.getClass().getMethods()) {
-            if (m.getName().startsWith("get") && m.getParameterTypes().length == 0 && !m.getName().endsWith("BrandID") && !m.getName().endsWith("CountryID")) {
+            if (m.getName().startsWith("get") && m.getParameterTypes().length == 0 && !m.getName().endsWith("BrandID") && !m.getName().endsWith("CountryID") && !m.getName().endsWith("City")) {
                 try {
                     if (m.invoke(wineRes) == null) {
                         String fieldName = m.getName().substring(3);

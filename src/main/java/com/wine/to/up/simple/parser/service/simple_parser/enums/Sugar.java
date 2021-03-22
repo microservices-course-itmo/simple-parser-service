@@ -14,7 +14,8 @@ public enum Sugar {
     DRY(ParserApi.Wine.Sugar.DRY, "сухое"),
     MEDIUM_DRY(ParserApi.Wine.Sugar.MEDIUM_DRY, "полусухое"),
     MEDIUM(ParserApi.Wine.Sugar.MEDIUM, "полусладкое"),
-    SWEET(ParserApi.Wine.Sugar.SWEET, "сладкое");
+    SWEET(ParserApi.Wine.Sugar.SWEET, "сладкое"),
+    UNDEFINED_SUGAR(ParserApi.Wine.Sugar.UNDEFINED_SUGAR, "нет информации");
 
     private final ParserApi.Wine.Sugar apiSugar;
     private final String sugarWine;
@@ -30,10 +31,10 @@ public enum Sugar {
     }
 
     public static ParserApi.Wine.Sugar getApiSugar(String sugar) {
-        return stringSugarMap.getOrDefault(sugar, DRY).apiSugar;
+        return stringSugarMap.getOrDefault(sugar, UNDEFINED_SUGAR).apiSugar;
     }
 
     public static String getStringSugar(ParserApi.Wine.Sugar apiSugar) {
-        return apiSugarMap.getOrDefault(apiSugar, DRY).sugarWine;
+        return apiSugarMap.getOrDefault(apiSugar, UNDEFINED_SUGAR).sugarWine;
     }
 }
