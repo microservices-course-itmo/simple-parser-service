@@ -60,7 +60,7 @@ public class Parser {
      * @param wineDoc Jsoup Document of wine
      * @return wine {@link SimpleWine}
      */
-    public static SimpleWine parseWine(Document wineDoc) {
+    public static SimpleWine parseWine(Document wineDoc, int city) {
         long wineParseStart = System.currentTimeMillis();
 
         float bottlePrice = 0;
@@ -124,7 +124,7 @@ public class Parser {
         parseProductDescriptions(sw, productDescriptions);
 
         log.debug("Wine parsing takes : {}", System.currentTimeMillis() - wineParseStart);
-        SimpleParserMetricsCollector.parseWineDetailsParsing(new Date().getTime() - wineParseStart);
+        SimpleParserMetricsCollector.parseWineDetailsParsing(new Date().getTime() - wineParseStart, city);
         SimpleWine wineRes = sw.link(wineDoc.baseUri()).discount(bottleDiscount).oldPrice(100 * bottlePrice / (100 - bottleDiscount))
                 .build();
         checkAbsentFields(wineDoc, wineRes);

@@ -79,7 +79,7 @@ public class ParserTest {
                 sparkling(false).
                 oldPrice((float) 1240.0).
                 build();
-        Assertions.assertEquals(testWine.toString(), Parser.parseWine(testWinePage).toString());
+        Assertions.assertEquals(testWine.toString(), Parser.parseWine(testWinePage, 1).toString());
     }
 
     /**
@@ -94,7 +94,7 @@ public class ParserTest {
         File testWinePageFile = new File("src/test/test-resources/Catalog_107_pages.html"); //catalog page instead of wine page
         Document testWinePage = Jsoup.parse(testWinePageFile, "UTF-8");
         Assertions.assertThrows(Exception.class, () ->
-                Parser.parseWine(testWinePage)
+                Parser.parseWine(testWinePage, 1)
         );
     }
 }
