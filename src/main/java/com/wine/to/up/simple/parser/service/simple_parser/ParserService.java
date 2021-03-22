@@ -139,16 +139,16 @@ public class ParserService {
      * Multithreading simplewine parser with a specified number of pages
      */
     public void startParser(int pagesToParse, int sparklingPagesToParse, int city) {
-        SimpleParserMetricsCollector.recordParsingStarted();
+        SimpleParserMetricsCollector.recordParsingStarted(city);
         if (pagesToParse <= Parser.parseNumberOfPages(urlToDocument(url + WINE_CITY_PATH + city))
                 && sparklingPagesToParse <= Parser.parseNumberOfPages(urlToDocument(url + SPARKLING_WINE_CITY_PATH + city)) &&
                 (sparklingPagesToParse > 0 || pagesToParse > 0)) {
             parser(pagesToParse, sparklingPagesToParse, city);
         } else {
             log.error("Set invalid number of pages: {}", pagesToParse);
-            SimpleParserMetricsCollector.recordParsingCompleted("FAILED");
+            SimpleParserMetricsCollector.recordParsingCompleted("FAILED", city);
         }
-        SimpleParserMetricsCollector.recordParsingCompleted(SUCCESS_MESSAGE);
+        SimpleParserMetricsCollector.recordParsingCompleted(SUCCESS_MESSAGE, city);
     }
 
     /**
@@ -163,9 +163,9 @@ public class ParserService {
     }
 
     public void startParser(int city) {
-        SimpleParserMetricsCollector.recordParsingStarted();
+        SimpleParserMetricsCollector.recordParsingStarted(city);
         parser(Parser.parseNumberOfPages(urlToDocument(url + WINE_CITY_PATH + city)), Parser.parseNumberOfPages(urlToDocument(url + SPARKLING_WINE_CITY_PATH + city)), city);
-        SimpleParserMetricsCollector.recordParsingCompleted(SUCCESS_MESSAGE);
+        SimpleParserMetricsCollector.recordParsingCompleted(SUCCESS_MESSAGE, city);
     }
 
     /**
