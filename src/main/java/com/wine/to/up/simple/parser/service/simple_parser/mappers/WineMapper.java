@@ -29,13 +29,6 @@ public class WineMapper {
             newWine.addAllGrapeSort(wine.getGrapeSort());
         }
 
-        //We wait when UNRECOGNIZED gets a numeric value.
-        if (wine.getSugar() != null && wine.getSugar() != ParserApi.Wine.Sugar.UNRECOGNIZED) {
-            newWine.setSugar(wine.getSugar());
-        }
-        if (wine.getColor() != null && wine.getColor() != ParserApi.Wine.Color.UNRECOGNIZED) {
-            newWine.setColor(wine.getColor());
-        }
         return newWine;
     }
 

@@ -3,6 +3,7 @@ package com.wine.to.up.simple.parser.service.simple_parser;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,6 +34,14 @@ class ParserIT {
     void testParseNumberOfPagesIntegration() throws IOException {
         Document testCatalogPage = Jsoup.connect(URL + "/catalog/vino/").get();
         int numberOfPages = Parser.parseNumberOfPages(testCatalogPage);
-        assertTrue(numberOfPages >= 0);
+        Assertions.assertTrue(numberOfPages >= 0);
+    }
+
+    @Test
+    void testInStock() {
+        Document testWinePage = ParserService.urlToDocument("https://simplewine.ru/catalog/product/two_hands_aerope_2013_075_1/"); //wine not in stock
+        Document testWinePage2 = ParserService.urlToDocument("https://simplewine.ru/catalog/product/frescobaldi_chianti_castiglioni_2019_075/"); //wine in stock
+        Assertions.assertTrue(testWinePage.is(":has(.js-offer-reservation-btn)") || testWinePage.is(":has(.product-buy__not-available)"));
+        Assertions.assertFalse(testWinePage2.is(":has(.js-offer-reservation-btn)") || testWinePage2.is(":has(.product-buy__not-available)"));
     }
 }

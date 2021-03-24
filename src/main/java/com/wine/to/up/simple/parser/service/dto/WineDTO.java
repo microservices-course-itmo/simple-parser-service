@@ -31,4 +31,5 @@ public class WineDTO {
     private String gastronomy;
     private String taste;
     private String city;
+    private Integer inStock;
 }

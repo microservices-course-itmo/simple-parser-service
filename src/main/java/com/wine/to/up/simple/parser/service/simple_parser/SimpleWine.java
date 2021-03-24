@@ -3,7 +3,6 @@ package com.wine.to.up.simple.parser.service.simple_parser;
 import com.wine.to.up.parser.common.api.schema.ParserApi;
 import com.wine.to.up.simple.parser.service.domain.entity.Brands;
 import com.wine.to.up.simple.parser.service.domain.entity.Countries;
-import com.wine.to.up.simple.parser.service.simple_parser.enums.City;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -32,8 +31,10 @@ public class SimpleWine {
     private Float capacity = 0.0f;
     @Builder.Default
     private Float strength = 0.0f; // alcohol by volume
-    private ParserApi.Wine.Color color;
-    private ParserApi.Wine.Sugar sugar;
+    @Builder.Default
+    private ParserApi.Wine.Color color = ParserApi.Wine.Color.UNDEFINED_COLOR;
+    @Builder.Default
+    private ParserApi.Wine.Sugar sugar = ParserApi.Wine.Sugar.UNDEFINED_SUGAR;
     private Integer year;
     private Float discount;
     private Float newPrice;
@@ -48,5 +49,7 @@ public class SimpleWine {
     private boolean sparkling;
     private String gastronomy;
     private String taste;
-    private City city;
+    private String city;
+    @Builder.Default
+    private Integer inStock = Integer.MAX_VALUE;
 }

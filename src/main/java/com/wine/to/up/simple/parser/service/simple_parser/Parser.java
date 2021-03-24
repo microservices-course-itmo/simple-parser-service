@@ -60,13 +60,17 @@ public class Parser {
      * @param wineDoc Jsoup Document of wine
      * @return wine {@link SimpleWine}
      */
-    public static SimpleWine parseWine(Document wineDoc) {
+    public static SimpleWine parseWine(Document wineDoc, int city) {
         long wineParseStart = System.currentTimeMillis();
 
         float bottlePrice = 0;
         float bottleDiscount = 0;
 
         SimpleWine.SimpleWineBuilder sw = SimpleWine.builder();
+
+        if (wineDoc.is(":has(.js-offer-reservation-btn)") || wineDoc.is(":has(.product-buy__not-available)")) { //"js-offer-reservation-btn" is a reservation button that is present only when wine is out of stock
+            sw.inStock(0);
+        }
 
         String header = wineDoc.select("h1").get(0).text();
         if (header.matches(".{0,}(Игристое|Шипучее|Шампанское).{0,}")) {
@@ -113,14 +117,14 @@ public class Parser {
             ParserService.eventLogger.warn(W_WINE_DETAILS_PARSING_FAILED, wineDoc.baseUri());
         }
 
-        Elements productCharateristics = wineDoc.getElementsByClass("characteristics-params__item");
-        parseProductCharateristics(sw, productCharateristics);
+        Elements productCharacteristics = wineDoc.getElementsByClass("characteristics-params__item");
+        parseProductCharateristics(sw, productCharacteristics);
 
         Elements productDescriptions = wineDoc.getElementsByClass("characteristics-description__item");
         parseProductDescriptions(sw, productDescriptions);
 
         log.debug("Wine parsing takes : {}", System.currentTimeMillis() - wineParseStart);
-        SimpleParserMetricsCollector.parseWineDetailsParsing(new Date().getTime() - wineParseStart);
+        SimpleParserMetricsCollector.parseWineDetailsParsing(new Date().getTime() - wineParseStart, city);
         SimpleWine wineRes = sw.link(wineDoc.baseUri()).discount(bottleDiscount).oldPrice(100 * bottlePrice / (100 - bottleDiscount))
                 .build();
         checkAbsentFields(wineDoc, wineRes);
@@ -194,7 +198,7 @@ public class Parser {
 
     private static void checkAbsentFields(Document wineDoc, SimpleWine wineRes) {
         for (Method m : wineRes.getClass().getMethods()) {
-            if (m.getName().startsWith("get") && m.getParameterTypes().length == 0 && !m.getName().endsWith("BrandID") && !m.getName().endsWith("CountryID")) {
+            if (m.getName().startsWith("get") && m.getParameterTypes().length == 0 && !m.getName().endsWith("BrandID") && !m.getName().endsWith("CountryID") && !m.getName().endsWith("City")) {
                 try {
                     if (m.invoke(wineRes) == null) {
                         String fieldName = m.getName().substring(3);
