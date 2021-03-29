@@ -54,11 +54,6 @@ public class SimpleParserMetricsCollector extends CommonMetricsCollector {
         micrometerTimeSinceLastSucceededParsingGauge.set(time);
     }
 
-    public static void recordParsingStarted() {
-        Metrics.counter(PARSING_STARTED_TOTAL).increment();
-        micrometerParsingInProgressGauge.incrementAndGet();
-    }
-
     public static void recordParsingStarted(int number) {
         Metrics.counter(PARSING_STARTED_TOTAL,"city", City.get(number).getRussianName()).increment();
         micrometerParsingInProgressGauge.incrementAndGet();
@@ -66,12 +61,6 @@ public class SimpleParserMetricsCollector extends CommonMetricsCollector {
 
     public static void recordParsingCompleted(String status, int number) {
         Metrics.counter(PARSING_COMPLETE_TOTAL, "status", status, "city", City.get(number).getRussianName()).increment();
-        micrometerParsingInProgressGauge.decrementAndGet();
-        timeSinceLastSucceededParse(System.currentTimeMillis());
-    }
-
-    public static void recordParsingCompleted(String status) {
-        Metrics.counter(PARSING_COMPLETE_TOTAL, "status", status).increment();
         micrometerParsingInProgressGauge.decrementAndGet();
         timeSinceLastSucceededParse(System.currentTimeMillis());
     }
