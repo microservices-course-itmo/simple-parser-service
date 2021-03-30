@@ -135,6 +135,9 @@ public class ParserService {
         SimpleParserMetricsCollector.parseProcess(System.currentTimeMillis() - start, city);
         log.info("End of parsing, {} wines collected and sent to Kafka", this.parsedWineCounter);
         SimpleParserMetricsCollector.recordParsingCompleted(SUCCESS_MESSAGE, city);
+        wineURLs.clear();
+        futures.clear();
+        products.clear();
     }
 
     /**
