@@ -69,7 +69,7 @@ public class ParserService {
             wineDoc = Jsoup.connect(someURL).maxBodySize(0).get();
             if (wineDoc.is(":has(.product-page)")) {
                 int rerequestNumber = 0;
-                while ((rerequestNumber < 3) && !wineDoc.getElementsByClass("product-page").first().children().first().className().equals("container")) {
+                while ((rerequestNumber < 3) && !wineDoc.getElementsByClass("product-page").first().children().get(1).className().equals("container")) {
                     log.debug("Doing re-request: {}", rerequestNumber);
                     wineDoc = Jsoup.connect(someURL).get();
                     rerequestNumber++;
@@ -179,7 +179,7 @@ public class ParserService {
         long winePageParseStart = System.currentTimeMillis();
         Document wineDocument = urlToDocument(url + wineURL);
         SimpleParserMetricsCollector.fetchDetailsWine(new Date().getTime() - winePageParseStart, city);
-        if (wineDocument != null && wineDocument.getElementsByClass("product-page").first().children().first().className().equals("container")) {
+        if (wineDocument != null && wineDocument.getElementsByClass("product-page").first().children().get(1).className().equals("container")) {
             SimpleWine wine = Parser.parseWine(wineDocument, city);
             wine.setCity(City.get(city).getRussianName());
             saveWineToDB(wine, dbHandler);
