@@ -2,6 +2,7 @@ package com.wine.to.up.simple.parser.service.simple_parser;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,5 +34,11 @@ class ParserServiceIT {
     void testURLConnection() throws IOException {
         Connection.Response res = Jsoup.connect(URL).followRedirects(false).execute();
         assertEquals(200, res.statusCode());
+    }
+
+    @Test
+    void testConnectionToPage() {
+        Document wineDocument = ParserService.urlToDocument("https://simplewine.ru/catalog/product/maison_francois_martenot_chemin_des_papes_cotes_du_rhone_rose_2018_075/");
+        assertTrue(wineDocument != null && wineDocument.getElementsByClass("product-page").first().children().get(1).className().equals("container"));
     }
 }
