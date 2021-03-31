@@ -146,8 +146,8 @@ public class Wine {
     private String city;
 
     /**
-     * Amount of wine in stock
+     * Wine in stock status
      */
     @Column(name = "inStock")
-    private Integer inStock;
+    private String inStock;
 }

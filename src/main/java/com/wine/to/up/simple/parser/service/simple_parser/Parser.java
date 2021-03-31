@@ -69,7 +69,7 @@ public class Parser {
         SimpleWine.SimpleWineBuilder sw = SimpleWine.builder();
 
         if (wineDoc.is(":has(.js-offer-reservation-btn)") || wineDoc.is(":has(.product-buy__not-available)")) { //"js-offer-reservation-btn" is a reservation button that is present only when wine is out of stock
-            sw.inStock(0);
+            sw.inStock("Нет в наличии");
         }
 
         String header = wineDoc.select("h1").get(0).text();

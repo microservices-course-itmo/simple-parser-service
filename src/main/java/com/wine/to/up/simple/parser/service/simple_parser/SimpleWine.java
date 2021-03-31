@@ -51,5 +51,5 @@ public class SimpleWine {
     private String taste;
     private String city;
     @Builder.Default
-    private Integer inStock = Integer.MAX_VALUE;
+    private String inStock = "Есть в наличии";
 }
